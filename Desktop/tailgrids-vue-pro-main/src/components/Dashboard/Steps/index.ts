@@ -1,0 +1,8 @@
+export { default as StepOne } from './StepOne.vue'
+export { default as StepTwo } from './StepTwo.vue'
+export { default as StepThree } from './StepThree.vue'
+export { default as StepFour } from './StepFour.vue'
+export { default as StepFive } from './StepFive.vue'
+export { default as StepSix } from './StepSix.vue'
+export { default as StepSeven } from './StepSeven.vue'
+export { default as StepEight } from './StepEight.vue'

@@ -1,0 +1,5 @@
+export { default as ProductCarouselOne } from './ProductCarouselOne.vue'
+export { default as ProductCarouselTwo } from './ProductCarouselTwo.vue'
+export { default as ProductCarouselThree } from './ProductCarouselThree.vue'
+export { default as ProductCarouselFour } from './ProductCarouselFour.vue'
+export { default as ProductCarouselFive } from './ProductCarouselFive.vue'

@@ -1,0 +1,116 @@
+<script setup lang="ts">
+import { ref } from 'vue';
+
+const selectedSort = ref('latest');
+
+const products = ref([
+  {
+    id: 1,
+    name: 'Apple Macbook M1 16\'\' 2022',
+    description: '1TB SSD, 16GB Ram',
+    image: 'https://cdn.tailgrids.com/2.0/image/dashboard/images/prodcuts-list/image-01.jpg',
+    status: 'Shipped',
+    price: '$2999',
+  },
+  {
+    id: 2,
+    name: 'Apple Watch Series 7',
+    description: '50m water resistant',
+    image: 'https://cdn.tailgrids.com/2.0/image/dashboard/images/prodcuts-list/image-02.jpg',
+    status: 'Processing',
+    price: '$400',
+  },
+  {
+    id: 3,
+    name: 'Google Pixel 5',
+    description: '8GB Ram 256GB Rom',
+    image: 'https://cdn.tailgrids.com/2.0/image/dashboard/images/prodcuts-list/image-03.jpg',
+    status: 'Shipped',
+    price: '$800',
+  },
+]);
+</script>
+
+<template>
+  <!-- ====== Products List Start -->
+  <section class="relative z-10 overflow-hidden bg-white dark:bg-dark py-20 lg:py-[100px]">
+    <div class="container mx-auto">
+      <div class="mx-auto w-full max-w-[770px]">
+        <div class="justify-between sm:flex">
+          <h3 class="mb-8 text-2xl font-semibold text-dark dark:text-white md:leading-[40px] md:text-[28px]">
+            Products List
+          </h3>
+          <div class="mb-8">
+            <div class="flex items-center sm:justify-end">
+              <label for="sorting" class="mr-4 text-base font-medium text-dark dark:text-white">
+                Filter by:
+              </label>
+              <div class="relative z-20 bg-white dark:bg-dark-2">
+                <select
+                  v-model="selectedSort"
+                  name="sorting"
+                  id="sorting"
+                  class="relative z-20 inline-block appearance-none text-base font-medium text-dark dark:text-white rounded-md border border-stroke dark:border-dark-3 bg-transparent py-2 pl-5 pr-12 outline-none"
+                >
+                  <option value="latest" class="dark:bg-dark-2">Latest</option>
+                  <option value="oldest" class="dark:bg-dark-2">Oldest</option>
+                </select>
+                <span class="absolute right-5 top-1/2 z-10 -translate-y-1/2 text-body-color dark:text-dark-6">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="fill-current stroke-current"
+                  >
+                    <path
+                      d="M2.41428 5.03569L2.41426 5.03571L2.41708 5.03846L7.76708 10.2635L8.00109 10.492L8.23401 10.2623L13.584 4.98735L13.584 4.98735L13.5857 4.98569C13.6805 4.89086 13.8195 4.89087 13.9143 4.98569C14.0088 5.08024 14.0091 5.21864 13.9151 5.31345C13.9148 5.31373 13.9146 5.31401 13.9143 5.31429L8.16635 10.9622L8.16634 10.9622L8.16428 10.9643C8.06797 11.0606 8.02311 11.0667 7.99998 11.0667C7.94106 11.0667 7.89001 11.0522 7.82023 10.9991L2.08485 5.36345C1.99086 5.26865 1.99113 5.13024 2.08568 5.03569C2.18051 4.94086 2.31945 4.94086 2.41428 5.03569Z"
+                      stroke-width="0.666667"
+                    />
+                  </svg>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="w-full overflow-x-auto border border-stroke dark:border-dark-3 bg-white dark:bg-dark-2 py-[15px] shadow-1 dark:shadow-box-dark"
+        >
+          <table class="table w-full">
+            <tbody>
+              <tr v-for="product in products" :key="product.id">
+                <td class="min-w-[375px] py-[15px] pl-[30px] pr-3">
+                  <div class="flex items-center">
+                    <div class="mr-5 h-[70px] w-full max-w-[70px] rounded-[5px] overflow-hidden">
+                      <img :src="product.image" :alt="product.name" />
+                    </div>
+                    <div>
+                      <h3 class="text-lg font-semibold text-dark dark:text-white">{{ product.name }}</h3>
+                      <p class="text-base text-body-color dark:text-dark-6">{{ product.description }}</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="min-w-[130px] py-[18px]">
+                  <span
+                    :class="{
+                      'bg-green-light-6 text-green': product.status === 'Shipped',
+                      'bg-yellow-light-4 text-yellow-dark-2': product.status === 'Processing'
+                    }"
+                    class="inline-block rounded-full py-[3px] px-[10px] text-sm font-medium "
+                  >
+                    {{ product.status }}
+                  </span>
+                </td>
+                <td class="min-w-[150px] py-[18px] pr-[30px] text-right">
+                  <p class="text-lg font-semibold text-dark dark:text-white">{{ product.price }}</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- ====== Products List End -->
+</template>

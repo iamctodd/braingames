@@ -1,0 +1,5 @@
+export { default as CheckBoxOne } from './CheckBoxOne.vue'
+export { default as CheckBoxTwo } from './CheckBoxTwo.vue'
+export { default as CheckBoxThree } from './CheckBoxThree.vue'
+export { default as CheckBoxFour } from './CheckBoxFour.vue'
+export { default as CheckBoxFive } from './CheckBoxFive.vue'

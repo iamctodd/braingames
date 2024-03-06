@@ -1,0 +1,7 @@
+export { default as FooterOne } from './FooterOne.vue'
+export { default as FooterTwo } from './FooterTwo.vue'
+export { default as FooterThree } from './FooterThree.vue'
+export { default as FooterFour } from './FooterFour.vue'
+export { default as FooterFive } from './FooterFive.vue'
+export { default as FooterSix } from './FooterSix.vue'
+export { default as FooterSeven } from './FooterSeven.vue'

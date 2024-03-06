@@ -1,0 +1,36 @@
+<template>
+  <!-- ====== CTA Section Start -->
+  <section
+    class="relative z-10 bg-cover bg-no-repeat py-20 lg:py-[100px] xl:py-[120px]"
+    style="background-image: url(https://cdn.tailgrids.com/2.0/image/marketing/images/cta/cta.jpg)"
+  >
+    <span class="absolute left-0 top-0 -z-10 h-full w-full bg-black/80"></span>
+    <div class="container">
+      <div class="mx-auto max-w-[575px] text-center">
+        <h4
+          class="mb-3 text-lg font-medium text-white sm:text-2xl"
+          style="text-shadow: 0px 0px 1px rgba(0, 0, 0, 0.2)"
+        >
+          Extra 30% Off Online
+        </h4>
+        <h2
+          class="mb-4 text-3xl font-bold text-white sm:text-4xl md:leading-[1.2] md:text-[48px]"
+          style="text-shadow: 0px 0px 1px rgba(0, 0, 0, 0.2)"
+        >
+          Summer Season Sale
+        </h2>
+        <p class="text-base text-white" style="text-shadow: 0px 0px 1px rgba(0, 0, 0, 0.2)">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas vel dolor pellentesque,
+          varius elit quis, malesuada quam.
+        </p>
+        <a
+          href="category.html"
+          class="mt-8 inline-flex rounded bg-primary px-8 py-3 font-semibold text-white hover:bg-opacity-90"
+        >
+          Shop Now
+        </a>
+      </div>
+    </div>
+  </section>
+  <!-- ====== CTA Section End -->
+</template>

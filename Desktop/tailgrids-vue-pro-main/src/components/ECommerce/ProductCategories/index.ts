@@ -1,0 +1,5 @@
+export { default as ProductCategoryOne } from './ProductCategoryOne.vue'
+export { default as ProductCategoryTwo } from './ProductCategoryTwo.vue'
+export { default as ProductCategoryThree } from './ProductCategoryThree.vue'
+export { default as ProductCategoryFour } from './ProductCategoryFour.vue'
+export { default as ProductCategoryFive } from './ProductCategoryFive.vue'

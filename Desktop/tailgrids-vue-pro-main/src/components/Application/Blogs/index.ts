@@ -1,0 +1,7 @@
+export { default as BlogOne } from './BlogOne.vue'
+export { default as BlogTwo } from './BlogTwo.vue'
+export { default as BlogThree } from './BlogThree.vue'
+export { default as BlogFour } from './BlogFour.vue'
+export { default as BlogFive } from './BlogFive.vue'
+export { default as BlogDetailsOne } from './BlogDetailsOne.vue'
+export { default as BlogDetailsTwo } from './BlogDetailsTwo.vue'

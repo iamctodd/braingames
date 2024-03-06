@@ -1,0 +1,8 @@
+export { default as TeamOne } from './TeamOne.vue'
+export { default as TeamTwo } from './TeamTwo.vue'
+export { default as TeamThree } from './TeamThree.vue'
+export { default as TeamFour } from './TeamFour.vue'
+export { default as TeamFive } from './TeamFive.vue'
+export { default as TeamSix } from './TeamSix.vue'
+export { default as TeamSeven } from './TeamSeven.vue'
+export { default as TeamEight } from './TeamEight.vue'

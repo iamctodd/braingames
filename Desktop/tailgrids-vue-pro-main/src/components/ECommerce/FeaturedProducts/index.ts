@@ -1,0 +1,5 @@
+export { default as FeaturedProductOne } from './FeaturedProductOne.vue'
+export { default as FeaturedProductTwo } from './FeaturedProductTwo.vue'
+export { default as FeaturedProductThree } from './FeaturedProductThree.vue'
+export { default as FeaturedProductFour } from './FeaturedProductFour.vue'
+export { default as FeaturedProductFive } from './FeaturedProductFive.vue'

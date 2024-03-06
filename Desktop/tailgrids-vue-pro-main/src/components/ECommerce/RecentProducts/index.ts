@@ -1,0 +1,5 @@
+export { default as RecentProductOne } from './RecentProductOne.vue'
+export { default as RecentProductTwo } from './RecentProductTwo.vue'
+export { default as RecentProductThree } from './RecentProductThree.vue'
+export { default as RecentProductFour } from './RecentProductFour.vue'
+export { default as RecentProductFive } from './RecentProductFive.vue'
