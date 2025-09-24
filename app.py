@@ -155,6 +155,35 @@ def manual_login():
         return redirect('/dashboard')
     else:
         return redirect('/signin?error=invalid')
+@app.route('/games/problem-solving-simple')
+def problem_solving_simple():
+    return '''
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Problem Solving - Simple</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-2xl mx-auto">
+        <h1 class="text-2xl font-bold mb-4">Problem Solving Test</h1>
+        <button id="test-btn" class="bg-blue-600 text-white px-4 py-2 rounded">
+            Click Me
+        </button>
+        <div id="result" class="mt-4"></div>
+    </div>
+    
+    <script>
+        console.log('Simple page JavaScript loaded');
+        document.getElementById('test-btn').addEventListener('click', function() {
+            console.log('Button clicked!');
+            alert('Button works!');
+            document.getElementById('result').innerHTML = '<p class="text-green-600">Success!</p>';
+        });
+    </script>
+</body>
+</html>
+    '''
 
 if __name__ == '__main__':
     app.run(debug=True)
