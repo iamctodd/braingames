@@ -390,6 +390,7 @@ class ProblemSolvingGame {
                 const userId = this.currentUser.uid || btoa(this.currentUser.email).substring(0, 10);
                 
                 console.log('Attempting to save game data...');
+                // Use local saveGameData function
                 const saved = await saveGameData('/api/games/problem-solving/response', {
                     case_id: caseNumber,
                     response: responses,
@@ -399,13 +400,11 @@ class ProblemSolvingGame {
                 
                 localStorage.setItem(`cases_completed_${userId}`, this.completedCases.toString());
                 
-                // Add activity
-                if (typeof addActivity === 'function') {
-                    const caseNames = ['Daily Operations', 'Group Problem-Solving', 'Communication Challenge'];
-                    const caseName = caseNames[parseInt(caseNumber) - 1] || 'Case Study';
-                    addActivity(userId, 'problem-solving', 'Problem Solving', `Completed "${caseName}" case study`);
-                    console.log('Activity added');
-                }
+                // Add activity using local function
+                const caseNames = ['Daily Operations', 'Group Problem-Solving', 'Communication Challenge'];
+                const caseName = caseNames[parseInt(caseNumber) - 1] || 'Case Study';
+                addActivity(userId, 'problem-solving', 'Problem Solving', `Completed "${caseName}" case study`);
+                console.log('Activity added');
             }
             
             this.showNotification('Case submitted successfully!', 'success');
