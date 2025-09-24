@@ -82,7 +82,7 @@
         </div>
     </footer>
 
-    <!-- Auth Modal -->
+<!-- Auth Modal -->
     <div id="auth-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
         <div class="flex items-center justify-center min-h-screen p-4">
             <div class="bg-white rounded-lg max-w-md w-full p-6">
@@ -107,11 +107,28 @@
                         Continue with Google
                     </button>
                     
-                    <!-- Passwordless Email -->
+                    <!-- Email/Password Authentication -->
                     <div class="relative">
-                        <!-- ... old magic link code ... -->
-                        <button id="email-signin" class="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            Send Magic Link
+                        <div class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-gray-300"></div>
+                        </div>
+                        <div class="relative flex justify-center text-sm">
+                            <span class="px-2 bg-white text-gray-500">or</span>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <input type="email" id="email-input" placeholder="Enter your email" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <input type="password" id="password-input" placeholder="Create a password (6+ characters)" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button id="email-signup" class="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            Sign Up
+                        </button>
+                        <button id="email-signin" class="w-full bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                            Sign In
                         </button>
                     </div>
                 </div>
@@ -176,6 +193,37 @@ if (window.auth) {
 } else {
     console.log('❌ Firebase Auth failed to initialize');
 }
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('=== AUTH DEBUG ===');
+    
+    // Check if buttons exist
+    const signupBtn = document.getElementById('email-signup');
+    const signinBtn = document.getElementById('email-signin');
+    console.log('Sign up button found:', !!signupBtn);
+    console.log('Sign in button found:', !!signinBtn);
+    
+    // Check if functions exist
+    console.log('signUpWithEmail function exists:', typeof signUpWithEmail === 'function');
+    console.log('signInWithEmail function exists:', typeof signInWithEmail === 'function');
+    console.log('Firebase createUser function exists:', !!window.createUserWithEmailAndPassword);
+    
+    // Test button clicks
+    if (signupBtn) {
+        signupBtn.addEventListener('click', function() {
+            console.log('Sign up button clicked!');
+            alert('Sign up button works!');
+        });
+    }
+    
+    if (signinBtn) {
+        signinBtn.addEventListener('click', function() {
+            console.log('Sign in button clicked!');
+            alert('Sign in button works!');
+        });
+    }
+});
 </script>
 </body>
 </html>

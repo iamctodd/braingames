@@ -22,7 +22,10 @@ document.addEventListener('DOMContentLoaded', function () {
   }); // Set up event listeners
 
   setupEventListeners();
-});
+}); // Email Sign-up and Sign-in
+
+document.getElementById('email-signup').addEventListener('click', signUpWithEmail);
+document.getElementById('email-signin').addEventListener('click', signInWithEmail);
 
 function setupEventListeners() {
   // Modal controls

@@ -26,6 +26,10 @@ document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
 });
 
+// Email Sign-up and Sign-in
+document.getElementById('email-signup').addEventListener('click', signUpWithEmail);
+document.getElementById('email-signin').addEventListener('click', signInWithEmail);
+
 function setupEventListeners() {
     // Modal controls
     closeAuthModal.addEventListener('click', closeModal);
