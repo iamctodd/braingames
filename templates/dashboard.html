@@ -94,63 +94,52 @@
 
 <!-- Auth Protection -->
 <script>
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     console.log('=== DASHBOARD AUTH DEBUG ===');
     
-    // Force auth state check
-    if (window.auth && window.onAuthStateChanged) {
-        window.onAuthStateChanged(window.auth, (user) => {
-            console.log('Auth state on dashboard:', !!user);
-            if (!user) {
-                console.log('No user, redirecting to home');
-                window.location.href = '/';
-            } else {
-                console.log('User found:', user.email);
-                loadDashboardData(user);
-                
-                // Force nav update
-                if (typeof updateNavAuth === 'function') {
-                    console.log('Calling updateNavAuth');
-                    updateNavAuth(user);
-                } else {
-                    console.log('updateNavAuth function not found');
-                }
+    try {
+        // Check Flask session first
+        const response = await fetch('/api/auth/user');
+        const data = await response.json();
+        
+        if (data.user) {
+            console.log('Flask session user found:', data.user.email);
+            // User is authenticated via Flask session
+            loadDashboardData(data.user);
+            
+            // Update nav with Flask user
+            if (typeof updateNavAuth === 'function') {
+                updateNavAuth(data.user);
             }
-        });
-    } else {
-        console.log('Firebase auth not ready');
-        setTimeout(() => {
-            if (window.auth && window.onAuthStateChanged) {
-                window.onAuthStateChanged(window.auth, (user) => {
-                    if (!user) {
-                        window.location.href = '/';
-                    } else {
-                        loadDashboardData(user);
-                        if (typeof updateNavAuth === 'function') {
-                            updateNavAuth(user);
-                        }
-                    }
-                });
-            }
-        }, 1000);
+        } else {
+            console.log('No Flask session user, redirecting to signin');
+            window.location.href = '/signin';
+        }
+        
+    } catch (error) {
+        console.error('Error checking auth:', error);
+        // On error, redirect to signin
+        window.location.href = '/signin';
     }
 });
 
 async function loadDashboardData(user) {
     try {
+        // Use uid if available (Firebase format), otherwise create from email (Flask format)
+        const userId = user.uid || btoa(user.email).substring(0, 10); // Convert email to consistent ID
+        
         // Load user's game statistics
-        // In production, these would come from your database
         const stats = {
-            memoryBestScore: localStorage.getItem(`memory_best_${user.uid}`) || 0,
-            problemSolvingCompleted: localStorage.getItem(`cases_completed_${user.uid}`) || 0,
-            tbiMemoryLevel: localStorage.getItem(`tbi_level_${user.uid}`) || 1,
-            totalGamesPlayed: getTotalGamesPlayed(user.uid),
-            totalTimePlayed: getTotalTimePlayed(user.uid),
-            streakDays: getStreakDays(user.uid)
+            memoryBestScore: localStorage.getItem(`memory_best_${userId}`) || 0,
+            problemSolvingCompleted: localStorage.getItem(`cases_completed_${userId}`) || 0,
+            tbiMemoryLevel: localStorage.getItem(`tbi_level_${userId}`) || 1,
+            totalGamesPlayed: getTotalGamesPlayed(userId),
+            totalTimePlayed: getTotalTimePlayed(userId),
+            streakDays: getStreakDays(userId)
         };
         
         updateDashboardStats(stats);
-        loadRecentActivity(user.uid);
+        loadRecentActivity(userId);
     } catch (error) {
         console.error('Error loading dashboard data:', error);
     }
