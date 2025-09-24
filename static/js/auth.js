@@ -12,10 +12,6 @@ const loadingSpinner = document.getElementById('loading-spinner');
 
 // Initialize auth state
 document.addEventListener('DOMContentLoaded', () => {
-    // Check for email link sign-in
-    if (window.isSignInWithEmailLink && window.isSignInWithEmailLink(window.auth, window.location.href)) {
-        handleEmailLinkSignIn();
-    }
 
     // Listen for auth state changes
     window.onAuthStateChanged(window.auth, (user) => {
@@ -40,11 +36,6 @@ function setupEventListeners() {
     // Google Sign-in
     googleSigninBtn.addEventListener('click', signInWithGoogle);
 
-    // Email Sign-in
-    emailSigninBtn.addEventListener('click', sendEmailLink);
-    emailInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') sendEmailLink();
-    });
 }
 
 function showModal() {
@@ -91,10 +82,7 @@ async function sendEmailLink() {
         const actionCodeSettings = {
             url: window.location.origin + '/dashboard',
             handleCodeInApp: true,
-        };
-
-        await window.sendSignInLinkToEmail(window.auth, email, actionCodeSettings);
-        
+        };        
         // Save email for later use
         localStorage.setItem('emailForSignIn', email);
         
