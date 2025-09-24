@@ -95,14 +95,45 @@
 <!-- Auth Protection -->
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // Check if user is authenticated
-    window.onAuthStateChanged(window.auth, (user) => {
-        if (!user) {
-            window.location.href = '/';
-        } else {
-            loadDashboardData(user);
-        }
-    });
+    console.log('=== DASHBOARD AUTH DEBUG ===');
+    
+    // Force auth state check
+    if (window.auth && window.onAuthStateChanged) {
+        window.onAuthStateChanged(window.auth, (user) => {
+            console.log('Auth state on dashboard:', !!user);
+            if (!user) {
+                console.log('No user, redirecting to home');
+                window.location.href = '/';
+            } else {
+                console.log('User found:', user.email);
+                loadDashboardData(user);
+                
+                // Force nav update
+                if (typeof updateNavAuth === 'function') {
+                    console.log('Calling updateNavAuth');
+                    updateNavAuth(user);
+                } else {
+                    console.log('updateNavAuth function not found');
+                }
+            }
+        });
+    } else {
+        console.log('Firebase auth not ready');
+        setTimeout(() => {
+            if (window.auth && window.onAuthStateChanged) {
+                window.onAuthStateChanged(window.auth, (user) => {
+                    if (!user) {
+                        window.location.href = '/';
+                    } else {
+                        loadDashboardData(user);
+                        if (typeof updateNavAuth === 'function') {
+                            updateNavAuth(user);
+                        }
+                    }
+                });
+            }
+        }, 1000);
+    }
 });
 
 async function loadDashboardData(user) {
