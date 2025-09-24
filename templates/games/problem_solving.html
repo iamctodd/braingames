@@ -540,6 +540,7 @@ function getActivityIcon(type) {
 <script>
 class ProblemSolvingGame {
     constructor() {
+        console.log('ProblemSolvingGame constructor called');
         this.currentCase = 1;
         this.totalCases = 3;
         this.completedCases = 0;
@@ -549,18 +550,49 @@ class ProblemSolvingGame {
         this.currentUser = null;
         this.responses = {};
         
-        this.setupEventListeners();
+        // Check auth first, then set up listeners
+        this.checkAuth();
+    }
+    
+    async checkAuth() {
+        try {
+            const response = await fetch('/api/auth/user');
+            const data = await response.json();
+            
+            if (data.user) {
+                this.currentUser = data.user;
+                this.loadProgress();
+                this.setupEventListeners();
+                console.log('Auth successful, event listeners set up');
+            } else {
+                window.location.href = '/signin';
+            }
+        } catch (error) {
+            console.error('Auth check error:', error);
+            window.location.href = '/signin';
+        }
     }
     
     setupEventListeners() {
-        document.getElementById('start-cases').addEventListener('click', () => this.startCases());
+        const startBtn = document.getElementById('start-cases');
+        if (startBtn) {
+            startBtn.addEventListener('click', () => this.startCases());
+        }
         
         document.querySelectorAll('.submit-case').forEach(button => {
             button.addEventListener('click', (e) => this.submitCase(e.target.dataset.case));
         });
         
-        document.getElementById('review-responses').addEventListener('click', () => this.reviewResponses());
-        document.getElementById('try-again').addEventListener('click', () => this.restart());
+        const reviewBtn = document.getElementById('review-responses');
+        if (reviewBtn) {
+            reviewBtn.addEventListener('click', () => this.reviewResponses());
+        }
+        
+        const tryAgainBtn = document.getElementById('try-again');
+        if (tryAgainBtn) {
+            tryAgainBtn.addEventListener('click', () => this.restart());
+        }
+    }
         
         // Auth state listener - check Flask session
         const checkAuth = async () => {
@@ -581,6 +613,18 @@ class ProblemSolvingGame {
         };
         
         checkAuth();
+    }
+    
+    startCases() {
+        console.log('startCases called');
+        this.startTime = Date.now();
+        this.startTimer();
+        
+        document.getElementById('instructions').classList.add('hidden');
+        document.getElementById('case-studies').classList.remove('hidden');
+        
+        this.showCase(1);
+        this.updateDisplay();
     }
     
     loadProgress() {
