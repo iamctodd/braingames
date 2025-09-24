@@ -245,6 +245,299 @@
 </div>
 
 <script>
+// Define helper functions first, outside the class
+async function saveGameData(endpoint, data) {
+    try {
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        });
+        
+        return response.ok;
+    } catch (error) {
+        console.error('Save game data error:', error);
+        return false;
+    }
+}
+
+function addActivity(userId, type, title, description) {
+    const activities = JSON.parse(localStorage.getItem(`activities_${userId}`) || '[]');
+    const newActivity = {
+        icon: getActivityIcon(type),
+        title: title,
+        description: description,
+        time: 'Just now',
+        type: type,
+        timestamp: Date.now()
+    };
+    
+    // Add to beginning of array
+    activities.unshift(newActivity);
+    
+    // Keep only last 10 activities
+    const recentActivities = activities.slice(0, 10);
+    
+    localStorage.setItem(`activities_${userId}`, JSON.stringify(recentActivities));
+}
+
+function getActivityIcon(type) {
+    const icons = {
+        'memory': '🧩',
+        'problem-solving': '💡',
+        'tbi-memory': '🎯',
+        'achievement': '🏆',
+        'progress': '📈',
+        'game': '🎮',
+        'case': '📝',
+        'exercise': '🔄'
+    };
+    return icons[type] || '🎯';
+}
+<div class="max-w-4xl mx-auto space-y-6">
+    <!-- Game Header -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="flex items-center justify-between mb-4">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">Problem Solving Practice</h1>
+                <p class="text-gray-600">Real situations • Simple solutions • 20 minutes total</p>
+            </div>
+            <a href="/dashboard" class="text-blue-600 hover:text-blue-700">← Back to Dashboard</a>
+        </div>
+        
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="text-center">
+                <div class="text-2xl font-bold text-green-600" id="cases-completed">0</div>
+                <div class="text-sm text-gray-600">Completed</div>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-blue-600" id="total-cases">3</div>
+                <div class="text-sm text-gray-600">Total Cases</div>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-purple-600" id="time-remaining">20:00</div>
+                <div class="text-sm text-gray-600">Time Left</div>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-orange-600" id="current-case">1</div>
+                <div class="text-sm text-gray-600">Current</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Instructions -->
+    <div id="instructions" class="bg-blue-50 rounded-lg p-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">Instructions</h2>
+        <p class="text-gray-700 mb-4">Read each case below, then click "Respond to This Case" to share your thoughts. Complete them one at a time!</p>
+        <ol class="list-decimal list-inside space-y-2 text-gray-700 mb-6">
+            <li><strong>Listen:</strong> What's really bothering people?</li>
+            <li><strong>Ask:</strong> What would make this better?</li>
+            <li><strong>Try:</strong> Start with the simplest solution</li>
+            <li><strong>Check:</strong> Is it working? If not, try something else!</li>
+        </ol>
+        <button id="start-cases" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+            Start Problem Solving
+        </button>
+    </div>
+
+    <!-- Case Studies -->
+    <div id="case-studies" class="space-y-6 hidden">
+        <!-- Case 1: Daily Operations -->
+        <div class="case-card bg-white rounded-lg shadow-md p-6" data-case="1">
+            <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-green-100 rounded-full p-2">
+                        <span class="text-green-600 font-bold">1</span>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900">Daily Operations</h3>
+                        <span class="text-sm text-gray-500">5 minutes</span>
+                    </div>
+                </div>
+                <div class="case-status bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">
+                    In Progress
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <p class="text-gray-700 mb-4">
+                    Betty runs a small bakery. Every morning she runs out of popular items too early, 
+                    but has leftover pastries at closing time.
+                </p>
+                
+                <div class="space-y-3 mb-4">
+                    <div class="bg-gray-50 p-3 rounded-lg">
+                        <strong class="text-gray-900">1. What's the main problem here?</strong>
+                        <textarea class="w-full mt-2 p-2 border rounded-md resize-none" rows="2" 
+                                  data-question="1" placeholder="Your thoughts..."></textarea>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-lg">
+                        <strong class="text-gray-900">2. What simple solution would you try first?</strong>
+                        <textarea class="w-full mt-2 p-2 border rounded-md resize-none" rows="2" 
+                                  data-question="2" placeholder="Your solution..."></textarea>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-lg">
+                        <strong class="text-gray-900">3. How could Betty learn what customers really want?</strong>
+                        <textarea class="w-full mt-2 p-2 border rounded-md resize-none" rows="2" 
+                                  data-question="3" placeholder="Your approach..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="bg-blue-50 p-3 rounded-lg mb-4">
+                    <p class="text-blue-700"><strong>💡 Think like a customer</strong> - what would make you happy?</p>
+                </div>
+            </div>
+            
+            <button class="submit-case bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700" 
+                    data-case="1">
+                Submit Response
+            </button>
+        </div>
+
+        <!-- Case 2: Group Problem-Solving -->
+        <div class="case-card bg-white rounded-lg shadow-md p-6 hidden" data-case="2">
+            <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-green-100 rounded-full p-2">
+                        <span class="text-green-600 font-bold">2</span>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900">Group Problem-Solving</h3>
+                        <span class="text-sm text-gray-500">5 minutes</span>
+                    </div>
+                </div>
+                <div class="case-status bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs">
+                    Locked
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <p class="text-gray-700 mb-4">
+                    The local community garden has 20 plots, but only 8 people are actively gardening. 
+                    The unused plots are becoming weedy and attracting complaints.
+                </p>
+                
+                <div class="space-y-3 mb-4">
+                    <div class="bg-gray-50 p-3 rounded-lg">
+                        <strong class="text-gray-900">1. Why aren't all plots being used?</strong>
+                        <textarea class="w-full mt-2 p-2 border rounded-md resize-none" rows="2" 
+                                  data-question="1" placeholder="Your analysis..."></textarea>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-lg">
+                        <strong class="text-gray-900">2. What's a simple way to get more people involved?</strong>
+                        <textarea class="w-full mt-2 p-2 border rounded-md resize-none" rows="2" 
+                                  data-question="2" placeholder="Your solution..."></textarea>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-lg">
+                        <strong class="text-gray-900">3. How could the group make this decision together?</strong>
+                        <textarea class="w-full mt-2 p-2 border rounded-md resize-none" rows="2" 
+                                  data-question="3" placeholder="Your process..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="bg-blue-50 p-3 rounded-lg mb-4">
+                    <p class="text-blue-700"><strong>💡 Sometimes the simplest solutions work best!</strong></p>
+                </div>
+            </div>
+            
+            <button class="submit-case bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700" 
+                    data-case="2">
+                Submit Response
+            </button>
+        </div>
+
+        <!-- Case 3: Communication Challenge -->
+        <div class="case-card bg-white rounded-lg shadow-md p-6 hidden" data-case="3">
+            <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-green-100 rounded-full p-2">
+                        <span class="text-green-600 font-bold">3</span>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900">Communication Challenge</h3>
+                        <span class="text-sm text-gray-500">5 minutes</span>
+                    </div>
+                </div>
+                <div class="case-status bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs">
+                    Locked
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <p class="text-gray-700 mb-4">
+                    The library book club used to have 15 regular members. Now only 5 people come to meetings. 
+                    Members say they don't like the current book choices.
+                </p>
+                
+                <div class="space-y-3 mb-4">
+                    <div class="bg-gray-50 p-3 rounded-lg">
+                        <strong class="text-gray-900">1. What's really causing people to stop coming?</strong>
+                        <textarea class="w-full mt-2 p-2 border rounded-md resize-none" rows="2" 
+                                  data-question="1" placeholder="Your analysis..."></textarea>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-lg">
+                        <strong class="text-gray-900">2. How could everyone have a say in book choices?</strong>
+                        <textarea class="w-full mt-2 p-2 border rounded-md resize-none" rows="2" 
+                                  data-question="2" placeholder="Your solution..."></textarea>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-lg">
+                        <strong class="text-gray-900">3. What would bring people back?</strong>
+                        <textarea class="w-full mt-2 p-2 border rounded-md resize-none" rows="2" 
+                                  data-question="3" placeholder="Your approach..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="bg-blue-50 p-3 rounded-lg mb-4">
+                    <p class="text-blue-700"><strong>💡 Listen first, then find solutions everyone can agree on.</strong></p>
+                </div>
+            </div>
+            
+            <button class="submit-case bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700" 
+                    data-case="3">
+                Submit Response
+            </button>
+        </div>
+    </div>
+
+    <!-- Completion Screen -->
+    <div id="completion-screen" class="bg-white rounded-lg shadow-md p-8 text-center hidden">
+        <div class="text-5xl mb-4">🎉</div>
+        <h2 class="text-2xl font-bold text-gray-900 mb-4">Great Job!</h2>
+        <p class="text-gray-600 mb-6">
+            You've completed all case studies. Your problem-solving approach shows thoughtful consideration 
+            of different perspectives and practical solutions.
+        </p>
+        
+        <div class="bg-gray-50 rounded-lg p-6 mb-6">
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <div class="text-2xl font-bold text-green-600" id="final-completed">3</div>
+                    <div class="text-sm text-gray-600">Cases Completed</div>
+                </div>
+                <div>
+                    <div class="text-2xl font-bold text-blue-600" id="final-time">15:30</div>
+                    <div class="text-sm text-gray-600">Time Used</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="space-x-4">
+            <button id="review-responses" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                Review Responses
+            </button>
+            <button id="try-again" class="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700">
+                Try Again
+            </button>
+            <a href="/dashboard" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 inline-block">
+                Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
 class ProblemSolvingGame {
     constructor() {
         this.currentCase = 1;
@@ -385,48 +678,27 @@ class ProblemSolvingGame {
             
             this.completedCases++;
             
-            // Save progress
-            if (this.currentUser) {
-                const userId = this.currentUser.uid || btoa(this.currentUser.email).substring(0, 10);
-                
-                console.log('Attempting to save game data...');
-                // Use local saveGameData function
-                const saved = await saveGameData('/api/games/problem-solving/response', {
-                    case_id: caseNumber,
-                    response: responses,
-                    completed_count: this.completedCases
-                });
-                console.log('Game data saved:', saved);
-                
-                localStorage.setItem(`cases_completed_${userId}`, this.completedCases.toString());
-                
-                // Add activity using local function
-                const caseNames = ['Daily Operations', 'Group Problem-Solving', 'Communication Challenge'];
-                const caseName = caseNames[parseInt(caseNumber) - 1] || 'Case Study';
-                addActivity(userId, 'problem-solving', 'Problem Solving', `Completed "${caseName}" case study`);
-                console.log('Activity added');
-            }
-            
-            this.showNotification('Case submitted successfully!', 'success');
-            
-            // Show next case or complete
-            if (this.completedCases < this.totalCases) {
-                setTimeout(() => {
-                    this.showCase(parseInt(caseNumber) + 1);
-                }, 1500);
-            } else {
-                setTimeout(() => {
-                    this.completeAllCases();
-                }, 1500);
-            }
-            
-            this.updateDisplay();
-            
-        } catch (error) {
-            console.error('Error in submitCase:', error);
-            this.showNotification('Error submitting case: ' + error.message, 'error');
+        
+        this.showNotification('Case submitted successfully!', 'success');
+        
+        // Show next case or complete
+        if (this.completedCases < this.totalCases) {
+            setTimeout(() => {
+                this.showCase(parseInt(caseNumber) + 1);
+            }, 1500);
+        } else {
+            setTimeout(() => {
+                this.completeAllCases();
+            }, 1500);
         }
+        
+        this.updateDisplay();
+        
+    } catch (error) {
+        console.error('Error in submitCase:', error);
+        this.showNotification('Error submitting case: ' + error.message, 'error');
     }
+}
     
     updateDisplay() {
         document.getElementById('cases-completed').textContent = this.completedCases;
