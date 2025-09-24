@@ -378,6 +378,13 @@ class ProblemSolvingGame {
             });
             
             localStorage.setItem(`cases_completed_${this.currentUser.uid}`, this.completedCases.toString());
+            
+            // Add activity
+            if (typeof addActivity === 'function') {
+                const caseNames = ['Daily Operations', 'Group Problem-Solving', 'Communication Challenge'];
+                const caseName = caseNames[parseInt(caseNumber) - 1] || 'Case Study';
+                addActivity(this.currentUser.uid, 'problem-solving', 'Problem Solving', `Completed "${caseName}" case study`);
+            }
         }
         
         this.showNotification('Case submitted successfully!', 'success');

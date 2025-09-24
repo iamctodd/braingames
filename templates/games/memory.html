@@ -311,12 +311,25 @@ class MemoryGame {
             
             // Save to backend
             await saveGameData('/api/games/memory/score', { score: this.score });
+            
+            // Add achievement activity
+            if (typeof addActivity === 'function') {
+                addActivity(this.currentUser.uid, 'achievement', 'New High Score!', `Memory Training: ${this.score} points`);
+            }
         }
         
         // Update game count
         if (this.currentUser) {
             const games = parseInt(localStorage.getItem(`memory_games_${this.currentUser.uid}`) || '0') + 1;
             localStorage.setItem(`memory_games_${this.currentUser.uid}`, games.toString());
+            
+            // Add game activity
+            if (typeof addActivity === 'function') {
+                const description = won ? 
+                    `Completed all levels! Final score: ${this.score}` : 
+                    `Reached level ${this.level} with score ${this.score}`;
+                addActivity(this.currentUser.uid, 'memory', 'Memory Training', description);
+            }
         }
         
         // Show results

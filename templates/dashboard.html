@@ -156,20 +156,140 @@ function loadRecentActivity(userId) {
     const recentActivity = document.getElementById('recent-activity');
     const activities = getRecentActivities(userId);
     
-    if (activities.length === 0) return;
+    if (activities.length === 0) {
+        // Add some sample activities for demo
+        const sampleActivities = [
+            {
+                icon: '🧩',
+                title: 'Memory Training',
+                description: 'Completed Level 3 with score 250',
+                time: '2 hours ago',
+                type: 'game'
+            },
+            {
+                icon: '💡', 
+                title: 'Problem Solving',
+                description: 'Finished "Daily Operations" case study',
+                time: '1 day ago',
+                type: 'case'
+            },
+            {
+                icon: '🎯',
+                title: 'TBI Memory', 
+                description: 'Practiced spatial memory exercises',
+                time: '2 days ago',
+                type: 'exercise'
+            },
+            {
+                icon: '🏆',
+                title: 'Achievement Unlocked',
+                description: 'Played 3 days in a row!',
+                time: '3 days ago',
+                type: 'achievement'
+            },
+            {
+                icon: '📈',
+                title: 'Progress Update',
+                description: 'Memory score improved by 15%',
+                time: '1 week ago',
+                type: 'progress'
+            }
+        ];
+        
+        // Save sample activities for this user
+        localStorage.setItem(`activities_${userId}`, JSON.stringify(sampleActivities));
+        renderActivityList(sampleActivities);
+        return;
+    }
+    
+    renderActivityList(activities);
+}
+
+function renderActivityList(activities) {
+    const recentActivity = document.getElementById('recent-activity');
+    
+    if (activities.length === 0) {
+        recentActivity.innerHTML = `
+            <div class="text-gray-500 text-center py-8">
+                <div class="text-4xl mb-2">🎮</div>
+                <p>Start playing games to see your activity here!</p>
+                <p class="text-sm mt-2">Your game sessions, scores, and achievements will appear below.</p>
+            </div>
+        `;
+        return;
+    }
     
     recentActivity.innerHTML = activities.map(activity => `
-        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-            <div class="flex items-center space-x-3">
+        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+            <div class="flex items-center space-x-4">
                 <div class="text-2xl">${activity.icon}</div>
                 <div>
                     <div class="font-medium text-gray-900">${activity.title}</div>
-                    <div class="text-sm text-gray-500">${activity.description}</div>
+                    <div class="text-sm text-gray-600">${activity.description}</div>
                 </div>
             </div>
-            <div class="text-sm text-gray-400">${activity.time}</div>
+            <div class="text-xs text-gray-400">${activity.time}</div>
         </div>
     `).join('');
+}
+
+// Add activity when games are played
+function addActivity(userId, type, title, description) {
+    const activities = JSON.parse(localStorage.getItem(`activities_${userId}`) || '[]');
+    const newActivity = {
+        icon: getActivityIcon(type),
+        title: title,
+        description: description,
+        time: 'Just now',
+        type: type,
+        timestamp: Date.now()
+    };
+    
+    // Add to beginning of array
+    activities.unshift(newActivity);
+    
+    // Keep only last 10 activities
+    const recentActivities = activities.slice(0, 10);
+    
+    // Update timestamps to be relative
+    updateActivityTimes(recentActivities);
+    
+    localStorage.setItem(`activities_${userId}`, JSON.stringify(recentActivities));
+    renderActivityList(recentActivities.slice(0, 5)); // Show only top 5 on dashboard
+}
+
+function getActivityIcon(type) {
+    const icons = {
+        'memory': '🧩',
+        'problem-solving': '💡',
+        'tbi-memory': '🎯',
+        'achievement': '🏆',
+        'progress': '📈',
+        'game': '🎮',
+        'case': '📝',
+        'exercise': '🔄'
+    };
+    return icons[type] || '🎯';
+}
+
+function updateActivityTimes(activities) {
+    const now = Date.now();
+    activities.forEach(activity => {
+        const timeDiff = now - (activity.timestamp || now);
+        const minutes = Math.floor(timeDiff / 60000);
+        const hours = Math.floor(minutes / 60);
+        const days = Math.floor(hours / 24);
+        
+        if (minutes < 1) {
+            activity.time = 'Just now';
+        } else if (minutes < 60) {
+            activity.time = `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
+        } else if (hours < 24) {
+            activity.time = `${hours} hour${hours !== 1 ? 's' : ''} ago`;
+        } else {
+            activity.time = `${days} day${days !== 1 ? 's' : ''} ago`;
+        }
+    });
 }
 
 function getRecentActivities(userId) {
