@@ -23,6 +23,36 @@ def index():
 def dashboard():
     return render_template('dashboard.html')
 
+@app.route('/profile')
+def profile_page():
+    if 'user' not in session:
+        return redirect('/signin')
+    
+    user = session['user']
+    return render_template('profile.html', user=user)
+
+@app.route('/update-profile', methods=['POST'])
+def update_profile():
+    if 'user' not in session:
+        return redirect('/signin')
+    
+    try:
+        display_name = request.form.get('display_name', '').strip()
+        email = request.form.get('email', '').strip()
+        
+        if not display_name or not email:
+            return redirect('/profile?error=missing-fields')
+        
+        # Update session data
+        session['user']['displayName'] = display_name
+        session['user']['email'] = email
+        session.modified = True  # Ensure session is saved
+        
+        return redirect('/profile?success=updated')
+        
+    except Exception as e:
+        return redirect('/profile?error=server-error')
+
 # Auth endpoints
 @app.route('/api/auth/login', methods=['POST'])
 def login():

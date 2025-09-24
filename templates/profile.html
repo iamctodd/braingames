@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - Brain Games{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto space-y-6">
+    <!-- Profile Header -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h1 class="text-2xl font-bold text-gray-900 mb-2">Profile Settings</h1>
+        <p class="text-gray-600">Update your account information and preferences.</p>
+    </div>
+
+    <!-- Success/Error Messages -->
+    {% if request.args.get('success') == 'updated' %}
+    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+        Profile updated successfully!
+    </div>
+    {% endif %}
+
+    {% if request.args.get('error') %}
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+        {% if request.args.get('error') == 'missing-fields' %}
+            Please fill in all required fields.
+        {% else %}
+            An error occurred. Please try again.
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Profile Form -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <form action="/update-profile" method="POST" class="space-y-4">
+            <div>
+                <label for="display_name" class="block text-sm font-medium text-gray-700 mb-1">
+                    Display Name
+                </label>
+                <input type="text" 
+                       id="display_name" 
+                       name="display_name" 
+                       value="{{ user.displayName or '' }}"
+                       placeholder="Your display name"
+                       required
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <p class="text-xs text-gray-500 mt-1">This name will appear on your dashboard and in games.</p>
+            </div>
+
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
+                    Email Address
+                </label>
+                <input type="email" 
+                       id="email" 
+                       name="email" 
+                       value="{{ user.email or '' }}"
+                       placeholder="your.email@example.com"
+                       required
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <p class="text-xs text-gray-500 mt-1">Used for account identification and notifications.</p>
+            </div>
+
+            <div class="flex space-x-4 pt-4">
+                <button type="submit" 
+                        class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    Save Changes
+                </button>
+                <a href="/dashboard" 
+                   class="bg-gray-600 text-white px-6 py-2 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 inline-block">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Account Stats -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Account Statistics</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="text-center p-3 bg-blue-50 rounded-lg">
+                <div class="text-xl font-bold text-blue-600" id="total-games">0</div>
+                <div class="text-sm text-gray-600">Games Played</div>
+            </div>
+            <div class="text-center p-3 bg-green-50 rounded-lg">
+                <div class="text-xl font-bold text-green-600" id="memory-best">0</div>
+                <div class="text-sm text-gray-600">Memory Best</div>
+            </div>
+            <div class="text-center p-3 bg-purple-50 rounded-lg">
+                <div class="text-xl font-bold text-purple-600" id="cases-solved">0</div>
+                <div class="text-sm text-gray-600">Cases Solved</div>
+            </div>
+            <div class="text-center p-3 bg-orange-50 rounded-lg">
+                <div class="text-xl font-bold text-orange-600" id="streak-days">0</div>
+                <div class="text-sm text-gray-600">Day Streak</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Danger Zone -->
+    <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-red-500">
+        <h2 class="text-lg font-semibold text-gray-900 mb-2">Reset Data</h2>
+        <p class="text-gray-600 mb-4">Clear all your game progress and statistics. This action cannot be undone.</p>
+        <button onclick="resetUserData()" 
+                class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">
+            Reset All Data
+        </button>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', async function() {
+    // Check auth and load stats
+    try {
+        const response = await fetch('/api/auth/user');
+        const data = await response.json();
+        
+        if (data.user) {
+            loadUserStats(data.user);
+        } else {
+            window.location.href = '/signin';
+        }
+    } catch (error) {
+        console.error('Error loading profile:', error);
+        window.location.href = '/signin';
+    }
+});
+
+function generateUserId(email) {
+    let hash = 0;
+    for (let i = 0; i < email.length; i++) {
+        const char = email.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash;
+    }
+    const hashStr = Math.abs(hash).toString();
+    const emailPrefix = email.split('@')[0].substring(0, 5);
+    return `user_${emailPrefix}_${hashStr}`;
+}
+
+function loadUserStats(user) {
+    const userId = user.uid || generateUserId(user.email);
+    
+    // Load stats from localStorage
+    const memoryBest = parseInt(localStorage.getItem(`memory_best_${userId}`) || '0');
+    const casesSolved = parseInt(localStorage.getItem(`cases_completed_${userId}`) || '0');
+    const memoryGames = parseInt(localStorage.getItem(`memory_games_${userId}`) || '0');
+    const totalGames = memoryGames + casesSolved;
+    const streak = parseInt(localStorage.getItem(`streak_${userId}`) || '0');
+    
+    // Update display
+    document.getElementById('total-games').textContent = totalGames;
+    document.getElementById('memory-best').textContent = memoryBest;
+    document.getElementById('cases-solved').textContent = casesSolved;
+    document.getElementById('streak-days').textContent = streak;
+}
+
+function resetUserData() {
+    if (confirm('Are you sure you want to reset ALL your game data? This cannot be undone.')) {
+        if (confirm('This will delete your scores, progress, and activity. Continue?')) {
+            // Get current user
+            fetch('/api/auth/user')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.user) {
+                        const userId = data.user.uid || generateUserId(data.user.email);
+                        
+                        // Clear all user-specific data
+                        const keysToRemove = [];
+                        for (let i = 0; i < localStorage.length; i++) {
+                            const key = localStorage.key(i);
+                            if (key.includes(userId)) {
+                                keysToRemove.push(key);
+                            }
+                        }
+                        
+                        keysToRemove.forEach(key => {
+                            localStorage.removeItem(key);
+                        });
+                        
+                        alert('All data has been reset successfully.');
+                        location.reload();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error resetting data:', error);
+                    alert('Error resetting data. Please try again.');
+                });
+        }
+    }
+}
+</script>
+{% endblock %}
