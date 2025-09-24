@@ -215,8 +215,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Check if Firebase scripts loaded
 setTimeout(() => {
-    console.log('Firebase check:', typeof window.firebase);
-    console.log('Auth check:', typeof window.auth);
+    console.log('=== FIREBASE DEBUG ===');
+    console.log('Firebase initialized:', !!window.firebase);
+    console.log('Auth available:', !!window.auth);
+    console.log('Config project ID:', window.firebase?.options?.projectId);
+    
+    // Test if auth functions exist
+    console.log('Sign up function available:', !!window.createUserWithEmailAndPassword);
 }, 3000);
 </script>
 {% endblock %}
