@@ -15,9 +15,9 @@
             Memory training, problem-solving, and specialized exercises all in one place.
         </p>
         <div class="space-x-4">
-            <button id="get-started-btn" class="bg-blue-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-colors">
+            <a href="/signin" id="get-started-btn" class="bg-blue-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-colors">
                 Get Started Free
-            </button>
+            </a>
             <a href="#features" class="text-blue-600 px-8 py-3 rounded-lg text-lg font-semibold hover:text-blue-700 transition-colors">
                 Learn More
             </a>
@@ -48,8 +48,8 @@
                     <li>✓ Progressive difficulty</li>
                     <li>✓ Performance tracking</li>
                 </ul>
-                <button class="w-full bg-blue-100 text-blue-700 py-2 px-4 rounded-md hover:bg-blue-200 transition-colors" onclick="window.location.href='https://mem-app.onrender.com/'">
-                    Play Game
+                <button class="w-full bg-blue-100 text-blue-700 py-2 px-4 rounded-md hover:bg-blue-200 transition-colors">
+                    Preview Game
                 </button>
             </div>
 
@@ -67,8 +67,8 @@
                     <li>✓ Decision-making practice</li>
                     <li>✓ Solution evaluation</li>
                 </ul>
-                <button class="w-full bg-green-100 text-green-700 py-2 px-4 rounded-md hover:bg-green-200 transition-colors" onclick="window.location.href='https://a-case-study.netlify.app/'">
-                    Play Game
+                <button class="w-full bg-green-100 text-green-700 py-2 px-4 rounded-md hover:bg-green-200 transition-colors">
+                    Preview Game
                 </button>
             </div>
 
@@ -86,8 +86,8 @@
                     <li>✓ Recovery-focused design</li>
                     <li>✓ Progress monitoring</li>
                 </ul>
-                <button class="w-full bg-purple-100 text-purple-700 py-2 px-4 rounded-md hover:bg-purple-200 transition-colors" onclick="window.location.href='https://iamctodd.github.io/tbi-memory/'">
-                    Play Game 
+                <button class="w-full bg-purple-100 text-purple-700 py-2 px-4 rounded-md hover:bg-purple-200 transition-colors">
+                    Preview Game
                 </button>
             </div>
         </div>
@@ -131,9 +131,9 @@
     <div class="text-center py-16 bg-blue-600 rounded-2xl text-white">
         <h2 class="text-3xl font-bold mb-4">Ready to Start Training?</h2>
         <p class="text-xl mb-8 text-blue-100">Join thousands of users improving their cognitive abilities daily.</p>
-        <button id="cta-signup-btn" class="bg-white text-blue-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-colors">
+        <a href="/signin" id="cta-signup-btn" class="bg-white text-blue-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-colors">
             Sign Up Now - It's Free
-        </button>
+        </a>
         <p class="text-sm text-blue-200 mt-4">No credit card required • Start playing immediately</p>
     </div>
 
@@ -142,7 +142,7 @@
         <div class="text-center mb-12">
             <h2 class="text-3xl font-bold text-gray-900 mb-4">How It Works</h2>
             <p class="text-gray-600 max-w-2xl mx-auto">
-                Get started in minutes with our simple process.
+                Get started in minutes with our simple three-step process.
             </p>
         </div>
 
@@ -178,22 +178,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const ctaSignupBtn = document.getElementById('cta-signup-btn');
     
     // Check if user is already signed in
-    window.onAuthStateChanged(window.auth, (user) => {
+    window.onAuthStateChanged && window.auth && window.onAuthStateChanged(window.auth, (user) => {
         if (user) {
             // User is signed in, redirect to dashboard
             window.location.href = '/dashboard';
         }
-    });
-    
-    // Set up sign-up button listeners
-    getStartedBtn.addEventListener('click', () => {
-        document.getElementById('auth-modal').classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-    });
-    
-    ctaSignupBtn.addEventListener('click', () => {
-        document.getElementById('auth-modal').classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
     });
     
     // Smooth scrolling for anchor links
@@ -210,18 +199,5 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
-</script>
-<script>
-
-// Check if Firebase scripts loaded
-setTimeout(() => {
-    console.log('=== FIREBASE DEBUG ===');
-    console.log('Firebase initialized:', !!window.firebase);
-    console.log('Auth available:', !!window.auth);
-    console.log('Config project ID:', window.firebase?.options?.projectId);
-    
-    // Test if auth functions exist
-    console.log('Sign up function available:', !!window.createUserWithEmailAndPassword);
-}, 3000);
 </script>
 {% endblock %}

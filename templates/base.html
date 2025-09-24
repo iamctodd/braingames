@@ -167,21 +167,12 @@
                     </div>
                 `;
             } else {
-                // User is signed out - show sign in button
+                // User is signed out - show sign in button that goes to signin page
                 navSection.innerHTML = `
-                    <button id="sign-in-btn" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 text-sm">
+                    <a href="/signin" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 text-sm">
                         Sign In
-                    </button>
+                    </a>
                 `;
-                
-                // Add click handler for sign in button
-                document.getElementById('sign-in-btn').addEventListener('click', () => {
-                    const modal = document.getElementById('auth-modal');
-                    if (modal) {
-                        modal.classList.remove('hidden');
-                        document.body.style.overflow = 'hidden';
-                    }
-                });
             }
         } catch (error) {
             console.error('Auth check error:', error);
