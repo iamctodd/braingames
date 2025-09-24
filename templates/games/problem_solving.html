@@ -292,7 +292,8 @@ class ProblemSolvingGame {
     
     loadProgress() {
         if (this.currentUser) {
-            const completed = parseInt(localStorage.getItem(`cases_completed_${this.currentUser.uid}`) || '0');
+            const userId = this.currentUser.uid || btoa(this.currentUser.email).substring(0, 10);
+            const completed = parseInt(localStorage.getItem(`cases_completed_${userId}`) || '0');
             document.getElementById('cases-completed').textContent = completed;
         }
     }
@@ -345,6 +346,8 @@ class ProblemSolvingGame {
     }
     
     async submitCase(caseNumber) {
+        console.log('Submit case called for case:', caseNumber);
+        
         const caseCard = document.querySelector(`[data-case="${caseNumber}"]`);
         const textareas = caseCard.querySelectorAll('textarea');
         const responses = {};
@@ -358,6 +361,8 @@ class ProblemSolvingGame {
             }
         });
         
+        console.log('Collected responses:', responses);
+        
         // Validate responses
         if (Object.keys(responses).length < 3) {
             this.showNotification('Please answer all questions before submitting.', 'warning');
@@ -367,50 +372,61 @@ class ProblemSolvingGame {
         // Save responses
         this.responses[caseNumber] = responses;
         
-        // Update case status
-        const statusElement = caseCard.querySelector('.case-status');
-        statusElement.textContent = 'Completed';
-        statusElement.className = 'case-status bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs';
-        
-        // Disable inputs
-        textareas.forEach(textarea => textarea.disabled = true);
-        caseCard.querySelector('.submit-case').disabled = true;
-        caseCard.querySelector('.submit-case').classList.add('opacity-50', 'cursor-not-allowed');
-        
-        this.completedCases++;
-        
-        // Save progress
-        if (this.currentUser) {
-            await saveGameData('/api/games/problem-solving/response', {
-                case_id: caseNumber,
-                response: responses,
-                completed_count: this.completedCases
-            });
+        try {
+            // Update case status
+            const statusElement = caseCard.querySelector('.case-status');
+            statusElement.textContent = 'Completed';
+            statusElement.className = 'case-status bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs';
             
-            localStorage.setItem(`cases_completed_${this.currentUser.uid}`, this.completedCases.toString());
+            // Disable inputs
+            textareas.forEach(textarea => textarea.disabled = true);
+            caseCard.querySelector('.submit-case').disabled = true;
+            caseCard.querySelector('.submit-case').classList.add('opacity-50', 'cursor-not-allowed');
             
-            // Add activity
-            if (typeof addActivity === 'function') {
-                const caseNames = ['Daily Operations', 'Group Problem-Solving', 'Communication Challenge'];
-                const caseName = caseNames[parseInt(caseNumber) - 1] || 'Case Study';
-                addActivity(this.currentUser.uid, 'problem-solving', 'Problem Solving', `Completed "${caseName}" case study`);
+            this.completedCases++;
+            
+            // Save progress
+            if (this.currentUser) {
+                const userId = this.currentUser.uid || btoa(this.currentUser.email).substring(0, 10);
+                
+                console.log('Attempting to save game data...');
+                const saved = await saveGameData('/api/games/problem-solving/response', {
+                    case_id: caseNumber,
+                    response: responses,
+                    completed_count: this.completedCases
+                });
+                console.log('Game data saved:', saved);
+                
+                localStorage.setItem(`cases_completed_${userId}`, this.completedCases.toString());
+                
+                // Add activity
+                if (typeof addActivity === 'function') {
+                    const caseNames = ['Daily Operations', 'Group Problem-Solving', 'Communication Challenge'];
+                    const caseName = caseNames[parseInt(caseNumber) - 1] || 'Case Study';
+                    addActivity(userId, 'problem-solving', 'Problem Solving', `Completed "${caseName}" case study`);
+                    console.log('Activity added');
+                }
             }
+            
+            this.showNotification('Case submitted successfully!', 'success');
+            
+            // Show next case or complete
+            if (this.completedCases < this.totalCases) {
+                setTimeout(() => {
+                    this.showCase(parseInt(caseNumber) + 1);
+                }, 1500);
+            } else {
+                setTimeout(() => {
+                    this.completeAllCases();
+                }, 1500);
+            }
+            
+            this.updateDisplay();
+            
+        } catch (error) {
+            console.error('Error in submitCase:', error);
+            this.showNotification('Error submitting case: ' + error.message, 'error');
         }
-        
-        this.showNotification('Case submitted successfully!', 'success');
-        
-        // Show next case or complete
-        if (this.completedCases < this.totalCases) {
-            setTimeout(() => {
-                this.showCase(parseInt(caseNumber) + 1);
-            }, 1500);
-        } else {
-            setTimeout(() => {
-                this.completeAllCases();
-            }, 1500);
-        }
-        
-        this.updateDisplay();
     }
     
     updateDisplay() {
