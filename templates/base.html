@@ -11,27 +11,39 @@
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
-        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+        import { 
+            getAuth, 
+            GoogleAuthProvider, 
+            signInWithPopup, 
+            signOut, 
+            onAuthStateChanged, 
+            createUserWithEmailAndPassword, 
+            signInWithEmailAndPassword 
+        } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
         
         // Your Firebase config (replace with your actual config)
         const firebaseConfig = {
-            apiKey: "your-api-key",
-            authDomain: "your-project.firebaseapp.com",
-            projectId: "your-project-id",
-            storageBucket: "your-project.appspot.com",
+            apiKey: "your-actual-api-key",
+            authDomain: "braingames-5ded7.firebaseapp.com",
+            projectId: "braingames-5ded7",
+            storageBucket: "braingames-5ded7.appspot.com",
             messagingSenderId: "123456789",
-            appId: "your-app-id"
+            appId: "your-actual-app-id"
         };
         
+        // Initialize Firebase
         window.firebase = initializeApp(firebaseConfig);
         window.auth = getAuth();
+        
+        // Make Firebase functions available globally
         window.GoogleAuthProvider = GoogleAuthProvider;
         window.signInWithPopup = signInWithPopup;
         window.signOut = signOut;
         window.onAuthStateChanged = onAuthStateChanged;
-        // window.sendSignInLinkToEmail = sendSignInLinkToEmail;
-        // window.isSignInWithEmailLink = isSignInWithEmailLink;
-        // window.signInWithEmailLink = signInWithEmailLink;
+        window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+        window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+        
+        console.log('✅ Firebase initialized with all auth functions');
     </script>
     
     <!-- Custom styles -->
