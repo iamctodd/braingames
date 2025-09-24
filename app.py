@@ -34,6 +34,43 @@ def login():
     session['user'] = user_data
     return jsonify({'success': True, 'user': user_data})
 
+@app.route('/games/problem-solving-simple')
+def problem_solving_simple():
+    return '''
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Problem Solving - Simple Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-2xl mx-auto bg-white rounded-lg shadow p-6">
+        <h1 class="text-2xl font-bold mb-4">Problem Solving JavaScript Test</h1>
+        <button id="test-btn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+            Click Me to Test
+        </button>
+        <div id="result" class="mt-4"></div>
+    </div>
+    
+    <script>
+        console.log('Simple page JavaScript loaded successfully');
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded in simple page');
+            
+            document.getElementById('test-btn').addEventListener('click', function() {
+                console.log('Test button clicked!');
+                alert('JavaScript is working perfectly!');
+                document.getElementById('result').innerHTML = '<p class="text-green-600 font-bold">Success! JavaScript is working.</p>';
+            });
+            
+            console.log('Event listener added to test button');
+        });
+    </script>
+</body>
+</html>
+    '''
+
 @app.route('/debug-session')
 def debug_session():
     return jsonify({
@@ -99,91 +136,6 @@ def problem_solving_game():
 @app.route('/games/tbi-memory')
 def tbi_memory_game():
     return render_template('games/tbi_memory.html')
-
-@app.route('/signin')
-def signin_page():
-    return '''
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Sign In - Brain Games</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center">
-    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <div class="text-center mb-6">
-            <h1 class="text-2xl font-bold">🧠 Brain Games</h1>
-            <p class="text-gray-600">Sign in to continue</p>
-        </div>
-        
-        <form action="/manual-login" method="POST" class="space-y-4">
-            <div>
-                <input type="email" name="email" placeholder="Enter your email" required
-                       class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-            <div>
-                <input type="password" name="password" placeholder="Enter your password" required
-                       class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-            <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700">
-                Sign In
-            </button>
-        </form>
-        
-        <div class="mt-4 text-center">
-            <p class="text-sm text-gray-600">
-                For demo: any email + any password works
-            </p>
-        </div>
-    </div>
-</body>
-</html>
-    '''
-
-@app.route('/manual-login', methods=['POST'])
-def manual_login():
-    email = request.form.get('email')
-    password = request.form.get('password')
-    
-    # Simple validation - for demo, any email/password works
-    if email and password:
-        session['user'] = {
-            'uid': 'demo-user',
-            'email': email,
-            'displayName': email.split('@')[0]
-        }
-        return redirect('/dashboard')
-    else:
-        return redirect('/signin?error=invalid')
-@app.route('/games/problem-solving-simple')
-def problem_solving_simple():
-    return '''
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Problem Solving - Simple</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 p-8">
-    <div class="max-w-2xl mx-auto">
-        <h1 class="text-2xl font-bold mb-4">Problem Solving Test</h1>
-        <button id="test-btn" class="bg-blue-600 text-white px-4 py-2 rounded">
-            Click Me
-        </button>
-        <div id="result" class="mt-4"></div>
-    </div>
-    
-    <script>
-        console.log('Simple page JavaScript loaded');
-        document.getElementById('test-btn').addEventListener('click', function() {
-            console.log('Button clicked!');
-            alert('Button works!');
-            document.getElementById('result').innerHTML = '<p class="text-green-600">Success!</p>';
-        });
-    </script>
-</body>
-</html>
-    '''
 
 if __name__ == '__main__':
     app.run(debug=True)
