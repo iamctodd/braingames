@@ -24,28 +24,47 @@
         </p>
         
         <div class="space-y-4">
-            <!-- Option 1: Link to existing game -->
+            <!-- Keep the external link as backup -->
             <a href="https://iamctodd.github.io/tbi-memory/" target="_blank"
-               class="inline-block bg-purple-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors">
-                Launch TBI Memory Game →
+               class="inline-block bg-gray-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-gray-700 transition-colors text-sm">
+                Open in New Tab →
             </a>
-            
-            <!-- Option 2: Embed existing game (if you want) -->
-            <div class="text-sm text-gray-500">
-                <p>Opens your existing TBI memory training application</p>
+        </div>
+    </div>
+
+    <!-- Game Controls -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-gray-900">Game Controls</h3>
+            <div class="flex space-x-2">
+                <button id="fullscreen-btn" class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">
+                    Full Screen
+                </button>
+                <button id="reload-game-btn" class="bg-gray-600 text-white px-3 py-1 rounded text-sm hover:bg-gray-700">
+                    Reload Game
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- Alternatively, embed your existing game in an iframe -->
-    <!-- 
+    <!-- Embedded TBI Memory Game -->
     <div class="bg-white rounded-lg shadow-md p-6">
-        <iframe src="https://iamctodd.github.io/tbi-memory/" 
-                class="w-full h-96 border rounded-lg"
-                title="TBI Memory Game">
-        </iframe>
+        <div class="mb-4">
+            <h3 class="text-lg font-semibold text-gray-900">TBI Memory Training Game</h3>
+            <p class="text-gray-600">Your specialized cognitive recovery exercises embedded below:</p>
+        </div>
+        <div id="game-container" class="border rounded-lg overflow-hidden">
+            <iframe id="tbi-game-iframe" src="https://iamctodd.github.io/tbi-memory/" 
+                    class="w-full h-[600px] md:h-[700px] lg:h-[800px]"
+                    frameborder="0"
+                    title="TBI Memory Game"
+                    allow="fullscreen">
+                <p>Your browser doesn't support iframes. 
+                   <a href="https://iamctodd.github.io/tbi-memory/" target="_blank">Click here to play the game</a>
+                </p>
+            </iframe>
+        </div>
     </div>
-    -->
 </div>
 
 <script>

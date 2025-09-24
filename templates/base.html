@@ -223,21 +223,7 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('signUpWithEmail function exists:', typeof signUpWithEmail === 'function');
     console.log('signInWithEmail function exists:', typeof signInWithEmail === 'function');
     console.log('Firebase createUser function exists:', !!window.createUserWithEmailAndPassword);
-    
-    // Test button clicks
-    if (signupBtn) {
-        signupBtn.addEventListener('click', function() {
-            console.log('Sign up button clicked!');
-            alert('Sign up button works!');
-        });
-    }
-    
-    if (signinBtn) {
-        signinBtn.addEventListener('click', function() {
-            console.log('Sign in button clicked!');
-            alert('Sign in button works!');
-        });
-    }
+
 });
 </script>
 </body>
