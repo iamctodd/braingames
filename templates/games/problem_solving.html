@@ -269,15 +269,25 @@ class ProblemSolvingGame {
         document.getElementById('review-responses').addEventListener('click', () => this.reviewResponses());
         document.getElementById('try-again').addEventListener('click', () => this.restart());
         
-        // Auth state listener
-        window.onAuthStateChanged(window.auth, (user) => {
-            this.currentUser = user;
-            if (!user) {
-                window.location.href = '/';
-            } else {
-                this.loadProgress();
+        // Auth state listener - check Flask session
+        const checkAuth = async () => {
+            try {
+                const response = await fetch('/api/auth/user');
+                const data = await response.json();
+                
+                if (data.user) {
+                    this.currentUser = data.user;
+                    this.loadProgress();
+                } else {
+                    window.location.href = '/signin';
+                }
+            } catch (error) {
+                console.error('Auth check error:', error);
+                window.location.href = '/signin';
             }
-        });
+        };
+        
+        checkAuth();
     }
     
     loadProgress() {

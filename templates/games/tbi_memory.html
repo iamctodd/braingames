@@ -68,11 +68,52 @@
 </div>
 
 <script>
-// Auth protection
-document.addEventListener('DOMContentLoaded', () => {
-    window.onAuthStateChanged(window.auth, (user) => {
-        if (!user) {
-            window.location.href = '/';
+// Auth protection - check Flask session
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        const response = await fetch('/api/auth/user');
+        const data = await response.json();
+        
+        if (!data.user) {
+            window.location.href = '/signin';
+        }
+    } catch (error) {
+        console.error('Auth check error:', error);
+        window.location.href = '/signin';
+    }
+    
+    // Game controls
+    const fullscreenBtn = document.getElementById('fullscreen-btn');
+    const reloadBtn = document.getElementById('reload-game-btn');
+    const iframe = document.getElementById('tbi-game-iframe');
+    const gameContainer = document.getElementById('game-container');
+    
+    // Full screen functionality
+    if (fullscreenBtn) {
+        fullscreenBtn.addEventListener('click', () => {
+            if (gameContainer.requestFullscreen) {
+                gameContainer.requestFullscreen();
+            } else if (gameContainer.webkitRequestFullscreen) {
+                gameContainer.webkitRequestFullscreen();
+            } else if (gameContainer.msRequestFullscreen) {
+                gameContainer.msRequestFullscreen();
+            }
+        });
+    }
+    
+    // Reload game
+    if (reloadBtn) {
+        reloadBtn.addEventListener('click', () => {
+            iframe.src = iframe.src;
+        });
+    }
+    
+    // Handle fullscreen changes
+    document.addEventListener('fullscreenchange', () => {
+        if (document.fullscreenElement) {
+            iframe.style.height = '100vh';
+        } else {
+            iframe.className = 'w-full h-[600px] md:h-[700px] lg:h-[800px]';
         }
     });
 });

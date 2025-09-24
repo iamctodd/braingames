@@ -160,20 +160,31 @@ class MemoryGame {
             tile.addEventListener('click', (e) => this.handleTileClick(e.target.dataset.color));
         });
         
-        // Auth state listener
-        window.onAuthStateChanged(window.auth, (user) => {
-            this.currentUser = user;
-            if (!user) {
-                window.location.href = '/';
-            } else {
-                this.loadBestScore();
+        // Auth state listener - check Flask session
+        const checkAuth = async () => {
+            try {
+                const response = await fetch('/api/auth/user');
+                const data = await response.json();
+                
+                if (data.user) {
+                    this.currentUser = data.user;
+                    this.loadBestScore();
+                } else {
+                    window.location.href = '/signin';
+                }
+            } catch (error) {
+                console.error('Auth check error:', error);
+                window.location.href = '/signin';
             }
-        });
+        };
+        
+        checkAuth();
     }
     
     loadBestScore() {
         if (this.currentUser) {
-            this.bestScore = parseInt(localStorage.getItem(`memory_best_${this.currentUser.uid}`) || '0');
+            const userId = this.currentUser.uid || btoa(this.currentUser.email).substring(0, 10);
+            this.bestScore = parseInt(localStorage.getItem(`memory_best_${userId}`) || '0');
             this.bestScoreElement.textContent = this.bestScore;
         }
     }
@@ -303,10 +314,13 @@ class MemoryGame {
         this.isPlaying = false;
         this.disableTiles();
         
+        // Create consistent user ID from email if uid doesn't exist
+        const userId = this.currentUser.uid || btoa(this.currentUser.email).substring(0, 10);
+        
         // Save best score
         if (this.score > this.bestScore && this.currentUser) {
             this.bestScore = this.score;
-            localStorage.setItem(`memory_best_${this.currentUser.uid}`, this.bestScore.toString());
+            localStorage.setItem(`memory_best_${userId}`, this.bestScore.toString());
             this.bestScoreElement.textContent = this.bestScore;
             
             // Save to backend
@@ -314,21 +328,21 @@ class MemoryGame {
             
             // Add achievement activity
             if (typeof addActivity === 'function') {
-                addActivity(this.currentUser.uid, 'achievement', 'New High Score!', `Memory Training: ${this.score} points`);
+                addActivity(userId, 'achievement', 'New High Score!', `Memory Training: ${this.score} points`);
             }
         }
         
         // Update game count
         if (this.currentUser) {
-            const games = parseInt(localStorage.getItem(`memory_games_${this.currentUser.uid}`) || '0') + 1;
-            localStorage.setItem(`memory_games_${this.currentUser.uid}`, games.toString());
+            const games = parseInt(localStorage.getItem(`memory_games_${userId}`) || '0') + 1;
+            localStorage.setItem(`memory_games_${userId}`, games.toString());
             
             // Add game activity
             if (typeof addActivity === 'function') {
                 const description = won ? 
                     `Completed all levels! Final score: ${this.score}` : 
                     `Reached level ${this.level} with score ${this.score}`;
-                addActivity(this.currentUser.uid, 'memory', 'Memory Training', description);
+                addActivity(userId, 'memory', 'Memory Training', description);
             }
         }
         
