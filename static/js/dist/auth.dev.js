@@ -6,8 +6,10 @@ var currentUser = null; // DOM elements
 var authModal = document.getElementById('auth-modal');
 var closeAuthModal = document.getElementById('close-auth-modal');
 var googleSigninBtn = document.getElementById('google-signin');
+var emailSignupBtn = document.getElementById('email-signup');
 var emailSigninBtn = document.getElementById('email-signin');
 var emailInput = document.getElementById('email-input');
+var passwordInput = document.getElementById('password-input');
 var navAuthSection = document.getElementById('nav-auth-section');
 var loadingSpinner = document.getElementById('loading-spinner'); // Initialize auth state
 
@@ -22,41 +24,75 @@ document.addEventListener('DOMContentLoaded', function () {
   }); // Set up event listeners
 
   setupEventListeners();
-}); // Email Sign-up and Sign-in
-
-document.getElementById('email-signup').addEventListener('click', signUpWithEmail);
-document.getElementById('email-signin').addEventListener('click', signInWithEmail);
+});
 
 function setupEventListeners() {
   // Modal controls
-  closeAuthModal.addEventListener('click', closeModal);
-  authModal.addEventListener('click', function (e) {
-    if (e.target === authModal) closeModal();
-  }); // Google Sign-in
+  if (closeAuthModal) {
+    closeAuthModal.addEventListener('click', closeModal);
+  }
 
-  googleSigninBtn.addEventListener('click', signInWithGoogle);
+  if (authModal) {
+    authModal.addEventListener('click', function (e) {
+      if (e.target === authModal) closeModal();
+    });
+  } // Authentication buttons
+
+
+  if (googleSigninBtn) {
+    googleSigninBtn.addEventListener('click', signInWithGoogle);
+  }
+
+  if (emailSignupBtn) {
+    emailSignupBtn.addEventListener('click', signUpWithEmail);
+  }
+
+  if (emailSigninBtn) {
+    emailSigninBtn.addEventListener('click', signInWithEmail);
+  } // Enter key handlers
+
+
+  if (passwordInput) {
+    passwordInput.addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') signUpWithEmail();
+    });
+  }
+
+  if (emailInput) {
+    emailInput.addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') signUpWithEmail();
+    });
+  }
 }
 
 function showModal() {
-  authModal.classList.remove('hidden');
-  document.body.style.overflow = 'hidden';
+  if (authModal) {
+    authModal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
 }
 
 function closeModal() {
-  authModal.classList.add('hidden');
-  document.body.style.overflow = 'auto';
+  if (authModal) {
+    authModal.classList.add('hidden');
+    document.body.style.overflow = 'auto';
+  }
 }
 
 function showLoading() {
-  loadingSpinner.classList.remove('hidden');
+  if (loadingSpinner) {
+    loadingSpinner.classList.remove('hidden');
+  }
 }
 
 function hideLoading() {
-  loadingSpinner.classList.add('hidden');
+  if (loadingSpinner) {
+    loadingSpinner.classList.add('hidden');
+  }
 }
 
 function signInWithGoogle() {
-  var provider, result;
+  var provider, result, message;
   return regeneratorRuntime.async(function signInWithGoogle$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
@@ -70,111 +106,172 @@ function signInWithGoogle() {
         case 5:
           result = _context.sent;
           console.log('Google sign-in successful:', result.user);
-          _context.next = 13;
+          showNotification('Welcome!', 'success');
+          _context.next = 16;
           break;
 
-        case 9:
-          _context.prev = 9;
+        case 10:
+          _context.prev = 10;
           _context.t0 = _context["catch"](0);
           console.error('Google sign-in error:', _context.t0);
-          showNotification('Sign-in failed. Please try again.', 'error');
+          message = 'Google sign-in failed. ';
 
-        case 13:
-          _context.prev = 13;
-          hideLoading();
-          return _context.finish(13);
+          if (_context.t0.code === 'auth/popup-blocked') {
+            message += 'Please allow popups and try again.';
+          } else if (_context.t0.code === 'auth/unauthorized-domain') {
+            message += 'This domain is not authorized.';
+          } else {
+            message += 'Please try again.';
+          }
+
+          showNotification(message, 'error');
 
         case 16:
+          _context.prev = 16;
+          hideLoading();
+          return _context.finish(16);
+
+        case 19:
         case "end":
           return _context.stop();
       }
     }
-  }, null, null, [[0, 9, 13, 16]]);
+  }, null, null, [[0, 10, 16, 19]]);
 }
 
-function sendEmailLink() {
-  var email, actionCodeSettings;
-  return regeneratorRuntime.async(function sendEmailLink$(_context2) {
+function signUpWithEmail() {
+  var email, password, result, message;
+  return regeneratorRuntime.async(function signUpWithEmail$(_context2) {
     while (1) {
       switch (_context2.prev = _context2.next) {
         case 0:
-          email = emailInput.value.trim();
+          email = emailInput ? emailInput.value.trim() : '';
+          password = passwordInput ? passwordInput.value : '';
+          console.log('Sign up attempt with:', email);
 
-          if (email) {
-            _context2.next = 4;
+          if (!(!email || !password)) {
+            _context2.next = 6;
             break;
           }
 
-          showNotification('Please enter your email address.', 'error');
+          showNotification('Please enter both email and password.', 'error');
           return _context2.abrupt("return");
 
-        case 4:
-          try {
-            showLoading();
-            actionCodeSettings = {
-              url: window.location.origin + '/dashboard',
-              handleCodeInApp: true
-            }; // Save email for later use
-
-            localStorage.setItem('emailForSignIn', email);
-            showNotification('Magic link sent! Check your email.', 'success');
-            closeModal();
-          } catch (error) {
-            console.error('Email link error:', error);
-            showNotification('Failed to send magic link. Please try again.', 'error');
-          } finally {
-            hideLoading();
+        case 6:
+          if (!(password.length < 6)) {
+            _context2.next = 9;
+            break;
           }
 
-        case 5:
+          showNotification('Password must be at least 6 characters.', 'error');
+          return _context2.abrupt("return");
+
+        case 9:
+          _context2.prev = 9;
+          showLoading();
+          console.log('Creating user with Firebase...');
+          _context2.next = 14;
+          return regeneratorRuntime.awrap(window.createUserWithEmailAndPassword(window.auth, email, password));
+
+        case 14:
+          result = _context2.sent;
+          console.log('Email sign-up successful:', result.user);
+          showNotification('Account created successfully!', 'success');
+          _context2.next = 25;
+          break;
+
+        case 19:
+          _context2.prev = 19;
+          _context2.t0 = _context2["catch"](9);
+          console.error('Email sign-up error:', _context2.t0);
+          message = 'Sign-up failed. ';
+
+          if (_context2.t0.code === 'auth/email-already-in-use') {
+            message += 'Email already in use. Try signing in instead.';
+          } else if (_context2.t0.code === 'auth/weak-password') {
+            message += 'Password is too weak. Please choose a stronger password.';
+          } else if (_context2.t0.code === 'auth/invalid-email') {
+            message += 'Invalid email address.';
+          } else {
+            message += 'Please try again. Error: ' + _context2.t0.message;
+          }
+
+          showNotification(message, 'error');
+
+        case 25:
+          _context2.prev = 25;
+          hideLoading();
+          return _context2.finish(25);
+
+        case 28:
         case "end":
           return _context2.stop();
       }
     }
-  });
+  }, null, null, [[9, 19, 25, 28]]);
 }
 
-function handleEmailLinkSignIn() {
-  var email, result;
-  return regeneratorRuntime.async(function handleEmailLinkSignIn$(_context3) {
+function signInWithEmail() {
+  var email, password, result, message;
+  return regeneratorRuntime.async(function signInWithEmail$(_context3) {
     while (1) {
       switch (_context3.prev = _context3.next) {
         case 0:
-          _context3.prev = 0;
-          showLoading();
-          email = localStorage.getItem('emailForSignIn');
+          email = emailInput ? emailInput.value.trim() : '';
+          password = passwordInput ? passwordInput.value : '';
+          console.log('Sign in attempt with:', email);
 
-          if (!email) {
-            email = window.prompt('Please provide your email for confirmation');
+          if (!(!email || !password)) {
+            _context3.next = 6;
+            break;
           }
 
-          _context3.next = 6;
-          return regeneratorRuntime.awrap(window.signInWithEmailLink(window.auth, email, window.location.href));
+          showNotification('Please enter both email and password.', 'error');
+          return _context3.abrupt("return");
 
         case 6:
-          result = _context3.sent;
-          localStorage.removeItem('emailForSignIn');
-          console.log('Email link sign-in successful:', result.user);
-          _context3.next = 15;
-          break;
+          _context3.prev = 6;
+          showLoading();
+          console.log('Signing in with Firebase...');
+          _context3.next = 11;
+          return regeneratorRuntime.awrap(window.signInWithEmailAndPassword(window.auth, email, password));
 
         case 11:
-          _context3.prev = 11;
-          _context3.t0 = _context3["catch"](0);
-          console.error('Email link sign-in error:', _context3.t0);
-          showNotification('Sign-in failed. Please try again.', 'error');
+          result = _context3.sent;
+          console.log('Email sign-in successful:', result.user);
+          showNotification('Welcome back!', 'success');
+          _context3.next = 22;
+          break;
 
-        case 15:
-          _context3.prev = 15;
+        case 16:
+          _context3.prev = 16;
+          _context3.t0 = _context3["catch"](6);
+          console.error('Email sign-in error:', _context3.t0);
+          message = 'Sign-in failed. ';
+
+          if (_context3.t0.code === 'auth/user-not-found') {
+            message += 'No account found. Try signing up first.';
+          } else if (_context3.t0.code === 'auth/wrong-password') {
+            message += 'Incorrect password.';
+          } else if (_context3.t0.code === 'auth/invalid-email') {
+            message += 'Invalid email address.';
+          } else {
+            message += 'Please check your credentials. Error: ' + _context3.t0.message;
+          }
+
+          showNotification(message, 'error');
+
+        case 22:
+          _context3.prev = 22;
           hideLoading();
-          return _context3.finish(15);
+          return _context3.finish(22);
 
-        case 18:
+        case 25:
         case "end":
           return _context3.stop();
       }
     }
-  }, null, null, [[0, 11, 15, 18]]);
+  }, null, null, [[6, 16, 22, 25]]);
 }
 
 function handleAuthSuccess(user) {
@@ -245,12 +342,22 @@ function handleAuthSignOut() {
 }
 
 function updateNavAuth(user) {
+  if (!navAuthSection) return;
+
   if (user) {
     navAuthSection.innerHTML = "\n            <div class=\"flex items-center space-x-4\">\n                <img src=\"".concat(user.photoURL || '/static/img/default-avatar.png', "\" \n                     alt=\"Profile\" class=\"w-8 h-8 rounded-full\">\n                <span class=\"hidden sm:inline text-gray-700\">").concat(user.displayName || user.email, "</span>\n                <button id=\"sign-out-btn\" class=\"text-gray-500 hover:text-gray-700\">\n                    Sign Out\n                </button>\n            </div>\n        ");
-    document.getElementById('sign-out-btn').addEventListener('click', signOut);
+    var signOutBtn = document.getElementById('sign-out-btn');
+
+    if (signOutBtn) {
+      signOutBtn.addEventListener('click', signOut);
+    }
   } else {
     navAuthSection.innerHTML = "\n            <button id=\"sign-in-btn\" class=\"bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700\">\n                Sign In\n            </button>\n        ";
-    document.getElementById('sign-in-btn').addEventListener('click', showModal);
+    var signInBtn = document.getElementById('sign-in-btn');
+
+    if (signInBtn) {
+      signInBtn.addEventListener('click', showModal);
+    }
   }
 }
 
