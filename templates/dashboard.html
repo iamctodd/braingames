@@ -125,8 +125,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function loadDashboardData(user) {
     try {
-        // Use uid if available (Firebase format), otherwise create from email (Flask format)
-        const userId = user.uid || btoa(user.email).substring(0, 10); // Convert email to consistent ID
+        // Use consistent user ID generation
+        const userId = user.uid || generateUserId(user.email);
         
         // Load user's game statistics
         const stats = {
@@ -143,6 +143,19 @@ async function loadDashboardData(user) {
     } catch (error) {
         console.error('Error loading dashboard data:', error);
     }
+}
+
+// Add the generateUserId function if it's not available from auth.js
+function generateUserId(email) {
+    let hash = 0;
+    for (let i = 0; i < email.length; i++) {
+        const char = email.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash;
+    }
+    const hashStr = Math.abs(hash).toString();
+    const emailPrefix = email.split('@')[0].substring(0, 5);
+    return `user_${emailPrefix}_${hashStr}`;
 }
 
 function updateDashboardStats(stats) {

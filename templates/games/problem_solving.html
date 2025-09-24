@@ -167,6 +167,47 @@ document.addEventListener('DOMContentLoaded', function() {
     
     let currentCase = 1;
     let completedCases = 0;
+    let currentUser = null;
+    
+    // Check auth and get user
+    checkAuth();
+    
+    async function checkAuth() {
+        try {
+            const response = await fetch('/api/auth/user');
+            const data = await response.json();
+            
+            if (data.user) {
+                currentUser = data.user;
+                loadProgress();
+            } else {
+                window.location.href = '/signin';
+            }
+        } catch (error) {
+            console.error('Auth check error:', error);
+            window.location.href = '/signin';
+        }
+    }
+    
+    function generateUserId(email) {
+        let hash = 0;
+        for (let i = 0; i < email.length; i++) {
+            const char = email.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash;
+        }
+        const hashStr = Math.abs(hash).toString();
+        const emailPrefix = email.split('@')[0].substring(0, 5);
+        return `user_${emailPrefix}_${hashStr}`;
+    }
+    
+    function loadProgress() {
+        if (currentUser) {
+            const userId = currentUser.uid || generateUserId(currentUser.email);
+            const completed = parseInt(localStorage.getItem(`cases_completed_${userId}`) || '0');
+            document.getElementById('cases-completed').textContent = completed;
+        }
+    }
     
     // Start button
     document.getElementById('start-cases').addEventListener('click', function() {
@@ -195,7 +236,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('current-case').textContent = caseNum;
     }
     
-    function submitCase(caseNumber) {
+    async function submitCase(caseNumber) {
         const caseCard = document.querySelector(`[data-case="${caseNumber}"]`);
         const textareas = caseCard.querySelectorAll('textarea');
         
@@ -216,6 +257,17 @@ document.addEventListener('DOMContentLoaded', function() {
         completedCases++;
         document.getElementById('cases-completed').textContent = completedCases;
         
+        // Save progress with consistent user ID
+        if (currentUser) {
+            const userId = currentUser.uid || generateUserId(currentUser.email);
+            localStorage.setItem(`cases_completed_${userId}`, completedCases.toString());
+            
+            // Add activity with specific user ID
+            const caseNames = ['Daily Operations', 'Group Problem-Solving', 'Communication Challenge'];
+            const caseName = caseNames[parseInt(caseNumber) - 1] || 'Case Study';
+            addActivity(userId, 'problem-solving', 'Problem Solving', `Completed "${caseName}" case study`);
+        }
+        
         // Disable inputs
         textareas.forEach(textarea => textarea.disabled = true);
         caseCard.querySelector('.submit-case').disabled = true;
@@ -232,6 +284,37 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('completion').classList.remove('hidden');
             }, 1000);
         }
+    }
+    
+    // Local addActivity function for user-specific activities
+    function addActivity(userId, type, title, description) {
+        const activities = JSON.parse(localStorage.getItem(`activities_${userId}`) || '[]');
+        const newActivity = {
+            icon: getActivityIcon(type),
+            title: title,
+            description: description,
+            time: 'Just now',
+            type: type,
+            timestamp: Date.now()
+        };
+        
+        activities.unshift(newActivity);
+        const recentActivities = activities.slice(0, 10);
+        localStorage.setItem(`activities_${userId}`, JSON.stringify(recentActivities));
+    }
+    
+    function getActivityIcon(type) {
+        const icons = {
+            'memory': '🧩',
+            'problem-solving': '💡',
+            'tbi-memory': '🎯',
+            'achievement': '🏆',
+            'progress': '📈',
+            'game': '🎮',
+            'case': '📝',
+            'exercise': '🔄'
+        };
+        return icons[type] || '🎯';
     }
 });
 </script>

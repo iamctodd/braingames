@@ -285,6 +285,21 @@ function requireAuth(callback) {
     return true;
 }
 
+// Generate consistent, unique user ID from email
+function generateUserId(email) {
+    // Create a consistent hash from email for unique ID
+    let hash = 0;
+    for (let i = 0; i < email.length; i++) {
+        const char = email.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; // Convert to 32-bit integer
+    }
+    // Convert to positive number and add email prefix for readability
+    const hashStr = Math.abs(hash).toString();
+    const emailPrefix = email.split('@')[0].substring(0, 5);
+    return `user_${emailPrefix}_${hashStr}`;
+}
+
 async function saveGameData(endpoint, data) {
     if (!currentUser) return false;
     

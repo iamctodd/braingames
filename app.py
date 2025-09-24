@@ -137,5 +137,81 @@ def problem_solving_game():
 def tbi_memory_game():
     return render_template('games/tbi_memory.html')
 
+@app.route('/signin')
+def signin_page():
+    error = request.args.get('error')
+    error_message = ''
+    
+    if error == 'missing-fields':
+        error_message = 'Please enter both email and password.'
+    elif error == 'server-error':
+        error_message = 'Server error occurred. Please try again.'
+    
+    return f'''
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sign In - Brain Games</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <div class="text-center mb-6">
+            <h1 class="text-2xl font-bold">🧠 Brain Games</h1>
+            <p class="text-gray-600">Sign in to continue</p>
+        </div>
+        
+        {f'<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error_message}</div>' if error_message else ''}
+        
+        <form action="/manual-login" method="POST" class="space-y-4">
+            <div>
+                <input type="email" name="email" placeholder="Enter your email" required
+                       class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+                <input type="password" name="password" placeholder="Enter your password" required
+                       class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700">
+                Sign In
+            </button>
+        </form>
+        
+        <div class="mt-4 text-center">
+            <p class="text-sm text-gray-600">
+                For demo: any email + any password works
+            </p>
+        </div>
+    </div>
+</body>
+</html>
+    '''
+
+@app.route('/manual-login', methods=['POST'])
+def manual_login():
+    try:
+        email = request.form.get('email', '').strip()
+        password = request.form.get('password', '').strip()
+        
+        print(f"Login attempt - Email: {email}, Password: {'*' * len(password)}")  # Debug log
+        
+        # Simple validation - for demo, any email/password works
+        if email and password and len(password) >= 1:
+            user_data = {
+                'uid': f'demo-{email.split("@")[0]}',
+                'email': email,
+                'displayName': email.split('@')[0]
+            }
+            session['user'] = user_data
+            print(f"User logged in: {user_data}")  # Debug log
+            return redirect('/dashboard')
+        else:
+            print("Login failed - missing email or password")  # Debug log
+            return redirect('/signin?error=missing-fields')
+            
+    except Exception as e:
+        print(f"Login error: {e}")  # Debug log
+        return redirect('/signin?error=server-error')
+
 if __name__ == '__main__':
     app.run(debug=True)
