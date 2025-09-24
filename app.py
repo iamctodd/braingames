@@ -34,6 +34,14 @@ def login():
     session['user'] = user_data
     return jsonify({'success': True, 'user': user_data})
 
+@app.route('/debug-session')
+def debug_session():
+    return jsonify({
+        'session_data': dict(session),
+        'has_user': 'user' in session,
+        'session_keys': list(session.keys())
+    })
+
 @app.route('/logout')
 def logout_page():
     # Clear Flask session
