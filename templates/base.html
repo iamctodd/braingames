@@ -61,14 +61,14 @@
                 </div>
                 <div class="flex items-center space-x-4">
                     <div id="nav-auth-section">
-                        <!-- Manual auth section for debugging -->
+                        <!-- Simple working auth section -->
                         <div class="flex items-center space-x-3">
                             <img src="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 fill=%22%23gray%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z%22/%3E%3C/svg%3E" 
                                  alt="Profile" class="w-8 h-8 rounded-full bg-gray-200">
                             <span class="hidden sm:inline text-gray-700 text-sm">hi@ctodd.com</span>
-                            <button id="manual-sign-out" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">
+                            <a href="/logout" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm no-underline">
                                 Sign Out
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -145,29 +145,43 @@
     </div>
 
     <script>
-    // Manual sign out for debugging
-    document.addEventListener('DOMContentLoaded', () => {
-        const manualSignOut = document.getElementById('manual-sign-out');
-        if (manualSignOut) {
-            manualSignOut.addEventListener('click', async () => {
-                try {
-                    // Clear Flask session
-                    await fetch('/api/auth/logout', { method: 'POST' });
-                    
-                    // Clear localStorage
-                    localStorage.clear();
-                    
-                    // Redirect to home
-                    window.location.href = '/';
-                    
-                    alert('Signed out successfully!');
-                } catch (error) {
-                    console.error('Sign out error:', error);
-                    // Force redirect anyway
-                    window.location.href = '/';
-                }
+    // Ultra-simple sign out function
+    function signOutUser() {
+        try {
+            // Clear localStorage
+            localStorage.clear();
+            
+            // Clear sessionStorage  
+            sessionStorage.clear();
+            
+            // Call Flask logout
+            fetch('/api/auth/logout', { 
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            }).then(() => {
+                // Force redirect to home
+                window.location.replace('/');
+            }).catch(() => {
+                // Even if fetch fails, redirect anyway
+                window.location.replace('/');
             });
+            
+            // Show immediate feedback
+            alert('Signing out...');
+            
+        } catch (error) {
+            console.error('Sign out error:', error);
+            // Force redirect no matter what
+            window.location.replace('/');
         }
+        
+        // Prevent default link behavior
+        return false;
+    }
+    
+    // Alternative: Direct link approach
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('Page loaded, sign out function ready');
     });
     </script>
 

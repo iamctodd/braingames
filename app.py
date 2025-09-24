@@ -34,6 +34,13 @@ def login():
     session['user'] = user_data
     return jsonify({'success': True, 'user': user_data})
 
+@app.route('/logout')
+def logout_page():
+    # Clear Flask session
+    session.clear()
+    # Redirect to home with success message
+    return redirect('/?message=signed-out')
+
 @app.route('/api/auth/logout', methods=['POST'])
 def logout():
     session.pop('user', None)
@@ -84,78 +91,6 @@ def problem_solving_game():
 @app.route('/games/tbi-memory')
 def tbi_memory_game():
     return render_template('games/tbi_memory.html')
-
-@app.route('/test-firebase')
-def test_firebase():
-    return '''
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Firebase Test</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 p-8">
-    <div class="max-w-md mx-auto bg-white rounded-lg shadow p-6">
-        <h1 class="text-xl font-bold mb-4">Firebase Connection Test</h1>
-        <div id="test-results" class="space-y-2"></div>
-        <button id="test-btn" class="bg-blue-600 text-white px-4 py-2 rounded mt-4">
-            Test Firebase
-        </button>
-    </div>
-
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
-        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
-        
-        const results = document.getElementById('test-results');
-        
-        function addResult(message, success = true) {
-            const div = document.createElement('div');
-            div.className = `p-2 rounded ${success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`;
-            div.textContent = message;
-            results.appendChild(div);
-            console.log(message);
-        }
-        
-        try {
-            // Your Firebase config - REPLACE WITH REAL VALUES
-            const firebaseConfig = {
-                apiKey: "your-actual-api-key-here",
-                authDomain: "braingames-5ded7.firebaseapp.com",
-                projectId: "braingames-5ded7",
-                storageBucket: "braingames-5ded7.appspot.com",
-                messagingSenderId: "123456789",
-                appId: "your-actual-app-id"
-            };
-            
-            addResult("✅ Firebase config loaded");
-            
-            const app = initializeApp(firebaseConfig);
-            addResult("✅ Firebase app initialized");
-            
-            const auth = getAuth();
-            addResult("✅ Firebase Auth ready");
-            
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    addResult(`✅ User logged in: ${user.email}`);
-                } else {
-                    addResult("ℹ️ No user logged in");
-                }
-            });
-            
-            document.getElementById('test-btn').addEventListener('click', () => {
-                addResult("🔄 Auth state listener is working!");
-            });
-            
-        } catch (error) {
-            addResult(`❌ Firebase Error: ${error.message}`, false);
-            console.error('Firebase error:', error);
-        }
-    </script>
-</body>
-</html>
-    '''
 
 if __name__ == '__main__':
     app.run(debug=True)
