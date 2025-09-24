@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}TBI Memory - Brain Games{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6">
+    <!-- Game Header -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="flex items-center justify-between mb-4">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">TBI Memory Training</h1>
+                <p class="text-gray-600">Specialized memory exercises for recovery and strengthening</p>
+            </div>
+            <a href="/dashboard" class="text-blue-600 hover:text-blue-700">← Back to Dashboard</a>
+        </div>
+    </div>
+
+    <!-- Integration Options -->
+    <div class="bg-white rounded-lg shadow-md p-8 text-center">
+        <div class="text-6xl mb-6">🎯</div>
+        <h2 class="text-2xl font-bold text-gray-900 mb-4">TBI Memory Exercises</h2>
+        <p class="text-gray-600 mb-8">
+            Your specialized TBI memory training exercises are ready to help with cognitive recovery.
+        </p>
+        
+        <div class="space-y-4">
+            <!-- Option 1: Link to existing game -->
+            <a href="https://iamctodd.github.io/tbi-memory/" target="_blank"
+               class="inline-block bg-purple-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors">
+                Launch TBI Memory Game →
+            </a>
+            
+            <!-- Option 2: Embed existing game (if you want) -->
+            <div class="text-sm text-gray-500">
+                <p>Opens your existing TBI memory training application</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alternatively, embed your existing game in an iframe -->
+    <!-- 
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <iframe src="https://iamctodd.github.io/tbi-memory/" 
+                class="w-full h-96 border rounded-lg"
+                title="TBI Memory Game">
+        </iframe>
+    </div>
+    -->
+</div>
+
+<script>
+// Auth protection
+document.addEventListener('DOMContentLoaded', () => {
+    window.onAuthStateChanged(window.auth, (user) => {
+        if (!user) {
+            window.location.href = '/';
+        }
+    });
+});
+</script>
+{% endblock %}
