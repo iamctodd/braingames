@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+
+{% block title %}Brain Games - Train Your Mind{% endblock %}
+
+{% block content %}
+<div class="space-y-16">
+    <!-- Hero Section -->
+    <div class="text-center py-16">
+        <div class="text-6xl mb-6">🧠</div>
+        <h1 class="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+            Train Your Mind
+        </h1>
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
+            Sharpen your cognitive abilities with scientifically-designed brain games. 
+            Memory training, problem-solving, and specialized exercises all in one place.
+        </p>
+        <div class="space-x-4">
+            <button id="get-started-btn" class="bg-blue-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-colors">
+                Get Started Free
+            </button>
+            <a href="#features" class="text-blue-600 px-8 py-3 rounded-lg text-lg font-semibold hover:text-blue-700 transition-colors">
+                Learn More
+            </a>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div id="features" class="py-16">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Three Powerful Brain Training Games</h2>
+            <p class="text-gray-600 max-w-2xl mx-auto">
+                Each game targets different cognitive skills to give you a comprehensive mental workout.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Memory Training -->
+            <div class="bg-white rounded-lg shadow-lg p-8 text-center">
+                <div class="text-5xl mb-4">🧩</div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-3">Memory Training</h3>
+                <p class="text-gray-600 mb-6">
+                    Test and strengthen your memory with pattern recognition, sequence recall, 
+                    and spatial memory challenges.
+                </p>
+                <ul class="text-sm text-gray-500 space-y-2 mb-6">
+                    <li>✓ Visual pattern matching</li>
+                    <li>✓ Sequence memorization</li>
+                    <li>✓ Progressive difficulty</li>
+                    <li>✓ Performance tracking</li>
+                </ul>
+                <button class="w-full bg-blue-100 text-blue-700 py-2 px-4 rounded-md hover:bg-blue-200 transition-colors" onclick="window.location.href='https://a-case-study.netlify.app/'">
+                    Play Game
+                </button>
+            </div>
+
+            <!-- Problem Solving -->
+            <div class="bg-white rounded-lg shadow-lg p-8 text-center">
+                <div class="text-5xl mb-4">💡</div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-3">Problem Solving</h3>
+                <p class="text-gray-600 mb-6">
+                    Practice critical thinking with real-world scenarios and case studies 
+                    that challenge your analytical skills.
+                </p>
+                <ul class="text-sm text-gray-500 space-y-2 mb-6">
+                    <li>✓ Real-world case studies</li>
+                    <li>✓ Multi-step problem solving</li>
+                    <li>✓ Decision-making practice</li>
+                    <li>✓ Solution evaluation</li>
+                </ul>
+                <button class="w-full bg-green-100 text-green-700 py-2 px-4 rounded-md hover:bg-green-200 transition-colors" onclick="window.location.href='https://mem-app.onrender.com/'">
+                    Play Game
+                </button>
+            </div>
+
+            <!-- TBI Memory -->
+            <div class="bg-white rounded-lg shadow-lg p-8 text-center">
+                <div class="text-5xl mb-4">🎯</div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-3">TBI Memory</h3>
+                <p class="text-gray-600 mb-6">
+                    Specialized memory exercises designed for traumatic brain injury 
+                    recovery and cognitive rehabilitation.
+                </p>
+                <ul class="text-sm text-gray-500 space-y-2 mb-6">
+                    <li>✓ Therapeutic exercises</li>
+                    <li>✓ Adaptive difficulty</li>
+                    <li>✓ Recovery-focused design</li>
+                    <li>✓ Progress monitoring</li>
+                </ul>
+                <button class="w-full bg-purple-100 text-purple-700 py-2 px-4 rounded-md hover:bg-purple-200 transition-colors" onclick="window.location.href='https://iamctodd.github.io/tbi-memory/'">
+                    Play Game 
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Benefits Section -->
+    <div class="bg-gray-50 rounded-2xl p-8 md:p-16">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Why Choose Brain Games?</h2>
+            <p class="text-gray-600 max-w-2xl mx-auto">
+                Our platform combines the latest cognitive science with engaging gameplay 
+                to help you achieve measurable mental improvement.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div class="text-center">
+                <div class="text-3xl mb-3">📊</div>
+                <h4 class="font-semibold text-gray-900 mb-2">Track Progress</h4>
+                <p class="text-sm text-gray-600">Monitor your improvement with detailed analytics and performance metrics.</p>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl mb-3">🎯</div>
+                <h4 class="font-semibold text-gray-900 mb-2">Adaptive Training</h4>
+                <p class="text-sm text-gray-600">Games adjust difficulty based on your performance for optimal challenge.</p>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl mb-3">📱</div>
+                <h4 class="font-semibold text-gray-900 mb-2">Mobile Friendly</h4>
+                <p class="text-sm text-gray-600">Train anywhere with responsive design that works on all devices.</p>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl mb-3">🔒</div>
+                <h4 class="font-semibold text-gray-900 mb-2">Secure & Private</h4>
+                <p class="text-sm text-gray-600">Your data is protected with enterprise-grade security and privacy.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    <div class="text-center py-16 bg-blue-600 rounded-2xl text-white">
+        <h2 class="text-3xl font-bold mb-4">Ready to Start Training?</h2>
+        <p class="text-xl mb-8 text-blue-100">Join thousands of users improving their cognitive abilities daily.</p>
+        <button id="cta-signup-btn" class="bg-white text-blue-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-colors">
+            Sign Up Now - It's Free
+        </button>
+        <p class="text-sm text-blue-200 mt-4">No credit card required • Start playing immediately</p>
+    </div>
+
+    <!-- How It Works -->
+    <div class="py-16">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">How It Works</h2>
+            <p class="text-gray-600 max-w-2xl mx-auto">
+                Get started in minutes with our simple process.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="text-center">
+                <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="text-blue-600 font-bold text-xl">1</span>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Sign Up</h3>
+                <p class="text-gray-600">Create your free account using Google, Apple, or email in seconds.</p>
+            </div>
+            <div class="text-center">
+                <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="text-green-600 font-bold text-xl">2</span>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Choose Your Game</h3>
+                <p class="text-gray-600">Select from memory training, problem solving, or specialized TBI exercises.</p>
+            </div>
+            <div class="text-center">
+                <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="text-purple-600 font-bold text-xl">3</span>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Start Training</h3>
+                <p class="text-gray-600">Begin your cognitive training journey and track your progress over time.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const getStartedBtn = document.getElementById('get-started-btn');
+    const ctaSignupBtn = document.getElementById('cta-signup-btn');
+    
+    // Check if user is already signed in
+    window.onAuthStateChanged(window.auth, (user) => {
+        if (user) {
+            // User is signed in, redirect to dashboard
+            window.location.href = '/dashboard';
+        }
+    });
+    
+    // Set up sign-up button listeners
+    getStartedBtn.addEventListener('click', () => {
+        document.getElementById('auth-modal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    });
+    
+    ctaSignupBtn.addEventListener('click', () => {
+        document.getElementById('auth-modal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    });
+    
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+});
+</script>
+<script>
+
+// Check if Firebase scripts loaded
+setTimeout(() => {
+    console.log('Firebase check:', typeof window.firebase);
+    console.log('Auth check:', typeof window.auth);
+}, 3000);
+</script>
+{% endblock %}

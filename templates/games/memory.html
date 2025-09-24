@@ -1,0 +1,355 @@
+{% extends "base.html" %}
+
+{% block title %}Memory Training - Brain Games{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6">
+    <!-- Game Header -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="flex items-center justify-between mb-4">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">Memory Training</h1>
+                <p class="text-gray-600">Test your memory with pattern sequences</p>
+            </div>
+            <a href="/dashboard" class="text-blue-600 hover:text-blue-700">← Back to Dashboard</a>
+        </div>
+        
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="text-center">
+                <div class="text-2xl font-bold text-blue-600" id="current-score">0</div>
+                <div class="text-sm text-gray-600">Score</div>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-green-600" id="current-level">1</div>
+                <div class="text-sm text-gray-600">Level</div>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-purple-600" id="best-score">0</div>
+                <div class="text-sm text-gray-600">Best Score</div>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-orange-600" id="sequence-length">3</div>
+                <div class="text-sm text-gray-600">Sequence</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Board -->
+    <div class="bg-white rounded-lg shadow-md p-8">
+        <div id="game-container" class="text-center">
+            <!-- Instructions -->
+            <div id="instructions" class="mb-8">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">How to Play</h2>
+                <div class="bg-blue-50 rounded-lg p-4 text-left max-w-md mx-auto">
+                    <ol class="list-decimal list-inside space-y-2 text-gray-700">
+                        <li>Watch the sequence of colored squares light up</li>
+                        <li>Memorize the order they appeared</li>
+                        <li>Click the squares in the same order</li>
+                        <li>Each level adds one more step to remember</li>
+                    </ol>
+                </div>
+                <button id="start-game" class="mt-6 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                    Start Game
+                </button>
+            </div>
+
+            <!-- Game Status -->
+            <div id="game-status" class="mb-6 hidden">
+                <div class="text-lg font-medium text-gray-700" id="status-text">Get ready...</div>
+                <div class="mt-2">
+                    <div class="bg-gray-200 rounded-full h-2 w-64 mx-auto">
+                        <div id="progress-bar" class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Memory Grid -->
+            <div id="memory-grid" class="hidden">
+                <div class="grid grid-cols-2 gap-4 w-64 h-64 mx-auto mb-6">
+                    <div class="memory-tile bg-red-400 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105" data-color="red"></div>
+                    <div class="memory-tile bg-blue-400 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105" data-color="blue"></div>
+                    <div class="memory-tile bg-green-400 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105" data-color="green"></div>
+                    <div class="memory-tile bg-yellow-400 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105" data-color="yellow"></div>
+                </div>
+            </div>
+
+            <!-- Game Controls -->
+            <div id="game-controls" class="space-x-4 hidden">
+                <button id="restart-game" class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700">
+                    Restart
+                </button>
+                <button id="next-level" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 hidden">
+                    Next Level
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Results -->
+    <div id="game-over" class="bg-white rounded-lg shadow-md p-6 hidden">
+        <div class="text-center">
+            <div class="text-4xl mb-4" id="result-emoji">🎯</div>
+            <h2 class="text-2xl font-bold text-gray-900 mb-2" id="result-title">Game Over</h2>
+            <p class="text-gray-600 mb-4" id="result-message">Great effort! Keep practicing to improve.</p>
+            
+            <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <div class="text-xl font-bold text-blue-600" id="final-score">0</div>
+                        <div class="text-sm text-gray-600">Final Score</div>
+                    </div>
+                    <div>
+                        <div class="text-xl font-bold text-green-600" id="final-level">1</div>
+                        <div class="text-sm text-gray-600">Level Reached</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="space-x-4">
+                <button id="play-again" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                    Play Again
+                </button>
+                <a href="/dashboard" class="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 inline-block">
+                    Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+class MemoryGame {
+    constructor() {
+        this.sequence = [];
+        this.playerSequence = [];
+        this.level = 1;
+        this.score = 0;
+        this.bestScore = 0;
+        this.isPlaying = false;
+        this.showingSequence = false;
+        this.currentUser = null;
+        
+        this.initializeElements();
+        this.loadBestScore();
+        this.setupEventListeners();
+    }
+    
+    initializeElements() {
+        this.tiles = document.querySelectorAll('.memory-tile');
+        this.scoreElement = document.getElementById('current-score');
+        this.levelElement = document.getElementById('current-level');
+        this.bestScoreElement = document.getElementById('best-score');
+        this.sequenceLengthElement = document.getElementById('sequence-length');
+        this.statusText = document.getElementById('status-text');
+        this.progressBar = document.getElementById('progress-bar');
+        
+        this.instructions = document.getElementById('instructions');
+        this.gameStatus = document.getElementById('game-status');
+        this.memoryGrid = document.getElementById('memory-grid');
+        this.gameControls = document.getElementById('game-controls');
+        this.gameOver = document.getElementById('game-over');
+    }
+    
+    setupEventListeners() {
+        document.getElementById('start-game').addEventListener('click', () => this.startGame());
+        document.getElementById('restart-game').addEventListener('click', () => this.restartGame());
+        document.getElementById('next-level').addEventListener('click', () => this.nextLevel());
+        document.getElementById('play-again').addEventListener('click', () => this.restartGame());
+        
+        this.tiles.forEach(tile => {
+            tile.addEventListener('click', (e) => this.handleTileClick(e.target.dataset.color));
+        });
+        
+        // Auth state listener
+        window.onAuthStateChanged(window.auth, (user) => {
+            this.currentUser = user;
+            if (!user) {
+                window.location.href = '/';
+            } else {
+                this.loadBestScore();
+            }
+        });
+    }
+    
+    loadBestScore() {
+        if (this.currentUser) {
+            this.bestScore = parseInt(localStorage.getItem(`memory_best_${this.currentUser.uid}`) || '0');
+            this.bestScoreElement.textContent = this.bestScore;
+        }
+    }
+    
+    startGame() {
+        this.isPlaying = true;
+        this.level = 1;
+        this.score = 0;
+        this.sequence = [];
+        
+        this.instructions.classList.add('hidden');
+        this.gameStatus.classList.remove('hidden');
+        this.memoryGrid.classList.remove('hidden');
+        this.gameControls.classList.remove('hidden');
+        this.gameOver.classList.add('hidden');
+        
+        this.updateDisplay();
+        this.generateSequence();
+        this.showSequence();
+    }
+    
+    restartGame() {
+        this.startGame();
+    }
+    
+    nextLevel() {
+        this.level++;
+        this.generateSequence();
+        this.showSequence();
+        document.getElementById('next-level').classList.add('hidden');
+    }
+    
+    generateSequence() {
+        const colors = ['red', 'blue', 'green', 'yellow'];
+        this.sequence.push(colors[Math.floor(Math.random() * colors.length)]);
+        this.playerSequence = [];
+        this.updateDisplay();
+    }
+    
+    async showSequence() {
+        this.showingSequence = true;
+        this.statusText.textContent = 'Watch the sequence...';
+        this.disableTiles();
+        
+        for (let i = 0; i < this.sequence.length; i++) {
+            await this.sleep(800);
+            this.lightUpTile(this.sequence[i]);
+            await this.sleep(600);
+            this.dimTile(this.sequence[i]);
+        }
+        
+        await this.sleep(500);
+        this.showingSequence = false;
+        this.statusText.textContent = 'Your turn! Click the tiles in order.';
+        this.enableTiles();
+        this.updateProgress();
+    }
+    
+    lightUpTile(color) {
+        const tile = document.querySelector(`[data-color="${color}"]`);
+        tile.classList.add('opacity-100', 'scale-110');
+        tile.classList.remove('opacity-70');
+    }
+    
+    dimTile(color) {
+        const tile = document.querySelector(`[data-color="${color}"]`);
+        tile.classList.remove('opacity-100', 'scale-110');
+        tile.classList.add('opacity-70');
+    }
+    
+    disableTiles() {
+        this.tiles.forEach(tile => {
+            tile.classList.add('pointer-events-none', 'opacity-70');
+        });
+    }
+    
+    enableTiles() {
+        this.tiles.forEach(tile => {
+            tile.classList.remove('pointer-events-none', 'opacity-70');
+        });
+    }
+    
+    handleTileClick(color) {
+        if (this.showingSequence || !this.isPlaying) return;
+        
+        this.lightUpTile(color);
+        setTimeout(() => this.dimTile(color), 200);
+        
+        this.playerSequence.push(color);
+        
+        // Check if the current input is correct
+        const currentIndex = this.playerSequence.length - 1;
+        if (this.playerSequence[currentIndex] !== this.sequence[currentIndex]) {
+            this.gameOverHandler(false);
+            return;
+        }
+        
+        // Check if sequence is complete
+        if (this.playerSequence.length === this.sequence.length) {
+            this.score += this.level * 10;
+            this.statusText.textContent = 'Correct! Well done!';
+            this.updateDisplay();
+            this.updateProgress();
+            
+            if (this.level < 10) {
+                document.getElementById('next-level').classList.remove('hidden');
+            } else {
+                this.gameOverHandler(true);
+            }
+        } else {
+            this.updateProgress();
+        }
+    }
+    
+    updateProgress() {
+        const progress = (this.playerSequence.length / this.sequence.length) * 100;
+        this.progressBar.style.width = `${progress}%`;
+    }
+    
+    updateDisplay() {
+        this.scoreElement.textContent = this.score;
+        this.levelElement.textContent = this.level;
+        this.sequenceLengthElement.textContent = this.sequence.length;
+    }
+    
+    async gameOverHandler(won = false) {
+        this.isPlaying = false;
+        this.disableTiles();
+        
+        // Save best score
+        if (this.score > this.bestScore && this.currentUser) {
+            this.bestScore = this.score;
+            localStorage.setItem(`memory_best_${this.currentUser.uid}`, this.bestScore.toString());
+            this.bestScoreElement.textContent = this.bestScore;
+            
+            // Save to backend
+            await saveGameData('/api/games/memory/score', { score: this.score });
+        }
+        
+        // Update game count
+        if (this.currentUser) {
+            const games = parseInt(localStorage.getItem(`memory_games_${this.currentUser.uid}`) || '0') + 1;
+            localStorage.setItem(`memory_games_${this.currentUser.uid}`, games.toString());
+        }
+        
+        // Show results
+        this.showResults(won);
+    }
+    
+    showResults(won) {
+        this.gameStatus.classList.add('hidden');
+        this.memoryGrid.classList.add('hidden');
+        this.gameControls.classList.add('hidden');
+        this.gameOver.classList.remove('hidden');
+        
+        const emoji = won ? '🏆' : '🎯';
+        const title = won ? 'Congratulations!' : 'Game Over';
+        const message = won ? 
+            'Amazing! You completed all levels!' : 
+            'Good effort! Keep practicing to improve your memory.';
+        
+        document.getElementById('result-emoji').textContent = emoji;
+        document.getElementById('result-title').textContent = title;
+        document.getElementById('result-message').textContent = message;
+        document.getElementById('final-score').textContent = this.score;
+        document.getElementById('final-level').textContent = this.level;
+    }
+    
+    sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+}
+
+// Initialize game when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    new MemoryGame();
+});
+</script>
+{% endblock %}

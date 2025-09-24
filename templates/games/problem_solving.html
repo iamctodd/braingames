@@ -1,0 +1,464 @@
+{% extends "base.html" %}
+
+{% block title %}Problem Solving - Brain Games{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6">
+    <!-- Game Header -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="flex items-center justify-between mb-4">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">Problem Solving Practice</h1>
+                <p class="text-gray-600">Real situations • Simple solutions • 20 minutes total</p>
+            </div>
+            <a href="/dashboard" class="text-blue-600 hover:text-blue-700">← Back to Dashboard</a>
+        </div>
+        
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="text-center">
+                <div class="text-2xl font-bold text-green-600" id="cases-completed">0</div>
+                <div class="text-sm text-gray-600">Completed</div>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-blue-600" id="total-cases">3</div>
+                <div class="text-sm text-gray-600">Total Cases</div>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-purple-600" id="time-remaining">20:00</div>
+                <div class="text-sm text-gray-600">Time Left</div>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-orange-600" id="current-case">1</div>
+                <div class="text-sm text-gray-600">Current</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Instructions -->
+    <div id="instructions" class="bg-blue-50 rounded-lg p-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">Instructions</h2>
+        <p class="text-gray-700 mb-4">Read each case below, then click "Respond to This Case" to share your thoughts. Complete them one at a time!</p>
+        <ol class="list-decimal list-inside space-y-2 text-gray-700 mb-6">
+            <li><strong>Listen:</strong> What's really bothering people?</li>
+            <li><strong>Ask:</strong> What would make this better?</li>
+            <li><strong>Try:</strong> Start with the simplest solution</li>
+            <li><strong>Check:</strong> Is it working? If not, try something else!</li>
+        </ol>
+        <button id="start-cases" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+            Start Problem Solving
+        </button>
+    </div>
+
+    <!-- Case Studies -->
+    <div id="case-studies" class="space-y-6 hidden">
+        <!-- Case 1: Daily Operations -->
+        <div class="case-card bg-white rounded-lg shadow-md p-6" data-case="1">
+            <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-green-100 rounded-full p-2">
+                        <span class="text-green-600 font-bold">1</span>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900">Daily Operations</h3>
+                        <span class="text-sm text-gray-500">5 minutes</span>
+                    </div>
+                </div>
+                <div class="case-status bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">
+                    In Progress
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <p class="text-gray-700 mb-4">
+                    Betty runs a small bakery. Every morning she runs out of popular items too early, 
+                    but has leftover pastries at closing time.
+                </p>
+                
+                <div class="space-y-3 mb-4">
+                    <div class="bg-gray-50 p-3 rounded-lg">
+                        <strong class="text-gray-900">1. What's the main problem here?</strong>
+                        <textarea class="w-full mt-2 p-2 border rounded-md resize-none" rows="2" 
+                                  data-question="1" placeholder="Your thoughts..."></textarea>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-lg">
+                        <strong class="text-gray-900">2. What simple solution would you try first?</strong>
+                        <textarea class="w-full mt-2 p-2 border rounded-md resize-none" rows="2" 
+                                  data-question="2" placeholder="Your solution..."></textarea>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-lg">
+                        <strong class="text-gray-900">3. How could Betty learn what customers really want?</strong>
+                        <textarea class="w-full mt-2 p-2 border rounded-md resize-none" rows="2" 
+                                  data-question="3" placeholder="Your approach..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="bg-blue-50 p-3 rounded-lg mb-4">
+                    <p class="text-blue-700"><strong>💡 Think like a customer</strong> - what would make you happy?</p>
+                </div>
+            </div>
+            
+            <button class="submit-case bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700" 
+                    data-case="1">
+                Submit Response
+            </button>
+        </div>
+
+        <!-- Case 2: Group Problem-Solving -->
+        <div class="case-card bg-white rounded-lg shadow-md p-6 hidden" data-case="2">
+            <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-green-100 rounded-full p-2">
+                        <span class="text-green-600 font-bold">2</span>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900">Group Problem-Solving</h3>
+                        <span class="text-sm text-gray-500">5 minutes</span>
+                    </div>
+                </div>
+                <div class="case-status bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs">
+                    Locked
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <p class="text-gray-700 mb-4">
+                    The local community garden has 20 plots, but only 8 people are actively gardening. 
+                    The unused plots are becoming weedy and attracting complaints.
+                </p>
+                
+                <div class="space-y-3 mb-4">
+                    <div class="bg-gray-50 p-3 rounded-lg">
+                        <strong class="text-gray-900">1. Why aren't all plots being used?</strong>
+                        <textarea class="w-full mt-2 p-2 border rounded-md resize-none" rows="2" 
+                                  data-question="1" placeholder="Your analysis..."></textarea>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-lg">
+                        <strong class="text-gray-900">2. What's a simple way to get more people involved?</strong>
+                        <textarea class="w-full mt-2 p-2 border rounded-md resize-none" rows="2" 
+                                  data-question="2" placeholder="Your solution..."></textarea>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-lg">
+                        <strong class="text-gray-900">3. How could the group make this decision together?</strong>
+                        <textarea class="w-full mt-2 p-2 border rounded-md resize-none" rows="2" 
+                                  data-question="3" placeholder="Your process..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="bg-blue-50 p-3 rounded-lg mb-4">
+                    <p class="text-blue-700"><strong>💡 Sometimes the simplest solutions work best!</strong></p>
+                </div>
+            </div>
+            
+            <button class="submit-case bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700" 
+                    data-case="2">
+                Submit Response
+            </button>
+        </div>
+
+        <!-- Case 3: Communication Challenge -->
+        <div class="case-card bg-white rounded-lg shadow-md p-6 hidden" data-case="3">
+            <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-green-100 rounded-full p-2">
+                        <span class="text-green-600 font-bold">3</span>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900">Communication Challenge</h3>
+                        <span class="text-sm text-gray-500">5 minutes</span>
+                    </div>
+                </div>
+                <div class="case-status bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs">
+                    Locked
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <p class="text-gray-700 mb-4">
+                    The library book club used to have 15 regular members. Now only 5 people come to meetings. 
+                    Members say they don't like the current book choices.
+                </p>
+                
+                <div class="space-y-3 mb-4">
+                    <div class="bg-gray-50 p-3 rounded-lg">
+                        <strong class="text-gray-900">1. What's really causing people to stop coming?</strong>
+                        <textarea class="w-full mt-2 p-2 border rounded-md resize-none" rows="2" 
+                                  data-question="1" placeholder="Your analysis..."></textarea>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-lg">
+                        <strong class="text-gray-900">2. How could everyone have a say in book choices?</strong>
+                        <textarea class="w-full mt-2 p-2 border rounded-md resize-none" rows="2" 
+                                  data-question="2" placeholder="Your solution..."></textarea>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-lg">
+                        <strong class="text-gray-900">3. What would bring people back?</strong>
+                        <textarea class="w-full mt-2 p-2 border rounded-md resize-none" rows="2" 
+                                  data-question="3" placeholder="Your approach..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="bg-blue-50 p-3 rounded-lg mb-4">
+                    <p class="text-blue-700"><strong>💡 Listen first, then find solutions everyone can agree on.</strong></p>
+                </div>
+            </div>
+            
+            <button class="submit-case bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700" 
+                    data-case="3">
+                Submit Response
+            </button>
+        </div>
+    </div>
+
+    <!-- Completion Screen -->
+    <div id="completion-screen" class="bg-white rounded-lg shadow-md p-8 text-center hidden">
+        <div class="text-5xl mb-4">🎉</div>
+        <h2 class="text-2xl font-bold text-gray-900 mb-4">Great Job!</h2>
+        <p class="text-gray-600 mb-6">
+            You've completed all case studies. Your problem-solving approach shows thoughtful consideration 
+            of different perspectives and practical solutions.
+        </p>
+        
+        <div class="bg-gray-50 rounded-lg p-6 mb-6">
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <div class="text-2xl font-bold text-green-600" id="final-completed">3</div>
+                    <div class="text-sm text-gray-600">Cases Completed</div>
+                </div>
+                <div>
+                    <div class="text-2xl font-bold text-blue-600" id="final-time">15:30</div>
+                    <div class="text-sm text-gray-600">Time Used</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="space-x-4">
+            <button id="review-responses" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                Review Responses
+            </button>
+            <button id="try-again" class="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700">
+                Try Again
+            </button>
+            <a href="/dashboard" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 inline-block">
+                Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+class ProblemSolvingGame {
+    constructor() {
+        this.currentCase = 1;
+        this.totalCases = 3;
+        this.completedCases = 0;
+        this.startTime = null;
+        this.timeLimit = 20 * 60; // 20 minutes in seconds
+        this.timer = null;
+        this.currentUser = null;
+        this.responses = {};
+        
+        this.setupEventListeners();
+    }
+    
+    setupEventListeners() {
+        document.getElementById('start-cases').addEventListener('click', () => this.startCases());
+        
+        document.querySelectorAll('.submit-case').forEach(button => {
+            button.addEventListener('click', (e) => this.submitCase(e.target.dataset.case));
+        });
+        
+        document.getElementById('review-responses').addEventListener('click', () => this.reviewResponses());
+        document.getElementById('try-again').addEventListener('click', () => this.restart());
+        
+        // Auth state listener
+        window.onAuthStateChanged(window.auth, (user) => {
+            this.currentUser = user;
+            if (!user) {
+                window.location.href = '/';
+            } else {
+                this.loadProgress();
+            }
+        });
+    }
+    
+    loadProgress() {
+        if (this.currentUser) {
+            const completed = parseInt(localStorage.getItem(`cases_completed_${this.currentUser.uid}`) || '0');
+            document.getElementById('cases-completed').textContent = completed;
+        }
+    }
+    
+    startCases() {
+        this.startTime = Date.now();
+        this.startTimer();
+        
+        document.getElementById('instructions').classList.add('hidden');
+        document.getElementById('case-studies').classList.remove('hidden');
+        
+        this.showCase(1);
+        this.updateDisplay();
+    }
+    
+    startTimer() {
+        this.timer = setInterval(() => {
+            const elapsed = Math.floor((Date.now() - this.startTime) / 1000);
+            const remaining = Math.max(0, this.timeLimit - elapsed);
+            
+            if (remaining === 0) {
+                this.timeUp();
+                return;
+            }
+            
+            const minutes = Math.floor(remaining / 60);
+            const seconds = remaining % 60;
+            document.getElementById('time-remaining').textContent = 
+                `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }, 1000);
+    }
+    
+    showCase(caseNumber) {
+        // Hide all cases
+        document.querySelectorAll('.case-card').forEach(card => {
+            card.classList.add('hidden');
+        });
+        
+        // Show current case
+        const currentCaseCard = document.querySelector(`[data-case="${caseNumber}"]`);
+        currentCaseCard.classList.remove('hidden');
+        
+        // Update status
+        currentCaseCard.querySelector('.case-status').textContent = 'In Progress';
+        currentCaseCard.querySelector('.case-status').className = 
+            'case-status bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs';
+        
+        this.currentCase = caseNumber;
+        this.updateDisplay();
+    }
+    
+    async submitCase(caseNumber) {
+        const caseCard = document.querySelector(`[data-case="${caseNumber}"]`);
+        const textareas = caseCard.querySelectorAll('textarea');
+        const responses = {};
+        
+        // Collect responses
+        textareas.forEach(textarea => {
+            const question = textarea.dataset.question;
+            const answer = textarea.value.trim();
+            if (answer) {
+                responses[question] = answer;
+            }
+        });
+        
+        // Validate responses
+        if (Object.keys(responses).length < 3) {
+            this.showNotification('Please answer all questions before submitting.', 'warning');
+            return;
+        }
+        
+        // Save responses
+        this.responses[caseNumber] = responses;
+        
+        // Update case status
+        const statusElement = caseCard.querySelector('.case-status');
+        statusElement.textContent = 'Completed';
+        statusElement.className = 'case-status bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs';
+        
+        // Disable inputs
+        textareas.forEach(textarea => textarea.disabled = true);
+        caseCard.querySelector('.submit-case').disabled = true;
+        caseCard.querySelector('.submit-case').classList.add('opacity-50', 'cursor-not-allowed');
+        
+        this.completedCases++;
+        
+        // Save progress
+        if (this.currentUser) {
+            await saveGameData('/api/games/problem-solving/response', {
+                case_id: caseNumber,
+                response: responses,
+                completed_count: this.completedCases
+            });
+            
+            localStorage.setItem(`cases_completed_${this.currentUser.uid}`, this.completedCases.toString());
+        }
+        
+        this.showNotification('Case submitted successfully!', 'success');
+        
+        // Show next case or complete
+        if (this.completedCases < this.totalCases) {
+            setTimeout(() => {
+                this.showCase(parseInt(caseNumber) + 1);
+            }, 1500);
+        } else {
+            setTimeout(() => {
+                this.completeAllCases();
+            }, 1500);
+        }
+        
+        this.updateDisplay();
+    }
+    
+    updateDisplay() {
+        document.getElementById('cases-completed').textContent = this.completedCases;
+        document.getElementById('current-case').textContent = this.currentCase;
+    }
+    
+    completeAllCases() {
+        clearInterval(this.timer);
+        
+        const timeUsed = Math.floor((Date.now() - this.startTime) / 1000);
+        const minutes = Math.floor(timeUsed / 60);
+        const seconds = timeUsed % 60;
+        
+        document.getElementById('case-studies').classList.add('hidden');
+        document.getElementById('completion-screen').classList.remove('hidden');
+        
+        document.getElementById('final-completed').textContent = this.completedCases;
+        document.getElementById('final-time').textContent = 
+            `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    }
+    
+    timeUp() {
+        clearInterval(this.timer);
+        this.showNotification('Time is up! Your progress has been saved.', 'info');
+        this.completeAllCases();
+    }
+    
+    reviewResponses() {
+        // Show all completed cases for review
+        document.getElementById('completion-screen').classList.add('hidden');
+        document.getElementById('case-studies').classList.remove('hidden');
+        
+        document.querySelectorAll('.case-card').forEach(card => {
+            card.classList.remove('hidden');
+        });
+    }
+    
+    restart() {
+        if (confirm('Are you sure you want to start over? Your current progress will be lost.')) {
+            location.reload();
+        }
+    }
+    
+    showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `fixed top-4 right-4 z-50 px-4 py-2 rounded-md text-white ${
+            type === 'success' ? 'bg-green-500' : 
+            type === 'warning' ? 'bg-yellow-500' : 
+            type === 'error' ? 'bg-red-500' : 
+            'bg-blue-500'
+        }`;
+        notification.textContent = message;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.remove();
+        }, 4000);
+    }
+}
+
+// Initialize game when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    new ProblemSolvingGame();
+});
+</script>
+{% endblock %}
