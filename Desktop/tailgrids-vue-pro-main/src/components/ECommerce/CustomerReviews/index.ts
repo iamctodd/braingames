@@ -1,5 +1,0 @@
-export { default as CustomerReviewOne } from './CustomerReviewOne.vue'
-export { default as CustomerReviewTwo } from './CustomerReviewTwo.vue'
-export { default as CustomerReviewThree } from './CustomerReviewThree.vue'
-export { default as CustomerReviewFour } from './CustomerReviewFour.vue'
-export { default as CustomerReviewFive } from './CustomerReviewFive.vue'

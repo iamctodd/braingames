@@ -1,5 +1,0 @@
-export { default as ProfileOne } from './ProfileOne.vue'
-export { default as ProfileTwo } from './ProfileTwo.vue'
-export { default as ProfileThree } from './ProfileThree.vue'
-export { default as ProfileFour } from './ProfileFour.vue'
-export { default as ProfileFive } from './ProfileFive.vue'

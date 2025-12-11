@@ -1,8 +1,0 @@
-export { default as NavbarOne } from './NavbarOne.vue'
-export { default as NavbarTwo } from './NavbarTwo.vue'
-export { default as NavbarThree } from './NavbarThree.vue'
-export { default as NavbarFour } from './NavbarFour.vue'
-export { default as NavbarFive } from './NavbarFive.vue'
-export { default as NavbarSix } from './NavbarSix.vue'
-export { default as NavbarSeven } from './NavbarSeven.vue'
-export { default as NavbarEight } from './NavbarEight.vue'

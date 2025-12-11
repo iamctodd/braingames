@@ -1,5 +1,0 @@
-export { default as TableStackOne } from './TableStackOne.vue'
-export { default as TableStackTwo } from './TableStackTwo.vue'
-export { default as TableStackThree } from './TableStackThree.vue'
-export { default as TableStackFour } from './TableStackFour.vue'
-export { default as TableStackFive } from './TableStackFive.vue'

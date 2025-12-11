@@ -1,6 +1,0 @@
-export { default as PortfolioOne } from './PortfolioOne.vue'
-export { default as PortfolioTwo } from './PortfolioTwo.vue'
-export { default as PortfolioThree } from './PortfolioThree.vue'
-export { default as PortfolioFour } from './PortfolioFour.vue'
-export { default as PortfolioFive } from './PortfolioFive.vue'
-export { default as PortfolioSix } from './PortfolioSix.vue'

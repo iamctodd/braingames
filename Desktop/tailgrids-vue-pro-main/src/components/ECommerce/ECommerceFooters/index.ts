@@ -1,5 +1,0 @@
-export { default as ECommerceFooterOne } from './ECommerceFooterOne.vue'
-export { default as ECommerceFooterTwo } from './ECommerceFooterTwo.vue'
-export { default as ECommerceFooterThree } from './ECommerceFooterThree.vue'
-export { default as ECommerceFooterFour } from './ECommerceFooterFour.vue'
-export { default as ECommerceFooterFive } from './ECommerceFooterFive.vue'

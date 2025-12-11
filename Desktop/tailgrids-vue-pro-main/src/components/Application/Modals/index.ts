@@ -1,6 +1,0 @@
-export { default as ModalOne } from './ModalOne.vue'
-export { default as ModalTwo } from './ModalTwo.vue'
-export { default as ModalThree } from './ModalThree.vue'
-export { default as ModalFour } from './ModalFour.vue'
-export { default as ModalFive } from './ModalFive.vue'
-export { default as ModalSix } from './ModalSix.vue'

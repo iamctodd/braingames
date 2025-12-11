@@ -1,8 +1,0 @@
-export { default as BrandOne } from './BrandOne.vue'
-export { default as BrandTwo } from './BrandTwo.vue'
-export { default as BrandThree } from './BrandThree.vue'
-export { default as BrandFour } from './BrandFour.vue'
-export { default as BrandFive } from './BrandFive.vue'
-export { default as BrandSix } from './BrandSix.vue'
-export { default as BrandSeven } from './BrandSeven.vue'
-export { default as BrandEight } from './BrandEight.vue'

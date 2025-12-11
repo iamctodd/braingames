@@ -1,5 +1,0 @@
-export { default as ProductDetailOne } from './ProductDetailOne.vue'
-export { default as ProductDetailTwo } from './ProductDetailTwo.vue'
-export { default as ProductDetailThree } from './ProductDetailThree.vue'
-export { default as ProductDetailFour } from './ProductDetailFour.vue'
-export { default as ProductDetailFive } from './ProductDetailFive.vue'

@@ -1,8 +1,0 @@
-export { default as AboutOne } from './AboutOne.vue'
-export { default as AboutTwo } from './AboutTwo.vue'
-export { default as AboutThree } from './AboutThree.vue'
-export { default as AboutFour } from './AboutFour.vue'
-export { default as AboutFive } from './AboutFive.vue'
-export { default as AboutSix } from './AboutSix.vue'
-export { default as AboutSeven } from './AboutSeven.vue'
-export { default as AboutEight } from './AboutEight.vue'

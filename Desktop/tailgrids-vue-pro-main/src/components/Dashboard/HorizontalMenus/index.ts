@@ -1,6 +1,0 @@
-export { default as HorizontalMenuOne } from './HorizontalMenuOne.vue'
-export { default as HorizontalMenuTwo } from './HorizontalMenuTwo.vue'
-export { default as HorizontalMenuThree } from './HorizontalMenuThree.vue'
-export { default as HorizontalMenuFour } from './HorizontalMenuFour.vue'
-export { default as HorizontalMenuFive } from './HorizontalMenuFive.vue'
-export { default as HorizontalMenuSix } from './HorizontalMenuSix.vue'

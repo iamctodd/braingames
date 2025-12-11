@@ -1,8 +1,0 @@
-export { default as SigninOne } from './SigninOne.vue'
-export { default as SigninTwo } from './SigninTwo.vue'
-export { default as SigninThree } from './SigninThree.vue'
-export { default as SigninFour } from './SigninFour.vue'
-export { default as SigninFive } from './SigninFive.vue'
-export { default as SigninSix } from './SigninSix.vue'
-export { default as SigninSeven } from './SigninSeven.vue'
-export { default as SigninEight } from './SigninEight.vue'

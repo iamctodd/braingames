@@ -1,5 +1,0 @@
-export { default as TestimonialOne } from './TestimonialOne.vue'
-export { default as TestimonialTwo } from './TestimonialTwo.vue'
-export { default as TestimonialThree } from './TestimonialThree.vue'
-export { default as TestimonialFour } from './TestimonialFour.vue'
-export { default as TestimonialFive } from './TestimonialFive.vue'

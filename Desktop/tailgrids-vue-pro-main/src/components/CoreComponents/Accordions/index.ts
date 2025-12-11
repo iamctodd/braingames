@@ -1,5 +1,0 @@
-export { default as AccordionOne } from './AccordionOne.vue'
-export { default as AccordionTwo } from './AccordionTwo.vue'
-export { default as AccordionThree } from './AccordionThree.vue'
-export { default as AccordionFour } from './AccordionFour.vue'
-export { default as AccordionFive } from './AccordionFive.vue'

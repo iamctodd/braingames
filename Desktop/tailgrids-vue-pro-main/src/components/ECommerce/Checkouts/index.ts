@@ -1,5 +1,0 @@
-export { default as CheckoutOne } from './CheckoutOne.vue'
-export { default as CheckoutTwo } from './CheckoutTwo.vue'
-export { default as CheckoutThree } from './CheckoutThree.vue'
-export { default as CheckoutFour } from './CheckoutFour.vue'
-export { default as CheckoutFive } from './CheckoutFive.vue'

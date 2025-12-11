@@ -1,5 +1,0 @@
-export { default as StatsOne } from './StatsOne.vue'
-export { default as StatsTwo } from './StatsTwo.vue'
-export { default as StatsThree } from './StatsThree.vue'
-export { default as StatsFour } from './StatsFour.vue'
-export { default as StatsFive } from './StatsFive.vue'

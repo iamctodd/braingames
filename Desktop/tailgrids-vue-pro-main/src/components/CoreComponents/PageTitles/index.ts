@@ -1,5 +1,0 @@
-export { default as PageTitleOne } from './PageTitleOne.vue'
-export { default as PageTitleTwo } from './PageTitleTwo.vue'
-export { default as PageTitleThree } from './PageTitleThree.vue'
-export { default as PageTitleFour } from './PageTitleFour.vue'
-export { default as PageTitleFive } from './PageTitleFive.vue'

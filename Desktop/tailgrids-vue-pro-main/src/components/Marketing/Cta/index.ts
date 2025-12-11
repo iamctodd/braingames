@@ -1,8 +1,0 @@
-export { default as CtaOne } from './CtaOne.vue'
-export { default as CtaTwo } from './CtaTwo.vue'
-export { default as CtaThree } from './CtaThree.vue'
-export { default as CtaFour } from './CtaFour.vue'
-export { default as CtaFive } from './CtaFive.vue'
-export { default as CtaSix } from './CtaSix.vue'
-export { default as CtaSeven } from './CtaSeven.vue'
-export { default as CtaEight } from './CtaEight.vue'

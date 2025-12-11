@@ -1,6 +1,0 @@
-export { default as PopoverOne } from './PopoverOne.vue'
-export { default as PopoverTwo } from './PopoverTwo.vue'
-export { default as PopoverThree } from './PopoverThree.vue'
-export { default as PopoverFour } from './PopoverFour.vue'
-export { default as PopoverFive } from './PopoverFive.vue'
-export { default as PopoverSix } from './PopoverSix.vue'
