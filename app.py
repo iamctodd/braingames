@@ -20,8 +20,64 @@ SCORES_FILE = 'scores.json'
 USERS_FILE = 'users.json'
 RESET_TOKENS_FILE = 'reset_tokens.json'
 
-# In-memory token storage (will work on Fly.io)
-RESET_TOKENS = {}
+# ============================================================================
+# TOKEN PERSISTENCE
+# ============================================================================
+
+def load_reset_tokens():
+    """Load reset tokens from file"""
+    if os.path.exists(RESET_TOKENS_FILE):
+        try:
+            with open(RESET_TOKENS_FILE, 'r') as f:
+                return json.load(f)
+        except:
+            return {}
+    return {}
+
+def save_reset_tokens(tokens):
+    """Save reset tokens to file"""
+    with open(RESET_TOKENS_FILE, 'w') as f:
+        json.dump(tokens, f, indent=2)
+
+def generate_reset_token(email):
+    """Generate and store a secure reset token"""
+    token = secrets.token_urlsafe(32)
+    tokens = load_reset_tokens()
+    
+    tokens[token] = {
+        'email': email,
+        'created_at': datetime.now().isoformat(),
+        'used': False
+    }
+    save_reset_tokens(tokens)
+    return token
+
+def verify_reset_token(token):
+    """Verify reset token and return email if valid"""
+    tokens = load_reset_tokens()
+    
+    if token not in tokens:
+        return None, "Invalid token"
+    
+    token_data = tokens[token]
+    
+    if token_data['used']:
+        return None, "Token already used"
+    
+    # Check if token expired (1 hour)
+    created = datetime.fromisoformat(token_data['created_at'])
+    age = datetime.now() - created
+    if age > timedelta(hours=1):
+        return None, "Token expired"
+    
+    return token_data['email'], None
+
+def use_reset_token(token):
+    """Mark token as used"""
+    tokens = load_reset_tokens()
+    if token in tokens:
+        tokens[token]['used'] = True
+        save_reset_tokens(tokens)
 
 # ============================================================================
 # EMAIL FUNCTIONS
@@ -59,38 +115,6 @@ def send_password_reset_email(email, reset_token):
     except Exception as e:
         print(f"Error sending email: {e}")
         return False
-
-def generate_reset_token(email):
-    """Generate a secure reset token"""
-    token = secrets.token_urlsafe(32)
-    RESET_TOKENS[token] = {
-        'email': email,
-        'created_at': datetime.now(),
-        'used': False
-    }
-    return token
-
-def verify_reset_token(token):
-    """Verify reset token and return email if valid"""
-    if token not in RESET_TOKENS:
-        return None, "Invalid token"
-    
-    token_data = RESET_TOKENS[token]
-    
-    if token_data['used']:
-        return None, "Token already used"
-    
-    # Check if token expired (1 hour)
-    age = datetime.now() - token_data['created_at']
-    if age > timedelta(hours=1):
-        return None, "Token expired"
-    
-    return token_data['email'], None
-
-def use_reset_token(token):
-    """Mark token as used"""
-    if token in RESET_TOKENS:
-        RESET_TOKENS[token]['used'] = True
 
 # ============================================================================
 # USER MANAGEMENT
@@ -464,6 +488,6 @@ def current_user():
     return jsonify({'user_id': None, 'user': None})
 
 if __name__ == '__main__':
-    print("�� Brain Games - With Email Password Reset")
+    print("🧠 Brain Games - With Email Password Reset")
     print("✓ http://127.0.0.1:5000/")
     app.run(debug=True)
