@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Reset Error - Brain Games{% endblock %}
+{% block content %}
+<div class="max-w-md mx-auto mt-12">
+    <div class="bg-white p-8 rounded-lg shadow">
+        <h1 class="text-3xl font-bold mb-2 text-center">🧠 Brain Games</h1>
+        <p class="text-center text-gray-600 mb-8">Password Reset</p>
+
+        <!-- Error Message -->
+        <div class="mb-6 p-4 rounded-lg bg-red-100 text-red-700">
+            <p class="font-bold mb-2">❌ Reset Link Invalid</p>
+            <p>{{ error }}</p>
+        </div>
+
+        <!-- Info -->
+        <div class="bg-blue-50 p-6 rounded-lg mb-6 text-center">
+            <p class="text-gray-700 mb-4">
+                Password reset links expire after 1 hour for security reasons.
+            </p>
+            <p class="text-sm text-gray-600">
+                Please request a new password reset link.
+            </p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="space-y-3">
+            <a href="/forgot-password" class="block w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg text-center">
+                Request New Reset Link
+            </a>
+            <a href="/login" class="block w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 rounded-lg text-center">
+                Back to Login
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
