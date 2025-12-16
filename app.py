@@ -340,3 +340,33 @@ if __name__ == '__main__':
     print("🧠 Brain Games - With User Accounts & Leaderboards")
     print("✓ http://127.0.0.1:5000/")
     app.run(debug=True)
+
+# ============================================================================
+# PASSWORD RESET ENDPOINT
+# ============================================================================
+
+@app.route('/forgot-password', methods=['GET'])
+def forgot_password():
+    """Forgot password page"""
+    return render_template('auth/forgot_password.html')
+
+@app.route('/api/reset-password', methods=['POST'])
+def reset_password():
+    """Reset user password"""
+    data = request.json
+    email = data.get('email')
+    new_password = data.get('new_password')
+    
+    users = load_users()
+    
+    if email not in users:
+        return jsonify({'success': False, 'message': 'Email not found'}), 404
+    
+    if len(new_password) < 6:
+        return jsonify({'success': False, 'message': 'Password must be at least 6 characters'}), 400
+    
+    # Update password
+    users[email]['password'] = hash_password(new_password)
+    save_users(users)
+    
+    return jsonify({'success': True, 'message': 'Password reset successfully'})
