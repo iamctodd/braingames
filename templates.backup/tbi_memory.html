@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}TBI Memory - Brain Games{% endblock %}
+
+{% block content %}
+<div>
+    <h1 class="text-3xl font-bold mb-8">🎯 TBI Memory Training</h1>
+
+    <div class="max-w-2xl mx-auto">
+        <div class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow">
+            <p class="text-gray-600 dark:text-gray-400 mb-4">
+                Words will appear one at a time. Type all the words you remember in order.
+            </p>
+
+            <!-- Game Status -->
+            <div class="text-center mb-8">
+                <p class="text-4xl font-bold mb-2" id="word-display">Ready to start?</p>
+                <p class="text-gray-600 dark:text-gray-400">Words: <span id="word-count">0</span></p>
+            </div>
+
+            <!-- Difficulty Selection -->
+            <div class="mb-6">
+                <label class="block text-sm font-bold mb-2">Difficulty:</label>
+                <select id="difficulty" class="w-full px-4 py-2 border rounded dark:bg-gray-700 dark:border-gray-600">
+                    <option value="easy">Easy (4 words)</option>
+                    <option value="medium" selected>Medium (6 words)</option>
+                    <option value="hard">Hard (8 words)</option>
+                </select>
+            </div>
+
+            <!-- Response Area -->
+            <div class="mb-6">
+                <label class="block text-sm font-bold mb-2">Type the words in order:</label>
+                <textarea id="response" rows="4" placeholder="Type each word separated by a comma..."
+                          class="w-full px-4 py-2 border rounded dark:bg-gray-700 dark:border-gray-600">
+                </textarea>
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex gap-4">
+                <button onclick="startGame()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-bold">
+                    Start Round
+                </button>
+                <button onclick="submitResponse()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-bold">
+                    Submit
+                </button>
+                <button onclick="resetGame()" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg font-bold">
+                    Reset
+                </button>
+            </div>
+
+            <div id="feedback" class="mt-6 hidden p-4 rounded-lg"></div>
+
+            <!-- Score -->
+            <div class="text-center mt-8">
+                <p class="text-2xl font-bold">Score: <span id="score">0</span></p>
+            </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="mt-8 bg-blue-50 dark:bg-blue-900 p-6 rounded-lg">
+            <h3 class="font-bold mb-2">How to Play:</h3>
+            <ol class="list-decimal list-inside space-y-1 text-sm">
+                <li>Choose your difficulty level</li>
+                <li>Click "Start Round" to see words appear one at a time</li>
+                <li>Type all the words you remember in the order they appeared</li>
+                <li>Separate words with commas</li>
+                <li>Click "Submit" to score your response</li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentWords = [];
+    let score = 0;
+    let isRunning = false;
+
+    function getWords(difficulty) {
+        const allWords = [
+            'apple', 'bicycle', 'cloud', 'dragon', 'elephant', 'flower', 
+            'guitar', 'house', 'island', 'jungle', 'keyboard', 'lemon'
+        ];
+        
+        const count = difficulty === 'easy' ? 4 : difficulty === 'medium' ? 6 : 8;
+        return allWords.sort(() => Math.random() - 0.5).slice(0, count);
+    }
+
+    function startGame() {
+        const difficulty = document.getElementById('difficulty').value;
+        currentWords = getWords(difficulty);
+        document.getElementById('response').value = '';
+        document.getElementById('feedback').classList.add('hidden');
+        
+        let index = 0;
+        isRunning = true;
+        
+        function showWord() {
+            if (index < currentWords.length) {
+                document.getElementById('word-display').textContent = currentWords[index];
+                document.getElementById('word-count').textContent = index + 1;
+                index++;
+                setTimeout(showWord, difficulty === 'easy' ? 3000 : difficulty === 'medium' ? 2000 : 1500);
+            } else {
+                document.getElementById('word-display').textContent = 'Now type the words...';
+                isRunning = false;
+            }
+        }
+        
+        document.getElementById('word-display').textContent = 'Starting...';
+        setTimeout(showWord, 500);
+    }
+
+    function submitResponse() {
+        if (currentWords.length === 0) {
+            alert('Please start a round first');
+            return;
+        }
+
+        const userResponse = document.getElementById('response').value
+            .toLowerCase()
+            .split(',')
+            .map(w => w.trim())
+            .filter(w => w.length > 0);
+
+        let correct = 0;
+        for (let i = 0; i < Math.min(userResponse.length, currentWords.length); i++) {
+            if (userResponse[i] === currentWords[i]) {
+                correct++;
+            }
+        }
+
+        const percentage = Math.round((correct / currentWords.length) * 100);
+        score += percentage;
+
+        const feedback = document.getElementById('feedback');
+        feedback.innerHTML = `
+            <p class="font-bold text-green-700 dark:text-green-400">
+                ✅ You got ${correct} out of ${currentWords.length} correct!
+            </p>
+            <p class="text-sm mt-2">Score: ${percentage} points</p>
+            <p class="text-xs mt-1 text-gray-600 dark:text-gray-400">
+                Words were: ${currentWords.join(', ')}
+            </p>
+        `;
+        feedback.className = 'mt-6 p-4 rounded-lg bg-green-100 dark:bg-green-900';
+
+        document.getElementById('score').textContent = score;
+
+        // Log session
+        fetch('/api/game-session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                gameType: 'tbi_memory',
+                score: percentage,
+                difficulty: document.getElementById('difficulty').value,
+                duration: 0
+            })
+        }).catch(err => console.log('Session logged'));
+    }
+
+    function resetGame() {
+        currentWords = [];
+        score = 0;
+        isRunning = false;
+        document.getElementById('response').value = '';
+        document.getElementById('word-display').textContent = 'Ready to start?';
+        document.getElementById('word-count').textContent = '0';
+        document.getElementById('score').textContent = '0';
+        document.getElementById('feedback').classList.add('hidden');
+    }
+</script>
+{% endblock %}

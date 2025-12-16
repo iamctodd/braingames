@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - Brain Games{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <h1 class="text-3xl font-bold mb-8">⚙️ Settings</h1>
+
+    {% if user %}
+    <!-- Avatar Section -->
+    <div class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow mb-8">
+        <h2 class="text-2xl font-bold mb-6">Profile Picture</h2>
+        
+        <!-- Avatar Display -->
+        <div class="flex items-center gap-6 mb-6">
+            <div class="w-32 h-32 bg-gray-300 dark:bg-gray-700 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
+                {% if user.avatar %}
+                <img id="avatar-preview" src="{{ user.avatar }}" alt="Avatar" class="w-full h-full object-cover">
+                {% else %}
+                <span id="avatar-placeholder" class="text-5xl">👤</span>
+                {% endif %}
+            </div>
+            
+            <div class="flex-1">
+                <p class="font-bold mb-4">Upload a profile picture:</p>
+                <label class="block mb-4">
+                    <input type="file" id="avatar-input" accept="image/*" class="block w-full text-sm text-gray-500
+                        file:mr-4 file:py-2 file:px-4
+                        file:rounded-lg file:border-0
+                        file:text-sm file:font-semibold
+                        file:bg-blue-50 file:text-blue-700
+                        hover:file:bg-blue-100">
+                </label>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Max 5MB • JPG, PNG, WebP, GIF</p>
+                <div id="upload-status" class="text-sm"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Form -->
+    <div class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow">
+        <form id="settings-form">
+            <!-- Display Name -->
+            <div class="mb-6">
+                <label class="block text-sm font-bold mb-2">Display Name</label>
+                <input type="text" id="displayName" value="{{ user.displayName or '' }}" 
+                       class="w-full px-4 py-2 border rounded dark:bg-gray-700 dark:border-gray-600">
+            </div>
+
+            <!-- Bio -->
+            <div class="mb-6">
+                <label class="block text-sm font-bold mb-2">Bio</label>
+                <textarea id="bio" rows="4"
+                          class="w-full px-4 py-2 border rounded dark:bg-gray-700 dark:border-gray-600">{{ user.bio or '' }}</textarea>
+            </div>
+
+            <!-- Notifications -->
+            <div class="mb-6">
+                <label class="block text-sm font-bold mb-4">Notifications</label>
+                <div class="space-y-2">
+                    <label class="flex items-center">
+                        <input type="checkbox" id="emailNotifications" 
+                               {% if user.preferences and user.preferences.emailNotifications %}checked{% endif %}>
+                        <span class="ml-2">Email Notifications</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="checkbox" id="pushNotifications"
+                               {% if user.preferences and user.preferences.pushNotifications %}checked{% endif %}>
+                        <span class="ml-2">Push Notifications</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Profile Visibility -->
+            <div class="mb-6">
+                <label class="block text-sm font-bold mb-2">Profile Visibility</label>
+                <select id="profileVisibility" class="w-full px-4 py-2 border rounded dark:bg-gray-700 dark:border-gray-600">
+                    <option value="public" {% if user.preferences and user.preferences.profileVisibility == 'public' %}selected{% endif %}>Public</option>
+                    <option value="friends" {% if user.preferences and user.preferences.profileVisibility == 'friends' %}selected{% endif %}>Friends Only</option>
+                    <option value="private" {% if user.preferences and user.preferences.profileVisibility == 'private' %}selected{% endif %}>Private</option>
+                </select>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold">
+                Save Settings
+            </button>
+        </form>
+
+        <div id="message" class="mt-4 hidden p-4 rounded-lg"></div>
+    </div>
+
+    <script>
+        // Handle avatar upload
+        document.getElementById('avatar-input').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Validate file
+            if (file.size > 5 * 1024 * 1024) {
+                showStatus('❌ File must be smaller than 5MB', 'error');
+                return;
+            }
+
+            if (!['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(file.type)) {
+                showStatus('❌ Must be JPG, PNG, WebP, or GIF', 'error');
+                return;
+            }
+
+            // Read and display file
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = event.target.result;
+                
+                // Show preview
+                const placeholder = document.getElementById('avatar-placeholder');
+                const preview = document.getElementById('avatar-preview');
+                
+                if (placeholder) placeholder.style.display = 'none';
+                
+                if (preview) {
+                    preview.src = img;
+                } else {
+                    const newImg = document.createElement('img');
+                    newImg.id = 'avatar-preview';
+                    newImg.src = img;
+                    newImg.className = 'w-full h-full object-cover';
+                    document.querySelector('.w-32.h-32').appendChild(newImg);
+                }
+                
+                showStatus('✅ Image ready to save. Click "Save Settings" to apply.', 'success');
+                
+                // Store in session storage for saving later
+                sessionStorage.setItem('pending_avatar', img);
+            };
+            reader.readAsDataURL(file);
+        });
+
+        function showStatus(message, type) {
+            const status = document.getElementById('upload-status');
+            status.textContent = message;
+            status.className = 'text-sm ' + (type === 'success' ? 'text-green-600' : 'text-red-600');
+        }
+
+        // Handle settings form submit
+        document.getElementById('settings-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const data = {
+                displayName: document.getElementById('displayName').value,
+                bio: document.getElementById('bio').value,
+                emailNotifications: document.getElementById('emailNotifications').checked,
+                pushNotifications: document.getElementById('pushNotifications').checked,
+                profileVisibility: document.getElementById('profileVisibility').value,
+                avatar: sessionStorage.getItem('pending_avatar') || null
+            };
+
+            try {
+                const response = await fetch('/api/settings/update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                const msg = document.getElementById('message');
+                
+                if (result.success) {
+                    msg.textContent = '✅ Settings saved successfully!';
+                    msg.className = 'mt-4 p-4 rounded-lg bg-green-100 text-green-700';
+                    sessionStorage.removeItem('pending_avatar');
+                } else {
+                    msg.textContent = '❌ Error: ' + result.error;
+                    msg.className = 'mt-4 p-4 rounded-lg bg-red-100 text-red-700';
+                }
+                msg.classList.remove('hidden');
+                
+                setTimeout(() => msg.classList.add('hidden'), 3000);
+            } catch (err) {
+                const msg = document.getElementById('message');
+                msg.textContent = '❌ Error saving settings';
+                msg.className = 'mt-4 p-4 rounded-lg bg-red-100 text-red-700';
+                msg.classList.remove('hidden');
+            }
+        });
+    </script>
+    {% else %}
+    <div class="bg-gray-100 dark:bg-gray-800 p-8 rounded-lg text-center">
+        <p class="text-gray-600 dark:text-gray-400">Please log in to access settings</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

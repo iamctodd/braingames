@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Problem Solving - Brain Games{% endblock %}
+
+{% block content %}
+<div>
+    <h1 class="text-3xl font-bold mb-8">💡 Problem Solving</h1>
+
+    <div class="max-w-3xl mx-auto">
+        <div class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow">
+            <p class="text-gray-600 dark:text-gray-400 mb-8">
+                Read the case study and provide your solution to the problem.
+            </p>
+
+            <!-- Case Study -->
+            <div class="bg-blue-50 dark:bg-blue-900 p-6 rounded-lg mb-8">
+                <h2 class="text-2xl font-bold mb-4">Case Study: Daily Operations Challenge</h2>
+                
+                <div class="space-y-4 mb-6">
+                    <p><strong>Scenario:</strong></p>
+                    <p class="text-gray-700 dark:text-gray-300">
+                        Betty runs a small bakery. Every morning she runs out of popular items too early, 
+                        but has leftover pastries at closing time. This wastes food and money.
+                    </p>
+                    
+                    <p><strong>The Problem:</strong></p>
+                    <p class="text-gray-700 dark:text-gray-300">
+                        Betty needs to balance supply and demand. What would you suggest?
+                    </p>
+                </div>
+
+                <div class="border-t dark:border-gray-700 pt-4">
+                    <p class="text-sm font-bold mb-2">Remember the approach:</p>
+                    <ol class="text-sm space-y-1 list-decimal list-inside">
+                        <li><strong>Listen:</strong> What's really bothering people?</li>
+                        <li><strong>Ask:</strong> What would make this better?</li>
+                        <li><strong>Try:</strong> Start with the simplest solution</li>
+                        <li><strong>Check:</strong> Is it working? If not, try something else!</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- Solution Form -->
+            <div class="mb-6">
+                <label class="block text-sm font-bold mb-2">Your Solution:</label>
+                <textarea id="solution" rows="6" placeholder="Type your solution here..."
+                          class="w-full px-4 py-2 border rounded dark:bg-gray-700 dark:border-gray-600">
+                </textarea>
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex gap-4">
+                <button onclick="submitSolution()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-bold">
+                    Submit Response
+                </button>
+                <button onclick="document.getElementById('solution').value = ''" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg font-bold">
+                    Clear
+                </button>
+            </div>
+
+            <div id="feedback" class="mt-6 hidden p-4 rounded-lg"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function submitSolution() {
+        const solution = document.getElementById('solution').value;
+        
+        if (!solution.trim()) {
+            alert('Please write a solution');
+            return;
+        }
+
+        // Simple scoring based on length and content
+        const hasAnalysis = solution.toLowerCase().includes('problem') || 
+                           solution.toLowerCase().includes('solution') ||
+                           solution.toLowerCase().includes('suggest') ||
+                           solution.toLowerCase().includes('try');
+        
+        const score = solution.length * 2 + (hasAnalysis ? 100 : 0);
+
+        // Show feedback
+        const feedback = document.getElementById('feedback');
+        feedback.innerHTML = `<p class="font-bold text-green-700 dark:text-green-400">✅ Response submitted!</p><p class="text-sm mt-2">Score: ${score}</p>`;
+        feedback.className = 'mt-6 p-4 rounded-lg bg-green-100 dark:bg-green-900';
+
+        // Log the session
+        fetch('/api/game-session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                gameType: 'problem_solving',
+                score: score,
+                difficulty: 'medium',
+                duration: 300
+            })
+        }).catch(err => console.log('Session logged'));
+
+        // Clear after 2 seconds
+        setTimeout(() => {
+            document.getElementById('solution').value = '';
+            feedback.classList.add('hidden');
+        }, 2000);
+    }
+</script>
+{% endblock %}

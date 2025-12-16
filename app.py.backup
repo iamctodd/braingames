@@ -1,0 +1,78 @@
+"""
+MINIMAL BRAIN GAMES APP - GAMES ONLY (No redirects)
+Just copy this to your app.py and run it
+"""
+from flask import Flask, render_template, session, redirect, url_for
+import os
+
+app = Flask(__name__)
+app.secret_key = os.getenv('SECRET_KEY', 'dev-secret-key')
+
+# ============================================================================
+# ROUTES - GAMES ONLY
+# ============================================================================
+
+@app.route('/')
+def index():
+    """Home page"""
+    return render_template('index.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    """Login page"""
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    """Logout"""
+    session.clear()
+    return redirect(url_for('index'))
+
+# DUMMY USER - so templates don't redirect
+DUMMY_USER = {
+    'id': 'anonymous',
+    'email': 'guest@braingames.local',
+    'displayName': 'Guest Player',
+    'avatar': None
+}
+
+# GAMES - NO DECORATORS, NO REDIRECTS
+@app.route('/games/memory')
+def memory_game():
+    """Memory Training Game"""
+    print("DEBUG: Accessing /games/memory")
+    return render_template('games/memory.html', user=DUMMY_USER)
+
+@app.route('/games/problem-solving')
+def problem_solving_game():
+    """Problem Solving Game"""
+    print("DEBUG: Accessing /games/problem-solving")
+    return render_template('games/problem_solving.html', user=DUMMY_USER)
+
+@app.route('/games/tbi-memory')
+def tbi_memory_game():
+    """TBI Memory Game"""
+    print("DEBUG: Accessing /games/tbi-memory")
+    return render_template('games/tbi_memory.html', user=DUMMY_USER)
+
+@app.route('/signin')
+def signin():
+    """Redirect to login"""
+    return redirect(url_for('login'))
+
+# Error handlers
+@app.errorhandler(404)
+def not_found(e):
+    return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def server_error(e):
+    return render_template('500.html'), 500
+
+if __name__ == '__main__':
+    print("🧠 Brain Games - Games Only Mode")
+    print("✓ Games accessible without login")
+    print("✓ http://127.0.0.1:5000/games/memory")
+    print("✓ http://127.0.0.1:5000/games/problem-solving")
+    print("✓ http://127.0.0.1:5000/games/tbi-memory")
+    app.run(debug=True)

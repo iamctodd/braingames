@@ -1,247 +1,152 @@
-from flask import Flask, render_template, jsonify, request, session, redirect
-from functools import wraps
+from flask import Flask, render_template, request, jsonify
 import json
+import os
+from datetime import datetime
 
 app = Flask(__name__)
-app.secret_key = 'your-secret-key-change-this'  # Change this in production
 
-# Decorator to require authentication
-def require_auth(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if 'user' not in session:
-            return jsonify({'error': 'Authentication required'}), 401
-        return f(*args, **kwargs)
-    return decorated_function
+# Score storage file
+SCORES_FILE = 'scores.json'
 
-# Routes
+def load_scores():
+    """Load scores from JSON file"""
+    if os.path.exists(SCORES_FILE):
+        with open(SCORES_FILE, 'r') as f:
+            return json.load(f)
+    return {'memory': [], 'problem_solving': [], 'tbi_memory': []}
+
+def save_scores(scores):
+    """Save scores to JSON file"""
+    with open(SCORES_FILE, 'w') as f:
+        json.dump(scores, f, indent=2)
+
+def add_score(game_type, score, difficulty='medium'):
+    """Add a new score"""
+    scores = load_scores()
+    scores[game_type].append({
+        'score': score,
+        'difficulty': difficulty,
+        'date': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    })
+    # Keep only last 100 scores per game
+    scores[game_type] = scores[game_type][-100:]
+    save_scores(scores)
+
+def get_best_score(game_type):
+    """Get best score for a game"""
+    scores = load_scores()
+    if scores[game_type]:
+        return max(s['score'] for s in scores[game_type])
+    return 0
+
+def get_game_stats(game_type):
+    """Get stats for a game"""
+    scores = load_scores()
+    game_scores = scores[game_type]
+    if not game_scores:
+        return {'best': 0, 'average': 0, 'total': 0}
+    
+    return {
+        'best': max(s['score'] for s in game_scores),
+        'average': round(sum(s['score'] for s in game_scores) / len(game_scores)),
+        'total': len(game_scores)
+    }
+
+def get_all_games_stats():
+    """Get stats for all games"""
+    return {
+        'memory': get_game_stats('memory'),
+        'problem_solving': get_game_stats('problem_solving'),
+        'tbi_memory': get_game_stats('tbi_memory')
+    }
+
+def get_recent_scores(limit=10):
+    """Get recent scores across all games"""
+    scores = load_scores()
+    all_scores = []
+    for game_type, game_scores in scores.items():
+        for score in game_scores:
+            all_scores.append({
+                'game': game_type.replace('_', ' ').title(),
+                'game_type': game_type,
+                **score
+            })
+    # Sort by date, newest first
+    all_scores.sort(key=lambda x: x['date'], reverse=True)
+    return all_scores[:limit]
+
 @app.route('/')
 def index():
-    return render_template('index.html')
+    stats = get_all_games_stats()
+    recent = get_recent_scores(10)
+    
+    return render_template('index.html',
+        memory_best=stats['memory']['best'],
+        memory_total=stats['memory']['total'],
+        problem_best=stats['problem_solving']['best'],
+        problem_total=stats['problem_solving']['total'],
+        tbi_best=stats['tbi_memory']['best'],
+        tbi_total=stats['tbi_memory']['total'],
+        total_games=stats['memory']['total'] + stats['problem_solving']['total'] + stats['tbi_memory']['total'],
+        recent_scores=recent
+    )
 
 @app.route('/dashboard')
 def dashboard():
-    return render_template('dashboard.html')
+    stats = get_all_games_stats()
+    return render_template('dashboard.html', stats=stats)
 
-@app.route('/profile')
-def profile_page():
-    if 'user' not in session:
-        return redirect('/signin')
-    
-    user = session['user']
-    return render_template('profile.html', user=user)
+@app.route('/history')
+def history():
+    scores = load_scores()
+    # Combine all scores with game type info
+    all_scores = []
+    for game_type, game_scores in scores.items():
+        for score in game_scores:
+            all_scores.append({
+                'game': game_type.replace('_', ' ').title(),
+                'game_type': game_type,
+                **score
+            })
+    # Sort by date, newest first
+    all_scores.sort(key=lambda x: x['date'], reverse=True)
+    return render_template('history.html', scores=all_scores)
 
-@app.route('/update-profile', methods=['POST'])
-def update_profile():
-    if 'user' not in session:
-        return redirect('/signin')
-    
-    try:
-        display_name = request.form.get('display_name', '').strip()
-        email = request.form.get('email', '').strip()
-        
-        if not display_name or not email:
-            return redirect('/profile?error=missing-fields')
-        
-        # Update session data
-        session['user']['displayName'] = display_name
-        session['user']['email'] = email
-        session.modified = True  # Ensure session is saved
-        
-        return redirect('/profile?success=updated')
-        
-    except Exception as e:
-        return redirect('/profile?error=server-error')
-
-# Auth endpoints
-@app.route('/api/auth/login', methods=['POST'])
-def login():
-    """Handle Firebase auth token verification"""
-    data = request.get_json()
-    # In production, verify the Firebase ID token here
-    # For now, we'll trust the frontend auth
-    user_data = data.get('user')
-    session['user'] = user_data
-    return jsonify({'success': True, 'user': user_data})
-
-@app.route('/games/problem-solving-simple')
-def problem_solving_simple():
-    return '''
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Problem Solving - Simple Test</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 p-8">
-    <div class="max-w-2xl mx-auto bg-white rounded-lg shadow p-6">
-        <h1 class="text-2xl font-bold mb-4">Problem Solving JavaScript Test</h1>
-        <button id="test-btn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-            Click Me to Test
-        </button>
-        <div id="result" class="mt-4"></div>
-    </div>
-    
-    <script>
-        console.log('Simple page JavaScript loaded successfully');
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM loaded in simple page');
-            
-            document.getElementById('test-btn').addEventListener('click', function() {
-                console.log('Test button clicked!');
-                alert('JavaScript is working perfectly!');
-                document.getElementById('result').innerHTML = '<p class="text-green-600 font-bold">Success! JavaScript is working.</p>';
-            });
-            
-            console.log('Event listener added to test button');
-        });
-    </script>
-</body>
-</html>
-    '''
-
-@app.route('/debug-session')
-def debug_session():
-    return jsonify({
-        'session_data': dict(session),
-        'has_user': 'user' in session,
-        'session_keys': list(session.keys())
-    })
-
-@app.route('/logout')
-def logout_page():
-    # Clear Flask session
-    session.clear()
-    # Redirect to home with success message
-    return redirect('/?message=signed-out')
-
-@app.route('/api/auth/logout', methods=['POST'])
-def logout():
-    session.pop('user', None)
-    return jsonify({'success': True})
-
-@app.route('/api/auth/user')
-def get_user():
-    return jsonify({'user': session.get('user')})
-
-# Game-specific API endpoints
-@app.route('/api/games/memory/score', methods=['POST'])
-@require_auth
-def save_memory_score():
-    data = request.get_json()
-    user_id = session['user']['uid']
-    score = data.get('score')
-    # Save to database in production
-    return jsonify({'success': True, 'message': 'Score saved'})
-
-@app.route('/api/games/problem-solving/response', methods=['POST'])
-@require_auth
-def save_problem_solving_response():
-    data = request.get_json()
-    user_id = session['user']['uid']
-    case_id = data.get('case_id')
-    response = data.get('response')
-    # Save to database in production
-    return jsonify({'success': True, 'message': 'Response saved'})
-
-@app.route('/api/games/tbi-memory/progress', methods=['POST'])
-@require_auth
-def save_tbi_progress():
-    data = request.get_json()
-    user_id = session['user']['uid']
-    progress = data.get('progress')
-    # Save to database in production
-    return jsonify({'success': True, 'message': 'Progress saved'})
-
-# Game routes
 @app.route('/games/memory')
-def memory_game():
-    return render_template('games/memory.html')
+def memory():
+    stats = get_game_stats('memory')
+    return render_template('games/memory.html', best_score=stats['best'], total_games=stats['total'])
 
 @app.route('/games/problem-solving')
-def problem_solving_game():
-    return render_template('games/problem_solving.html')
+def problem_solving():
+    stats = get_game_stats('problem_solving')
+    return render_template('games/problem_solving.html', best_score=stats['best'], total_games=stats['total'])
 
 @app.route('/games/tbi-memory')
-def tbi_memory_game():
-    return render_template('games/tbi_memory.html')
+def tbi_memory():
+    stats = get_game_stats('tbi_memory')
+    return render_template('games/tbi_memory.html', best_score=stats['best'], total_games=stats['total'])
 
-@app.route('/signin')
-def signin_page():
-    error = request.args.get('error')
-    error_message = ''
+# API endpoint to save score
+@app.route('/api/save-score', methods=['POST'])
+def save_score():
+    """Save a game score"""
+    data = request.json
+    game_type = data.get('game_type')
+    score = data.get('score')
+    difficulty = data.get('difficulty', 'medium')
     
-    if error == 'missing-fields':
-        error_message = 'Please enter both email and password.'
-    elif error == 'server-error':
-        error_message = 'Server error occurred. Please try again.'
+    add_score(game_type, score, difficulty)
     
-    return f'''
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Sign In - Brain Games</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center">
-    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <div class="text-center mb-6">
-            <h1 class="text-2xl font-bold">🧠 Brain Games</h1>
-            <p class="text-gray-600">Sign in to continue</p>
-        </div>
-        
-        {f'<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error_message}</div>' if error_message else ''}
-        
-        <form action="/manual-login" method="POST" class="space-y-4">
-            <div>
-                <input type="email" name="email" placeholder="Enter your email" required
-                       class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-            <div>
-                <input type="password" name="password" placeholder="Enter your password" required
-                       class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-            <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700">
-                Sign In
-            </button>
-        </form>
-        
-        <div class="mt-4 text-center">
-            <p class="text-sm text-gray-600">
-                For demo: any email + any password works
-            </p>
-        </div>
-    </div>
-</body>
-</html>
-    '''
-
-@app.route('/manual-login', methods=['POST'])
-def manual_login():
-    try:
-        email = request.form.get('email', '').strip()
-        password = request.form.get('password', '').strip()
-        
-        print(f"Login attempt - Email: {email}, Password: {'*' * len(password)}")  # Debug log
-        
-        # Simple validation - for demo, any email/password works
-        if email and password and len(password) >= 1:
-            user_data = {
-                'uid': f'demo-{email.split("@")[0]}',
-                'email': email,
-                'displayName': email.split('@')[0]
-            }
-            session['user'] = user_data
-            print(f"User logged in: {user_data}")  # Debug log
-            return redirect('/dashboard')
-        else:
-            print("Login failed - missing email or password")  # Debug log
-            return redirect('/signin?error=missing-fields')
-            
-    except Exception as e:
-        print(f"Login error: {e}")  # Debug log
-        return redirect('/signin?error=server-error')
+    return jsonify({
+        'success': True,
+        'best_score': get_best_score(game_type),
+        'message': 'Score saved!'
+    })
 
 if __name__ == '__main__':
+    print("🧠 Brain Games - Beautiful Home Page")
+    print("✓ http://127.0.0.1:5000/")
+    print("✓ http://127.0.0.1:5000/dashboard")
+    print("✓ http://127.0.0.1:5000/history")
     app.run(debug=True)

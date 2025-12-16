@@ -1,321 +1,107 @@
 {% extends "base.html" %}
-
-{% block title %}Problem Solving - Brain Games{% endblock %}
-
+{% block title %}Problem Solving{% endblock %}
 {% block content %}
-<div class="max-w-4xl mx-auto space-y-6">
-    <!-- Game Header -->
-    <div class="bg-white rounded-lg shadow-md p-6">
-        <div class="flex items-center justify-between mb-4">
-            <div>
-                <h1 class="text-2xl font-bold text-gray-900">Problem Solving Practice</h1>
-                <p class="text-gray-600">Real situations • Simple solutions • 20 minutes total</p>
-            </div>
-            <a href="/dashboard" class="text-blue-600 hover:text-blue-700">← Back to Dashboard</a>
+<!-- Back Button - Top Left, Outside Box -->
+<a href="/" class="inline-block mb-6 text-blue-600 hover:text-blue-800 font-bold text-lg">← Back to Home</a>
+
+<div class="bg-white p-8 rounded shadow max-w-2xl mx-auto">
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-3xl font-bold">💡 Problem Solving</h1>
+            <p class="text-gray-600">Read the case study and provide your solution</p>
         </div>
-        
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div class="text-center">
-                <div class="text-2xl font-bold text-green-600" id="cases-completed">0</div>
-                <div class="text-sm text-gray-600">Completed</div>
-            </div>
-            <div class="text-center">
-                <div class="text-2xl font-bold text-blue-600">3</div>
-                <div class="text-sm text-gray-600">Total Cases</div>
-            </div>
-            <div class="text-center">
-                <div class="text-2xl font-bold text-purple-600" id="time-remaining">20:00</div>
-                <div class="text-sm text-gray-600">Time Left</div>
-            </div>
-            <div class="text-center">
-                <div class="text-2xl font-bold text-orange-600" id="current-case">1</div>
-                <div class="text-sm text-gray-600">Current</div>
-            </div>
+        <div class="text-right">
+            <p class="text-sm text-gray-600">Best Score</p>
+            <p class="text-2xl font-bold text-blue-600">{{ best_score }}</p>
+            {% if total_games > 0 %}
+            <p class="text-xs text-gray-500">Problems solved: {{ total_games }}</p>
+            {% endif %}
         </div>
     </div>
 
-    <!-- Instructions -->
-    <div id="instructions" class="bg-blue-50 rounded-lg p-6">
-        <h2 class="text-xl font-semibold text-gray-900 mb-4">Instructions</h2>
-        <p class="text-gray-700 mb-4">Read each case below, then click "Submit Response" to share your thoughts. Complete them one at a time!</p>
-        <ol class="list-decimal list-inside space-y-2 text-gray-700 mb-6">
-            <li><strong>Listen:</strong> What's really bothering people?</li>
-            <li><strong>Ask:</strong> What would make this better?</li>
-            <li><strong>Try:</strong> Start with the simplest solution</li>
-            <li><strong>Check:</strong> Is it working? If not, try something else!</li>
-        </ol>
-        <button id="start-cases" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
-            Start Problem Solving
+    <!-- Case Study -->
+    <div class="bg-blue-50 p-6 rounded mb-6">
+        <h2 class="text-xl font-bold mb-4">Case Study: Coffee Shop Inventory Problem</h2>
+        <p class="text-gray-700 mb-4">
+            Sarah runs a small coffee shop. Every morning she makes 50 cups of coffee, but:
+        </p>
+        <ul class="list-disc list-inside text-gray-700 mb-4">
+            <li>By noon, she often runs out and disappointed customers leave</li>
+            <li>At closing time, she throws away 10-15 unsold cups</li>
+            <li>She wastes money on wasted coffee</li>
+            <li>She loses customers who come back and find none available</li>
+        </ul>
+        <p class="font-bold text-gray-900">What would you suggest to solve this problem?</p>
+    </div>
+
+    <!-- Solution Input -->
+    <div class="mb-6">
+        <label class="block text-sm font-bold mb-2">Your Solution:</label>
+        <textarea id="solution" rows="6" placeholder="Type your solution here..." 
+                  class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+    </div>
+
+    <!-- Buttons -->
+    <div class="flex gap-4">
+        <button onclick="submitSolution()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-bold">
+            Submit Solution
+        </button>
+        <button onclick="document.getElementById('solution').value = ''" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg font-bold">
+            Clear
         </button>
     </div>
 
-    <!-- Case Studies -->
-    <div id="case-studies" class="space-y-6 hidden">
-        <!-- Case 1 -->
-        <div class="case-card bg-white rounded-lg shadow-md p-6" data-case="1">
-            <h3 class="text-lg font-semibold text-gray-900 mb-3">Daily Operations Case</h3>
-            <p class="text-gray-700 mb-4">
-                Betty runs a small bakery. Every morning she runs out of popular items too early, 
-                but has leftover pastries at closing time.
-            </p>
-            
-            <div class="space-y-3 mb-4">
-                <div class="bg-gray-50 p-3 rounded-lg">
-                    <strong class="text-gray-900">1. What's the main problem here?</strong>
-                    <textarea class="w-full mt-2 p-2 border rounded-md resize-none" rows="2" 
-                              data-question="1" placeholder="Your thoughts..."></textarea>
-                </div>
-                <div class="bg-gray-50 p-3 rounded-lg">
-                    <strong class="text-gray-900">2. What simple solution would you try first?</strong>
-                    <textarea class="w-full mt-2 p-2 border rounded-md resize-none" rows="2" 
-                              data-question="2" placeholder="Your solution..."></textarea>
-                </div>
-                <div class="bg-gray-50 p-3 rounded-lg">
-                    <strong class="text-gray-900">3. How could Betty learn what customers really want?</strong>
-                    <textarea class="w-full mt-2 p-2 border rounded-md resize-none" rows="2" 
-                              data-question="3" placeholder="Your approach..."></textarea>
-                </div>
-            </div>
-            
-            <button class="submit-case bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700" 
-                    data-case="1">
-                Submit Response
-            </button>
-        </div>
+    <!-- Feedback -->
+    <div id="feedback" class="mt-6 p-4 rounded-lg hidden"></div>
 
-        <!-- Case 2 -->
-        <div class="case-card bg-white rounded-lg shadow-md p-6 hidden" data-case="2">
-            <h3 class="text-lg font-semibold text-gray-900 mb-3">Group Problem-Solving Case</h3>
-            <p class="text-gray-700 mb-4">
-                The local community garden has 20 plots, but only 8 people are actively gardening. 
-                The unused plots are becoming weedy and attracting complaints.
-            </p>
-            
-            <div class="space-y-3 mb-4">
-                <div class="bg-gray-50 p-3 rounded-lg">
-                    <strong class="text-gray-900">1. Why aren't all plots being used?</strong>
-                    <textarea class="w-full mt-2 p-2 border rounded-md resize-none" rows="2" 
-                              data-question="1" placeholder="Your analysis..."></textarea>
-                </div>
-                <div class="bg-gray-50 p-3 rounded-lg">
-                    <strong class="text-gray-900">2. What's a simple way to get more people involved?</strong>
-                    <textarea class="w-full mt-2 p-2 border rounded-md resize-none" rows="2" 
-                              data-question="2" placeholder="Your solution..."></textarea>
-                </div>
-                <div class="bg-gray-50 p-3 rounded-lg">
-                    <strong class="text-gray-900">3. How could the group make this decision together?</strong>
-                    <textarea class="w-full mt-2 p-2 border rounded-md resize-none" rows="2" 
-                              data-question="3" placeholder="Your process..."></textarea>
-                </div>
-            </div>
-            
-            <button class="submit-case bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700" 
-                    data-case="2">
-                Submit Response
-            </button>
-        </div>
-
-        <!-- Case 3 -->
-        <div class="case-card bg-white rounded-lg shadow-md p-6 hidden" data-case="3">
-            <h3 class="text-lg font-semibold text-gray-900 mb-3">Communication Challenge Case</h3>
-            <p class="text-gray-700 mb-4">
-                The library book club used to have 15 regular members. Now only 5 people come to meetings. 
-                Members say they don't like the current book choices.
-            </p>
-            
-            <div class="space-y-3 mb-4">
-                <div class="bg-gray-50 p-3 rounded-lg">
-                    <strong class="text-gray-900">1. What's really causing people to stop coming?</strong>
-                    <textarea class="w-full mt-2 p-2 border rounded-md resize-none" rows="2" 
-                              data-question="1" placeholder="Your analysis..."></textarea>
-                </div>
-                <div class="bg-gray-50 p-3 rounded-lg">
-                    <strong class="text-gray-900">2. How could everyone have a say in book choices?</strong>
-                    <textarea class="w-full mt-2 p-2 border rounded-md resize-none" rows="2" 
-                              data-question="2" placeholder="Your solution..."></textarea>
-                </div>
-                <div class="bg-gray-50 p-3 rounded-lg">
-                    <strong class="text-gray-900">3. What would bring people back?</strong>
-                    <textarea class="w-full mt-2 p-2 border rounded-md resize-none" rows="2" 
-                              data-question="3" placeholder="Your approach..."></textarea>
-                </div>
-            </div>
-            
-            <button class="submit-case bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700" 
-                    data-case="3">
-                Submit Response
-            </button>
-        </div>
-    </div>
-
-    <!-- Completion -->
-    <div id="completion" class="bg-white rounded-lg shadow-md p-8 text-center hidden">
-        <div class="text-5xl mb-4">🎉</div>
-        <h2 class="text-2xl font-bold text-gray-900 mb-4">Great Job!</h2>
-        <p class="text-gray-600 mb-6">You've completed all case studies!</p>
-        <a href="/dashboard" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 inline-block">
-            Back to Dashboard
-        </a>
+    <!-- Score -->
+    <div class="mt-8 text-center">
+        <p class="text-2xl font-bold">Session Score: <span id="score">0</span></p>
     </div>
 </div>
-{% endblock %}
 
-{% block scripts %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('Problem Solving page loaded');
-    
-    let currentCase = 1;
-    let completedCases = 0;
-    let currentUser = null;
-    
-    // Check auth and get user
-    checkAuth();
-    
-    async function checkAuth() {
-        try {
-            const response = await fetch('/api/auth/user');
-            const data = await response.json();
-            
-            if (data.user) {
-                currentUser = data.user;
-                loadProgress();
-            } else {
-                window.location.href = '/signin';
-            }
-        } catch (error) {
-            console.error('Auth check error:', error);
-            window.location.href = '/signin';
-        }
-    }
-    
-    function generateUserId(email) {
-        let hash = 0;
-        for (let i = 0; i < email.length; i++) {
-            const char = email.charCodeAt(i);
-            hash = ((hash << 5) - hash) + char;
-            hash = hash & hash;
-        }
-        const hashStr = Math.abs(hash).toString();
-        const emailPrefix = email.split('@')[0].substring(0, 5);
-        return `user_${emailPrefix}_${hashStr}`;
-    }
-    
-    function loadProgress() {
-        if (currentUser) {
-            const userId = currentUser.uid || generateUserId(currentUser.email);
-            const completed = parseInt(localStorage.getItem(`cases_completed_${userId}`) || '0');
-            document.getElementById('cases-completed').textContent = completed;
-        }
-    }
-    
-    // Start button
-    document.getElementById('start-cases').addEventListener('click', function() {
-        console.log('Start button clicked');
-        document.getElementById('instructions').classList.add('hidden');
-        document.getElementById('case-studies').classList.remove('hidden');
-        showCase(1);
-    });
-    
-    // Submit buttons
-    document.querySelectorAll('.submit-case').forEach(button => {
-        button.addEventListener('click', function(e) {
-            const caseNumber = e.target.dataset.case;
-            console.log('Submit case:', caseNumber);
-            submitCase(caseNumber);
-        });
-    });
-    
-    function showCase(caseNum) {
-        // Hide all cases
-        document.querySelectorAll('.case-card').forEach(card => {
-            card.classList.add('hidden');
-        });
-        // Show current case
-        document.querySelector(`[data-case="${caseNum}"]`).classList.remove('hidden');
-        document.getElementById('current-case').textContent = caseNum;
-    }
-    
-    async function submitCase(caseNumber) {
-        const caseCard = document.querySelector(`[data-case="${caseNumber}"]`);
-        const textareas = caseCard.querySelectorAll('textarea');
+    function submitSolution() {
+        const solution = document.getElementById('solution').value;
         
-        // Check if all fields are filled
-        let allFilled = true;
-        textareas.forEach(textarea => {
-            if (!textarea.value.trim()) {
-                allFilled = false;
-            }
-        });
-        
-        if (!allFilled) {
-            alert('Please answer all questions before submitting.');
+        if (!solution.trim()) {
+            alert('Please write a solution');
             return;
         }
+
+        let score = 0;
+        score += Math.min(solution.length / 10, 100);
         
-        // Mark as completed
-        completedCases++;
-        document.getElementById('cases-completed').textContent = completedCases;
+        const keywords = ['problem', 'solution', 'suggest', 'make', 'try', 'track', 'customer', 'waste'];
+        const solutionLower = solution.toLowerCase();
+        keywords.forEach(keyword => {
+            if (solutionLower.includes(keyword)) {
+                score += 10;
+            }
+        });
         
-        // Save progress with consistent user ID
-        if (currentUser) {
-            const userId = currentUser.uid || generateUserId(currentUser.email);
-            localStorage.setItem(`cases_completed_${userId}`, completedCases.toString());
-            
-            // Add activity with specific user ID
-            const caseNames = ['Daily Operations', 'Group Problem-Solving', 'Communication Challenge'];
-            const caseName = caseNames[parseInt(caseNumber) - 1] || 'Case Study';
-            addActivity(userId, 'problem-solving', 'Problem Solving', `Completed "${caseName}" case study`);
-        }
+        score = Math.min(Math.round(score), 100);
+
+        const feedback = document.getElementById('feedback');
+        feedback.innerHTML = `<p class="font-bold text-green-700">✅ Solution submitted!</p><p class="text-sm mt-2">Score: ${score}/100</p>`;
+        feedback.className = 'mt-6 p-4 rounded-lg bg-green-100 text-green-900';
         
-        // Disable inputs
-        textareas.forEach(textarea => textarea.disabled = true);
-        caseCard.querySelector('.submit-case').disabled = true;
-        caseCard.querySelector('.submit-case').textContent = 'Completed ✓';
-        
-        // Show next case or completion
-        if (completedCases < 3) {
-            setTimeout(() => {
-                showCase(parseInt(caseNumber) + 1);
-            }, 1000);
-        } else {
-            setTimeout(() => {
-                document.getElementById('case-studies').classList.add('hidden');
-                document.getElementById('completion').classList.remove('hidden');
-            }, 1000);
-        }
+        document.getElementById('score').textContent = score;
+
+        fetch('/api/save-score', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                game_type: 'problem_solving',
+                score: score,
+                difficulty: 'medium'
+            })
+        })
+        .then(r => r.json())
+        .then(data => {
+            console.log('Score saved:', data);
+            setTimeout(() => location.reload(), 2000);
+        });
     }
-    
-    // Local addActivity function for user-specific activities
-    function addActivity(userId, type, title, description) {
-        const activities = JSON.parse(localStorage.getItem(`activities_${userId}`) || '[]');
-        const newActivity = {
-            icon: getActivityIcon(type),
-            title: title,
-            description: description,
-            time: 'Just now',
-            type: type,
-            timestamp: Date.now()
-        };
-        
-        activities.unshift(newActivity);
-        const recentActivities = activities.slice(0, 10);
-        localStorage.setItem(`activities_${userId}`, JSON.stringify(recentActivities));
-    }
-    
-    function getActivityIcon(type) {
-        const icons = {
-            'memory': '🧩',
-            'problem-solving': '💡',
-            'tbi-memory': '🎯',
-            'achievement': '🏆',
-            'progress': '📈',
-            'game': '🎮',
-            'case': '📝',
-            'exercise': '🔄'
-        };
-        return icons[type] || '🎯';
-    }
-});
 </script>
 {% endblock %}

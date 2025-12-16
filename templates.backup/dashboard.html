@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Brain Games{% endblock %}
+
+{% block content %}
+<div>
+    <h1 class="text-3xl font-bold mb-8">Dashboard</h1>
+
+    {% if user %}
+    <div class="bg-blue-50 dark:bg-blue-900 p-6 rounded-lg mb-8">
+        <h2 class="text-xl font-bold">Welcome, {{ user.displayName or user.email }}</h2>
+    </div>
+    {% endif %}
+
+    <!-- Stats -->
+    {% if stats %}
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+            <p class="text-gray-600 dark:text-gray-400 text-sm">Games Played</p>
+            <p class="text-3xl font-bold">{{ stats.totalGamesPlayed }}</p>
+        </div>
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+            <p class="text-gray-600 dark:text-gray-400 text-sm">Minutes Played</p>
+            <p class="text-3xl font-bold">{{ stats.totalMinutesPlayed }}</p>
+        </div>
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+            <p class="text-gray-600 dark:text-gray-400 text-sm">Best Score</p>
+            <p class="text-3xl font-bold">{{ stats.bestScore }}</p>
+        </div>
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+            <p class="text-gray-600 dark:text-gray-400 text-sm">Current Streak 🔥</p>
+            <p class="text-3xl font-bold">{{ stats.currentStreak }}</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Recent Sessions -->
+    {% if recentSessions %}
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+        <h2 class="text-xl font-bold mb-4">Recent Games</h2>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead class="border-b dark:border-gray-700">
+                    <tr>
+                        <th class="pb-2">Game Type</th>
+                        <th class="pb-2">Score</th>
+                        <th class="pb-2">Duration</th>
+                        <th class="pb-2">Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for session in recentSessions %}
+                    <tr class="border-b dark:border-gray-700">
+                        <td class="py-2">{{ session.gameType }}</td>
+                        <td class="py-2 font-bold text-green-600">{{ session.score }}</td>
+                        <td class="py-2">{{ (session.duration / 60) | round | int }} min</td>
+                        <td class="py-2 text-sm">
+                            {% if session.timestamp %}
+                                {{ session.timestamp.strftime('%Y-%m-%d %H:%M') if session.timestamp.strftime else session.timestamp }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div class="bg-gray-100 dark:bg-gray-800 p-8 rounded-lg text-center">
+        <p class="text-gray-600 dark:text-gray-400 mb-4">No games played yet</p>
+        <a href="/" class="text-blue-600 hover:text-blue-800">Start playing →</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

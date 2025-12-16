@@ -1,354 +1,109 @@
 {% extends "base.html" %}
-
 {% block title %}Dashboard - Brain Games{% endblock %}
-
 {% block content %}
-<div class="space-y-8">
-    <!-- Welcome Header -->
-    <div class="text-center">
-        <h1 class="text-3xl font-bold text-gray-900">Welcome to Brain Games</h1>
-        <p class="mt-2 text-gray-600">Choose a game below to start training your mind!</p>
-    </div>
+<div class="max-w-4xl mx-auto">
+    <h1 class="text-4xl font-bold mb-8">📊 Dashboard</h1>
 
-    <!-- Games Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Memory Training Game -->
-        <div class="game-card bg-white rounded-lg shadow-md p-6 cursor-pointer" onclick="window.location.href='/games/memory'">
-            <div class="text-center">
-                <div class="text-4xl mb-4">🧩</div>
-                <h3 class="text-xl font-semibold text-gray-900 mb-2">Memory Training</h3>
-                <p class="text-gray-600 mb-4">Test and improve your memory with challenging exercises.</p>
-                <div class="bg-blue-50 rounded-lg p-3 mb-4">
-                    <div class="text-sm text-gray-600">Best Score</div>
-                    <div class="text-lg font-bold text-blue-600" id="memory-best-score">--</div>
+    <!-- Overview Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <!-- Memory Stats -->
+        <div class="bg-blue-50 p-6 rounded-lg shadow">
+            <h2 class="text-2xl font-bold mb-4">🧩 Memory Training</h2>
+            <div class="space-y-3">
+                <div>
+                    <p class="text-gray-600 text-sm">Best Score</p>
+                    <p class="text-3xl font-bold text-blue-600">{{ stats.memory.best }}</p>
                 </div>
-                <button class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors">
-                    Play Now
-                </button>
+                <div>
+                    <p class="text-gray-600 text-sm">Average Score</p>
+                    <p class="text-2xl font-bold text-blue-500">{{ stats.memory.average }}</p>
+                </div>
+                <div>
+                    <p class="text-gray-600 text-sm">Games Played</p>
+                    <p class="text-2xl font-bold text-blue-500">{{ stats.memory.total }}</p>
+                </div>
             </div>
+            <a href="/games/memory" class="mt-4 block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-center font-bold">
+                Play Game
+            </a>
         </div>
 
-        <!-- Problem Solving Game -->
-        <div class="game-card bg-white rounded-lg shadow-md p-6 cursor-pointer" onclick="window.location.href='/games/problem-solving'">
-            <div class="text-center">
-                <div class="text-4xl mb-4">💡</div>
-                <h3 class="text-xl font-semibold text-gray-900 mb-2">Problem Solving</h3>
-                <p class="text-gray-600 mb-4">Practice real-world problem-solving with case studies.</p>
-                <div class="bg-green-50 rounded-lg p-3 mb-4">
-                    <div class="text-sm text-gray-600">Cases Completed</div>
-                    <div class="text-lg font-bold text-green-600" id="problem-solving-completed">--</div>
+        <!-- Problem Solving Stats -->
+        <div class="bg-green-50 p-6 rounded-lg shadow">
+            <h2 class="text-2xl font-bold mb-4">💡 Problem Solving</h2>
+            <div class="space-y-3">
+                <div>
+                    <p class="text-gray-600 text-sm">Best Score</p>
+                    <p class="text-3xl font-bold text-green-600">{{ stats.problem_solving.best }}</p>
                 </div>
-                <button class="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors">
-                    Start Cases
-                </button>
+                <div>
+                    <p class="text-gray-600 text-sm">Average Score</p>
+                    <p class="text-2xl font-bold text-green-500">{{ stats.problem_solving.average }}</p>
+                </div>
+                <div>
+                    <p class="text-gray-600 text-sm">Problems Solved</p>
+                    <p class="text-2xl font-bold text-green-500">{{ stats.problem_solving.total }}</p>
+                </div>
             </div>
+            <a href="/games/problem-solving" class="mt-4 block bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-center font-bold">
+                Play Game
+            </a>
         </div>
 
-        <!-- TBI Memory Game -->
-        <div class="game-card bg-white rounded-lg shadow-md p-6 cursor-pointer" onclick="window.location.href='/games/tbi-memory'">
-            <div class="text-center">
-                <div class="text-4xl mb-4">🎯</div>
-                <h3 class="text-xl font-semibold text-gray-900 mb-2">TBI Memory</h3>
-                <p class="text-gray-600 mb-4">Specialized memory exercises for recovery and strengthening.</p>
-                <div class="bg-purple-50 rounded-lg p-3 mb-4">
-                    <div class="text-sm text-gray-600">Progress Level</div>
-                    <div class="text-lg font-bold text-purple-600" id="tbi-memory-level">--</div>
+        <!-- TBI Memory Stats -->
+        <div class="bg-purple-50 p-6 rounded-lg shadow">
+            <h2 class="text-2xl font-bold mb-4">🎯 TBI Memory</h2>
+            <div class="space-y-3">
+                <div>
+                    <p class="text-gray-600 text-sm">Best Score</p>
+                    <p class="text-3xl font-bold text-purple-600">{{ stats.tbi_memory.best }}</p>
                 </div>
-                <button class="w-full bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 transition-colors">
-                    Continue
-                </button>
+                <div>
+                    <p class="text-gray-600 text-sm">Average Score</p>
+                    <p class="text-2xl font-bold text-purple-500">{{ stats.tbi_memory.average }}</p>
+                </div>
+                <div>
+                    <p class="text-gray-600 text-sm">Rounds Played</p>
+                    <p class="text-2xl font-bold text-purple-500">{{ stats.tbi_memory.total }}</p>
+                </div>
             </div>
-        </div>
-    </div>
-
-    <!-- Progress Overview -->
-    <div class="bg-white rounded-lg shadow-md p-6">
-        <h2 class="text-2xl font-bold text-gray-900 mb-4">Your Progress</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="text-center p-4 bg-blue-50 rounded-lg">
-                <div class="text-2xl font-bold text-blue-600" id="total-games-played">0</div>
-                <div class="text-sm text-gray-600">Games Played</div>
-            </div>
-            <div class="text-center p-4 bg-green-50 rounded-lg">
-                <div class="text-2xl font-bold text-green-600" id="total-time-played">0m</div>
-                <div class="text-sm text-gray-600">Time Played</div>
-            </div>
-            <div class="text-center p-4 bg-purple-50 rounded-lg">
-                <div class="text-2xl font-bold text-purple-600" id="streak-days">0</div>
-                <div class="text-sm text-gray-600">Day Streak</div>
-            </div>
+            <a href="/games/tbi-memory" class="mt-4 block bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded text-center font-bold">
+                Play Game
+            </a>
         </div>
     </div>
 
-    <!-- Recent Activity -->
-    <div class="bg-white rounded-lg shadow-md p-6">
-        <h2 class="text-2xl font-bold text-gray-900 mb-4">Recent Activity</h2>
-        <div id="recent-activity" class="space-y-3">
-            <!-- Activity items will be populated by JavaScript -->
-            <div class="text-gray-500 text-center py-4">
-                Start playing games to see your activity here!
+    <!-- Overall Stats -->
+    <div class="bg-white p-6 rounded-lg shadow mb-8">
+        <h2 class="text-2xl font-bold mb-4">📈 Overall Statistics</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-gray-50 p-4 rounded">
+                <p class="text-gray-600 text-sm">Total Games</p>
+                <p class="text-3xl font-bold">{{ stats.memory.total + stats.problem_solving.total + stats.tbi_memory.total }}</p>
+            </div>
+            <div class="bg-gray-50 p-4 rounded">
+                <p class="text-gray-600 text-sm">Best Memory Score</p>
+                <p class="text-3xl font-bold text-blue-600">{{ stats.memory.best }}</p>
+            </div>
+            <div class="bg-gray-50 p-4 rounded">
+                <p class="text-gray-600 text-sm">Best Problem Score</p>
+                <p class="text-3xl font-bold text-green-600">{{ stats.problem_solving.best }}</p>
+            </div>
+            <div class="bg-gray-50 p-4 rounded">
+                <p class="text-gray-600 text-sm">Best TBI Score</p>
+                <p class="text-3xl font-bold text-purple-600">{{ stats.tbi_memory.best }}</p>
             </div>
         </div>
+    </div>
+
+    <!-- Links -->
+    <div class="flex gap-4">
+        <a href="/history" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold">
+            View Score History
+        </a>
+        <a href="/" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-bold">
+            Back to Games
+        </a>
     </div>
 </div>
-
-<!-- Auth Protection -->
-<script>
-document.addEventListener('DOMContentLoaded', async () => {
-    console.log('=== DASHBOARD AUTH DEBUG ===');
-    
-    try {
-        // Check Flask session first
-        const response = await fetch('/api/auth/user');
-        const data = await response.json();
-        
-        if (data.user) {
-            console.log('Dashboard: Flask session user found:', data.user.email);
-            // User is authenticated via Flask session
-            loadDashboardData(data.user);
-            
-            // Update nav with Flask user
-            if (typeof window.updateNavAuth === 'function') {
-                console.log('Dashboard: Calling updateNavAuth');
-                window.updateNavAuth(data.user);
-            } else {
-                console.log('Dashboard: updateNavAuth function not available, updating nav manually');
-                // Manual nav update as fallback
-                const navSection = document.getElementById('nav-auth-section');
-                if (navSection) {
-                    navSection.innerHTML = `
-                        <div class="flex items-center space-x-3">
-                            <a href="/profile">
-                                <img src="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 fill=%22%23gray%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z%22/%3E%3C/svg%3E" 
-                                     alt="Profile" class="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300">
-                            </a>
-                            <span class="hidden sm:inline text-gray-700 text-sm">${data.user.displayName || data.user.email}</span>
-                            <a href="/profile" class="text-gray-600 hover:text-gray-800 text-sm">Profile</a>
-                            <a href="/logout" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">
-                                Sign Out
-                            </a>
-                        </div>
-                    `;
-                }
-            }
-        } else {
-            console.log('No Flask session user, redirecting to signin');
-            window.location.href = '/signin';
-        }
-        
-    } catch (error) {
-        console.error('Error checking auth:', error);
-        // On error, redirect to signin
-        window.location.href = '/signin';
-    }
-});
-
-async function loadDashboardData(user) {
-    try {
-        // Use consistent user ID generation
-        const userId = user.uid || generateUserId(user.email);
-        
-        // Load user's game statistics
-        const stats = {
-            memoryBestScore: localStorage.getItem(`memory_best_${userId}`) || 0,
-            problemSolvingCompleted: localStorage.getItem(`cases_completed_${userId}`) || 0,
-            tbiMemoryLevel: localStorage.getItem(`tbi_level_${userId}`) || 1,
-            totalGamesPlayed: getTotalGamesPlayed(userId),
-            totalTimePlayed: getTotalTimePlayed(userId),
-            streakDays: getStreakDays(userId)
-        };
-        
-        updateDashboardStats(stats);
-        loadRecentActivity(userId);
-    } catch (error) {
-        console.error('Error loading dashboard data:', error);
-    }
-}
-
-// Add the generateUserId function if it's not available from auth.js
-function generateUserId(email) {
-    let hash = 0;
-    for (let i = 0; i < email.length; i++) {
-        const char = email.charCodeAt(i);
-        hash = ((hash << 5) - hash) + char;
-        hash = hash & hash;
-    }
-    const hashStr = Math.abs(hash).toString();
-    const emailPrefix = email.split('@')[0].substring(0, 5);
-    return `user_${emailPrefix}_${hashStr}`;
-}
-
-function updateDashboardStats(stats) {
-    document.getElementById('memory-best-score').textContent = stats.memoryBestScore;
-    document.getElementById('problem-solving-completed').textContent = stats.problemSolvingCompleted;
-    document.getElementById('tbi-memory-level').textContent = stats.tbiMemoryLevel;
-    document.getElementById('total-games-played').textContent = stats.totalGamesPlayed;
-    document.getElementById('total-time-played').textContent = `${stats.totalTimePlayed}m`;
-    document.getElementById('streak-days').textContent = stats.streakDays;
-}
-
-function getTotalGamesPlayed(userId) {
-    // Calculate from localStorage or API
-    const memory = parseInt(localStorage.getItem(`memory_games_${userId}`) || '0');
-    const problemSolving = parseInt(localStorage.getItem(`cases_completed_${userId}`) || '0');
-    const tbi = parseInt(localStorage.getItem(`tbi_games_${userId}`) || '0');
-    return memory + problemSolving + tbi;
-}
-
-function getTotalTimePlayed(userId) {
-    // Calculate from localStorage or API
-    return parseInt(localStorage.getItem(`total_time_${userId}`) || '0');
-}
-
-function getStreakDays(userId) {
-    // Calculate streak from localStorage or API
-    return parseInt(localStorage.getItem(`streak_${userId}`) || '0');
-}
-
-function loadRecentActivity(userId) {
-    const recentActivity = document.getElementById('recent-activity');
-    const activities = getRecentActivities(userId);
-    
-    if (activities.length === 0) {
-        // Add some sample activities for demo
-        const sampleActivities = [
-            {
-                icon: '🧩',
-                title: 'Memory Training',
-                description: 'Completed Level 3 with score 250',
-                time: '2 hours ago',
-                type: 'game'
-            },
-            {
-                icon: '💡', 
-                title: 'Problem Solving',
-                description: 'Finished "Daily Operations" case study',
-                time: '1 day ago',
-                type: 'case'
-            },
-            {
-                icon: '🎯',
-                title: 'TBI Memory', 
-                description: 'Practiced spatial memory exercises',
-                time: '2 days ago',
-                type: 'exercise'
-            },
-            {
-                icon: '🏆',
-                title: 'Achievement Unlocked',
-                description: 'Played 3 days in a row!',
-                time: '3 days ago',
-                type: 'achievement'
-            },
-            {
-                icon: '📈',
-                title: 'Progress Update',
-                description: 'Memory score improved by 15%',
-                time: '1 week ago',
-                type: 'progress'
-            }
-        ];
-        
-        // Save sample activities for this user
-        localStorage.setItem(`activities_${userId}`, JSON.stringify(sampleActivities));
-        renderActivityList(sampleActivities);
-        return;
-    }
-    
-    renderActivityList(activities);
-}
-
-function renderActivityList(activities) {
-    const recentActivity = document.getElementById('recent-activity');
-    
-    if (activities.length === 0) {
-        recentActivity.innerHTML = `
-            <div class="text-gray-500 text-center py-8">
-                <div class="text-4xl mb-2">🎮</div>
-                <p>Start playing games to see your activity here!</p>
-                <p class="text-sm mt-2">Your game sessions, scores, and achievements will appear below.</p>
-            </div>
-        `;
-        return;
-    }
-    
-    recentActivity.innerHTML = activities.map(activity => `
-        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-            <div class="flex items-center space-x-4">
-                <div class="text-2xl">${activity.icon}</div>
-                <div>
-                    <div class="font-medium text-gray-900">${activity.title}</div>
-                    <div class="text-sm text-gray-600">${activity.description}</div>
-                </div>
-            </div>
-            <div class="text-xs text-gray-400">${activity.time}</div>
-        </div>
-    `).join('');
-}
-
-// Add activity when games are played
-function addActivity(userId, type, title, description) {
-    const activities = JSON.parse(localStorage.getItem(`activities_${userId}`) || '[]');
-    const newActivity = {
-        icon: getActivityIcon(type),
-        title: title,
-        description: description,
-        time: 'Just now',
-        type: type,
-        timestamp: Date.now()
-    };
-    
-    // Add to beginning of array
-    activities.unshift(newActivity);
-    
-    // Keep only last 10 activities
-    const recentActivities = activities.slice(0, 10);
-    
-    // Update timestamps to be relative
-    updateActivityTimes(recentActivities);
-    
-    localStorage.setItem(`activities_${userId}`, JSON.stringify(recentActivities));
-    renderActivityList(recentActivities.slice(0, 5)); // Show only top 5 on dashboard
-}
-
-function getActivityIcon(type) {
-    const icons = {
-        'memory': '🧩',
-        'problem-solving': '💡',
-        'tbi-memory': '🎯',
-        'achievement': '🏆',
-        'progress': '📈',
-        'game': '🎮',
-        'case': '📝',
-        'exercise': '🔄'
-    };
-    return icons[type] || '🎯';
-}
-
-function updateActivityTimes(activities) {
-    const now = Date.now();
-    activities.forEach(activity => {
-        const timeDiff = now - (activity.timestamp || now);
-        const minutes = Math.floor(timeDiff / 60000);
-        const hours = Math.floor(minutes / 60);
-        const days = Math.floor(hours / 24);
-        
-        if (minutes < 1) {
-            activity.time = 'Just now';
-        } else if (minutes < 60) {
-            activity.time = `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
-        } else if (hours < 24) {
-            activity.time = `${hours} hour${hours !== 1 ? 's' : ''} ago`;
-        } else {
-            activity.time = `${days} day${days !== 1 ? 's' : ''} ago`;
-        }
-    });
-}
-
-function getRecentActivities(userId) {
-    // In production, load from API/database
-    const activities = JSON.parse(localStorage.getItem(`activities_${userId}`) || '[]');
-    return activities.slice(0, 5); // Show last 5 activities
-}
-</script>
 {% endblock %}

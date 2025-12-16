@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics - Brain Games{% endblock %}
+
+{% block content %}
+<div>
+    <h1 class="text-3xl font-bold mb-8">📊 Your Analytics</h1>
+
+    {% if stats %}
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+            <p class="text-gray-600 dark:text-gray-400 text-sm">Total Games</p>
+            <p class="text-3xl font-bold">{{ stats.totalGamesPlayed }}</p>
+        </div>
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+            <p class="text-gray-600 dark:text-gray-400 text-sm">Total Time</p>
+            <p class="text-3xl font-bold">{{ stats.totalMinutesPlayed }} min</p>
+        </div>
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+            <p class="text-gray-600 dark:text-gray-400 text-sm">Best Score</p>
+            <p class="text-3xl font-bold">{{ stats.bestScore }}</p>
+        </div>
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+            <p class="text-gray-600 dark:text-gray-400 text-sm">Avg Score</p>
+            <p class="text-3xl font-bold">{{ stats.averageScore }}</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Game Breakdown -->
+    {% if stats.gameBreakdown %}
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow mb-8">
+        <h2 class="text-xl font-bold mb-4">Games by Type</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {% for gameType, count in stats.gameBreakdown.items() %}
+            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded">
+                <p class="text-gray-600 dark:text-gray-300 text-sm">{{ gameType }}</p>
+                <p class="text-2xl font-bold">{{ count }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Recent Sessions -->
+    {% if sessions %}
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+        <h2 class="text-xl font-bold mb-4">Recent Sessions</h2>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead class="border-b dark:border-gray-700">
+                    <tr>
+                        <th class="pb-2">Date</th>
+                        <th class="pb-2">Game</th>
+                        <th class="pb-2">Score</th>
+                        <th class="pb-2">Duration</th>
+                        <th class="pb-2">Difficulty</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for session in sessions %}
+                    <tr class="border-b dark:border-gray-700">
+                        <td class="py-2 text-sm">
+                            {% if session.timestamp %}
+                                {{ session.timestamp.strftime('%Y-%m-%d') if session.timestamp.strftime else session.timestamp }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                        <td class="py-2">{{ session.gameType }}</td>
+                        <td class="py-2 font-bold text-green-600">{{ session.score }}</td>
+                        <td class="py-2">{{ (session.duration / 60) | round | int }} min</td>
+                        <td class="py-2">
+                            <span class="px-2 py-1 rounded dark:bg-gray-700 bg-gray-200 text-xs">
+                                {{ session.difficulty or 'medium' }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div class="bg-gray-100 dark:bg-gray-800 p-8 rounded-lg text-center">
+        <p class="text-gray-600 dark:text-gray-400">No sessions yet. Start playing to see analytics!</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

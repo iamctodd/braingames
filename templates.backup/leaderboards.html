@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Leaderboards - Brain Games{% endblock %}
+
+{% block content %}
+<div>
+    <h1 class="text-3xl font-bold mb-8">🏆 Global Leaderboards</h1>
+
+    <!-- Game Type Tabs -->
+    <div class="flex gap-2 mb-6 border-b dark:border-gray-700">
+        <button data-game-type="memory" class="active px-4 py-2 border-b-2 border-blue-500 font-semibold">
+            🧩 Memory Training
+        </button>
+        <button data-game-type="problem_solving" class="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-900">
+            💡 Problem Solving
+        </button>
+        <button data-game-type="tbi_memory" class="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-900">
+            🎯 TBI Memory
+        </button>
+    </div>
+
+    <!-- Timeframe Tabs -->
+    <div class="flex gap-2 mb-6">
+        <button data-timeframe="alltime" class="active px-3 py-2 rounded-lg dark:bg-gray-700 bg-gray-100 text-sm font-medium">
+            All Time
+        </button>
+        <button data-timeframe="month" class="px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400">
+            This Month
+        </button>
+        <button data-timeframe="week" class="px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400">
+            This Week
+        </button>
+    </div>
+
+    <!-- Leaderboard Table -->
+    <div id="leaderboard-table" class="bg-white dark:bg-gray-800 rounded-lg shadow">
+        <div class="text-center py-12">
+            <p class="text-gray-600 dark:text-gray-400">Loading leaderboard...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Simple leaderboard loader
+    document.querySelectorAll('[data-game-type]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const gameType = e.target.dataset.gameType;
+            const timeframe = document.querySelector('[data-timeframe].active').dataset.timeframe;
+            loadLeaderboard(gameType, timeframe);
+            
+            // Update active state
+            document.querySelectorAll('[data-game-type]').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+        });
+    });
+
+    document.querySelectorAll('[data-timeframe]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const timeframe = e.target.dataset.timeframe;
+            const gameType = document.querySelector('[data-game-type].active').dataset.gameType;
+            loadLeaderboard(gameType, timeframe);
+            
+            // Update active state
+            document.querySelectorAll('[data-timeframe]').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+        });
+    });
+
+    function loadLeaderboard(gameType, timeframe) {
+        const table = document.getElementById('leaderboard-table');
+        table.innerHTML = '<div class="text-center py-12"><p>Loading...</p></div>';
+        
+        fetch(`/api/leaderboards/${gameType}?timeframe=${timeframe}`)
+            .then(r => r.json())
+            .then(data => {
+                if (data.leaderboard && data.leaderboard.length > 0) {
+                    let html = '<table class="w-full"><thead class="border-b dark:border-gray-700"><tr><th class="text-left p-4">Rank</th><th class="text-left p-4">Player</th><th class="text-left p-4">Score</th><th class="text-left p-4">Difficulty</th></tr></thead><tbody>';
+                    
+                    data.leaderboard.forEach((entry, idx) => {
+                        const medal = ['🥇', '🥈', '🥉'][idx] || `#${idx + 1}`;
+                        html += `<tr class="border-b dark:border-gray-700"><td class="p-4 font-bold">${medal}</td><td class="p-4">${entry.displayName}</td><td class="p-4 font-bold text-green-600">${entry.score}</td><td class="p-4"><span class="px-2 py-1 rounded dark:bg-gray-700 bg-gray-200 text-sm">${entry.difficulty}</span></td></tr>`;
+                    });
+                    
+                    html += '</tbody></table>';
+                    table.innerHTML = html;
+                } else {
+                    table.innerHTML = '<div class="text-center py-12"><p class="text-gray-600 dark:text-gray-400">No scores yet for this timeframe</p></div>';
+                }
+            })
+            .catch(err => {
+                table.innerHTML = '<div class="text-center py-12"><p class="text-red-600">Error loading leaderboard</p></div>';
+            });
+    }
+
+    // Load initial leaderboard
+    loadLeaderboard('memory', 'alltime');
+</script>
+
+<style>
+    [data-game-type].active,
+    [data-timeframe].active {
+        @apply border-blue-500 dark:border-blue-400 text-gray-900 dark:text-white;
+    }
+</style>
+{% endblock %}

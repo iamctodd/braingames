@@ -1,0 +1,434 @@
+{% extends "base.html" %}
+
+{% block title %}TBI Memory Training - Brain Games{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-8">
+    <!-- Game Header - Streamlined -->
+    <div class="text-center">
+        <div class="flex items-center justify-between mb-6">
+            <a href="/dashboard" class="text-blue-600 hover:text-blue-700 flex items-center">
+                ← Back to Dashboard
+            </a>
+            <div class="flex space-x-6 text-sm text-gray-600">
+                <span>Level <span id="current-level" class="font-bold text-blue-600">1</span></span>
+                <span>Score <span id="current-score" class="font-bold text-green-600">0</span></span>
+                <span>Lives <span id="lives-remaining" class="font-bold text-red-600">3</span></span>
+            </div>
+        </div>
+        
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">NeuraFlex TBI Memory</h1>
+        <p class="text-gray-600 text-lg">Test your memory! Remember sequences of words and repeat them back.</p>
+    </div>
+
+    <!-- Game Status - Inline -->
+    <div id="game-status" class="text-center hidden">
+        <div class="text-xl font-medium text-gray-700 mb-4" id="status-text">Get ready...</div>
+        <div class="max-w-md mx-auto">
+            <div class="bg-gray-200 rounded-full h-3">
+                <div id="progress-bar" class="bg-blue-600 h-3 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Instructions - Clean -->
+    <div id="instructions" class="text-center">
+        <div class="bg-blue-50 rounded-xl p-8 max-w-2xl mx-auto">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-6">How to Play</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div class="text-left">
+                    <div class="flex items-center mb-3">
+                        <div class="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-3">1</div>
+                        <span class="font-medium">Watch the words</span>
+                    </div>
+                    <p class="text-gray-600 text-sm">Pay attention to the sequence of words that appear</p>
+                </div>
+                <div class="text-left">
+                    <div class="flex items-center mb-3">
+                        <div class="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-3">2</div>
+                        <span class="font-medium">Memorize the order</span>
+                    </div>
+                    <p class="text-gray-600 text-sm">Remember them in the exact sequence shown</p>
+                </div>
+                <div class="text-left">
+                    <div class="flex items-center mb-3">
+                        <div class="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-3">3</div>
+                        <span class="font-medium">Type them back</span>
+                    </div>
+                    <p class="text-gray-600 text-sm">Enter the words in the same order</p>
+                </div>
+                <div class="text-left">
+                    <div class="flex items-center mb-3">
+                        <div class="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-3">4</div>
+                        <span class="font-medium">Level up</span>
+                    </div>
+                    <p class="text-gray-600 text-sm">Each level adds more words to remember</p>
+                </div>
+            </div>
+            <button id="start-game" class="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-lg">
+                Start Game
+            </button>
+        </div>
+    </div>
+
+    <!-- Word Display - Full Screen Feel -->
+    <div id="word-display" class="hidden">
+        <div class="min-h-[200px] flex items-center justify-center">
+            <div class="text-6xl font-bold text-gray-800 animate-pulse" id="current-word">
+                <!-- Words appear here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Input Phase - Clean and Focused -->
+    <div id="input-phase" class="hidden">
+        <div class="text-center space-y-6">
+            <div>
+                <h3 class="text-2xl font-semibold text-gray-900 mb-4">Your Turn</h3>
+                <p class="text-lg text-gray-600">Type the words in the order they appeared:</p>
+            </div>
+            
+            <div class="max-w-lg mx-auto">
+                <input type="text" id="word-input" placeholder="Enter words separated by spaces" 
+                       class="w-full px-6 py-4 text-lg border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-200 transition-all">
+            </div>
+            
+            <button id="submit-answer" class="bg-green-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors text-lg">
+                Submit Answer
+            </button>
+        </div>
+    </div>
+
+    <!-- Game Controls - Minimal -->
+    <div id="game-controls" class="text-center space-x-4 hidden">
+        <button id="restart-game" class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors">
+            Restart Game
+        </button>
+        <button id="next-level" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors hidden">
+            Continue to Level <span id="next-level-number">2</span>
+        </button>
+    </div>
+
+    <!-- Game Results - Integrated -->
+    <div id="game-over" class="text-center hidden">
+        <div class="max-w-md mx-auto space-y-6">
+            <div class="text-6xl mb-4" id="result-emoji">🎯</div>
+            <h2 class="text-3xl font-bold text-gray-900" id="result-title">Game Over</h2>
+            <p class="text-lg text-gray-600" id="result-message">Keep practicing to improve your memory!</p>
+            
+            <div class="bg-gradient-to-r from-blue-50 to-green-50 rounded-xl p-6">
+                <div class="grid grid-cols-2 gap-6">
+                    <div>
+                        <div class="text-3xl font-bold text-blue-600" id="final-score">0</div>
+                        <div class="text-sm text-gray-600 uppercase tracking-wider">Final Score</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-bold text-green-600" id="final-level">1</div>
+                        <div class="text-sm text-gray-600 uppercase tracking-wider">Level Reached</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="space-x-4">
+                <button id="play-again" class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+                    Play Again
+                </button>
+                <a href="/dashboard" class="bg-gray-500 text-white px-8 py-3 rounded-lg hover:bg-gray-600 transition-colors font-semibold inline-block">
+                    Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+class TBIMemoryGame {
+    constructor() {
+        this.level = 1;
+        this.score = 0;
+        this.lives = 3;
+        this.sequence = [];
+        this.currentWordIndex = 0;
+        this.isPlaying = false;
+        this.showingSequence = false;
+        this.currentUser = null;
+        
+        // Word bank for generating sequences
+        this.wordBank = [
+            'apple', 'house', 'tree', 'water', 'chair', 'book', 'light', 'music',
+            'flower', 'phone', 'table', 'window', 'door', 'cloud', 'smile', 'heart',
+            'ocean', 'mountain', 'bridge', 'garden', 'coffee', 'paper', 'stone', 'fire',
+            'moon', 'star', 'river', 'forest', 'castle', 'dream', 'magic', 'peace'
+        ];
+        
+        this.initializeElements();
+        this.checkAuth();
+        this.setupEventListeners();
+    }
+    
+    async checkAuth() {
+        try {
+            const response = await fetch('/api/auth/user');
+            const data = await response.json();
+            
+            if (data.user) {
+                this.currentUser = data.user;
+                this.loadBestScore();
+            } else {
+                window.location.href = '/signin';
+            }
+        } catch (error) {
+            console.error('Auth check error:', error);
+            window.location.href = '/signin';
+        }
+    }
+    
+    generateUserId(email) {
+        let hash = 0;
+        for (let i = 0; i < email.length; i++) {
+            const char = email.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash;
+        }
+        const hashStr = Math.abs(hash).toString();
+        const emailPrefix = email.split('@')[0].substring(0, 5);
+        return `user_${emailPrefix}_${hashStr}`;
+    }
+    
+    initializeElements() {
+        this.levelElement = document.getElementById('current-level');
+        this.scoreElement = document.getElementById('current-score');
+        this.livesElement = document.getElementById('lives-remaining');
+        this.statusText = document.getElementById('status-text');
+        this.progressBar = document.getElementById('progress-bar');
+        this.currentWordElement = document.getElementById('current-word');
+        this.wordInput = document.getElementById('word-input');
+        
+        this.instructions = document.getElementById('instructions');
+        this.gameStatus = document.getElementById('game-status');
+        this.wordDisplay = document.getElementById('word-display');
+        this.inputPhase = document.getElementById('input-phase');
+        this.gameControls = document.getElementById('game-controls');
+        this.gameOver = document.getElementById('game-over');
+    }
+    
+    setupEventListeners() {
+        document.getElementById('start-game').addEventListener('click', () => this.startGame());
+        document.getElementById('restart-game').addEventListener('click', () => this.restartGame());
+        document.getElementById('next-level').addEventListener('click', () => this.nextLevel());
+        document.getElementById('play-again').addEventListener('click', () => this.restartGame());
+        document.getElementById('submit-answer').addEventListener('click', () => this.checkAnswer());
+        
+        this.wordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.checkAnswer();
+        });
+    }
+    
+    loadBestScore() {
+        if (this.currentUser) {
+            const userId = this.currentUser.uid || this.generateUserId(this.currentUser.email);
+            this.bestScore = parseInt(localStorage.getItem(`tbi_memory_best_${userId}`) || '0');
+        }
+    }
+    
+    startGame() {
+        this.isPlaying = true;
+        this.level = 1;
+        this.score = 0;
+        this.lives = 3;
+        
+        this.instructions.classList.add('hidden');
+        this.gameStatus.classList.remove('hidden');
+        this.gameControls.classList.remove('hidden');
+        this.gameOver.classList.add('hidden');
+        
+        this.updateDisplay();
+        this.startLevel();
+    }
+    
+    restartGame() {
+        this.startGame();
+    }
+    
+    nextLevel() {
+        this.level++;
+        document.getElementById('next-level-number').textContent = this.level + 1;
+        this.startLevel();
+        document.getElementById('next-level').classList.add('hidden');
+    }
+    
+    startLevel() {
+        this.generateSequence();
+        this.showSequence();
+    }
+    
+    generateSequence() {
+        this.sequence = [];
+        const sequenceLength = Math.min(2 + this.level, 8); // Start with 3 words, max 9
+        
+        for (let i = 0; i < sequenceLength; i++) {
+            const word = this.wordBank[Math.floor(Math.random() * this.wordBank.length)];
+            this.sequence.push(word);
+        }
+        
+        this.updateDisplay();
+    }
+    
+    async showSequence() {
+        this.showingSequence = true;
+        this.statusText.textContent = `Level ${this.level} - Watch carefully...`;
+        this.wordDisplay.classList.remove('hidden');
+        this.inputPhase.classList.add('hidden');
+        
+        for (let i = 0; i < this.sequence.length; i++) {
+            this.currentWordElement.textContent = this.sequence[i];
+            this.currentWordElement.style.opacity = '1';
+            this.updateProgress((i + 1) / this.sequence.length * 100);
+            
+            await this.sleep(1500); // Show word for 1.5 seconds
+            
+            this.currentWordElement.style.opacity = '0.3';
+            await this.sleep(500); // Brief pause between words
+        }
+        
+        this.currentWordElement.textContent = '';
+        this.wordDisplay.classList.add('hidden');
+        this.showInputPhase();
+    }
+    
+    showInputPhase() {
+        this.showingSequence = false;
+        this.statusText.textContent = `${this.sequence.length} words to remember - Type them in order:`;
+        this.inputPhase.classList.remove('hidden');
+        this.wordInput.value = '';
+        this.wordInput.focus();
+        this.updateProgress(0);
+    }
+    
+    checkAnswer() {
+        const userInput = this.wordInput.value.trim().toLowerCase();
+        const correctSequence = this.sequence.join(' ').toLowerCase();
+        
+        if (userInput === correctSequence) {
+            this.handleCorrectAnswer();
+        } else {
+            this.handleIncorrectAnswer();
+        }
+    }
+    
+    handleCorrectAnswer() {
+        this.score += this.level * 10;
+        this.statusText.textContent = `Correct! +${this.level * 10} points`;
+        this.inputPhase.classList.add('hidden');
+        
+        if (this.level < 10) {
+            document.getElementById('next-level').classList.remove('hidden');
+        } else {
+            this.endGame(true);
+        }
+        
+        this.updateDisplay();
+    }
+    
+    handleIncorrectAnswer() {
+        this.lives--;
+        this.statusText.textContent = `Incorrect. The sequence was: ${this.sequence.join(' ')}`;
+        this.inputPhase.classList.add('hidden');
+        
+        if (this.lives <= 0) {
+            this.endGame(false);
+        } else {
+            setTimeout(() => {
+                this.startLevel();
+            }, 3000);
+        }
+        
+        this.updateDisplay();
+    }
+    
+    async endGame(won = false) {
+        this.isPlaying = false;
+        
+        // Save best score and progress
+        if (this.currentUser) {
+            const userId = this.currentUser.uid || this.generateUserId(this.currentUser.email);
+            
+            if (this.score > this.bestScore) {
+                this.bestScore = this.score;
+                localStorage.setItem(`tbi_memory_best_${userId}`, this.bestScore.toString());
+            }
+            
+            // Save level progress
+            localStorage.setItem(`tbi_memory_level_${userId}`, this.level.toString());
+            
+            // Update game count
+            const games = parseInt(localStorage.getItem(`tbi_games_${userId}`) || '0') + 1;
+            localStorage.setItem(`tbi_games_${userId}`, games.toString());
+            
+            // Add activity
+            this.addActivity(userId, 'tbi-memory', 'TBI Memory', 
+                won ? `Completed level ${this.level} with score ${this.score}` : 
+                      `Reached level ${this.level} with score ${this.score}`);
+        }
+        
+        this.showResults(won);
+    }
+    
+    addActivity(userId, type, title, description) {
+        const activities = JSON.parse(localStorage.getItem(`activities_${userId}`) || '[]');
+        const newActivity = {
+            icon: '🎯',
+            title: title,
+            description: description,
+            time: 'Just now',
+            type: type,
+            timestamp: Date.now()
+        };
+        
+        activities.unshift(newActivity);
+        const recentActivities = activities.slice(0, 10);
+        localStorage.setItem(`activities_${userId}`, JSON.stringify(recentActivities));
+    }
+    
+    showResults(won) {
+        this.gameStatus.classList.add('hidden');
+        this.wordDisplay.classList.add('hidden');
+        this.inputPhase.classList.add('hidden');
+        this.gameControls.classList.add('hidden');
+        this.gameOver.classList.remove('hidden');
+        
+        const emoji = won ? '🏆' : this.score > 50 ? '🎯' : '💪';
+        const title = won ? 'Amazing!' : this.score > 50 ? 'Well Done!' : 'Keep Practicing!';
+        const message = won ? 
+            'You completed all levels!' : 
+            this.score > 50 ? 'You\'re improving your memory skills!' :
+            'Every practice session strengthens your memory!';
+        
+        document.getElementById('result-emoji').textContent = emoji;
+        document.getElementById('result-title').textContent = title;
+        document.getElementById('result-message').textContent = message;
+        document.getElementById('final-score').textContent = this.score;
+        document.getElementById('final-level').textContent = this.level;
+    }
+    
+    updateDisplay() {
+        this.levelElement.textContent = this.level;
+        this.scoreElement.textContent = this.score;
+        this.livesElement.textContent = this.lives;
+    }
+    
+    updateProgress(percentage) {
+        this.progressBar.style.width = `${percentage}%`;
+    }
+    
+    sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+}
+
+// Initialize game when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    new TBIMemoryGame();
+});
+</script>
+{% endblock %}

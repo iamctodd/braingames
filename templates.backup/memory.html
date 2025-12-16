@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}Memory Training - Brain Games{% endblock %}
+
+{% block content %}
+<div>
+    <h1 class="text-3xl font-bold mb-8">🧩 Memory Training</h1>
+    
+    <div class="max-w-2xl mx-auto">
+        <div class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow">
+            <p class="text-gray-600 dark:text-gray-400 mb-4">
+                Watch the colored squares light up, then click them in the same order!
+            </p>
+
+            <!-- Game Board -->
+            <div class="grid grid-cols-4 gap-2 mb-8 max-w-xs mx-auto">
+                {% for i in range(16) %}
+                <button class="memory-button h-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg hover:shadow-lg transition" 
+                        data-index="{{ i }}">
+                </button>
+                {% endfor %}
+            </div>
+
+            <!-- Level Info -->
+            <div class="text-center mb-6">
+                <p class="text-lg font-bold">Level: <span id="level">1</span></p>
+                <p class="text-gray-600 dark:text-gray-400">Sequence: <span id="sequence-length">1</span></p>
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex gap-4 justify-center">
+                <button onclick="startGame()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-bold">
+                    Start Game
+                </button>
+                <button onclick="resetGame()" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg font-bold">
+                    Reset
+                </button>
+            </div>
+
+            <!-- Score -->
+            <div class="text-center mt-8">
+                <p class="text-2xl font-bold">Score: <span id="score">0</span></p>
+            </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="mt-8 bg-blue-50 dark:bg-blue-900 p-6 rounded-lg">
+            <h3 class="font-bold mb-2">How to Play:</h3>
+            <ol class="list-decimal list-inside space-y-1 text-sm">
+                <li>Click "Start Game" to begin</li>
+                <li>Watch the sequence of colored squares</li>
+                <li>Click the squares in the same order</li>
+                <li>Each level adds one more square to remember</li>
+                <li>How many levels can you reach?</li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+<script>
+    let sequence = [];
+    let userSequence = [];
+    let level = 1;
+    let isPlaying = false;
+
+    function startGame() {
+        sequence = [];
+        userSequence = [];
+        level = 1;
+        isPlaying = true;
+        playNextLevel();
+    }
+
+    function resetGame() {
+        sequence = [];
+        userSequence = [];
+        level = 1;
+        isPlaying = false;
+        document.getElementById('level').textContent = '1';
+        document.getElementById('score').textContent = '0';
+        document.getElementById('sequence-length').textContent = '1';
+    }
+
+    function playNextLevel() {
+        userSequence = [];
+        const index = Math.floor(Math.random() * 16);
+        sequence.push(index);
+        
+        document.getElementById('level').textContent = level;
+        document.getElementById('sequence-length').textContent = sequence.length;
+        
+        playSequence();
+    }
+
+    function playSequence() {
+        let delay = 500;
+        sequence.forEach((index, i) => {
+            setTimeout(() => {
+                flashButton(index);
+            }, delay + i * 600);
+        });
+    }
+
+    function flashButton(index) {
+        const btn = document.querySelectorAll('.memory-button')[index];
+        btn.style.opacity = '0.5';
+        setTimeout(() => {
+            btn.style.opacity = '1';
+        }, 300);
+    }
+
+    document.querySelectorAll('.memory-button').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            if (!isPlaying) return;
+            
+            const index = parseInt(e.target.dataset.index);
+            userSequence.push(index);
+            flashButton(index);
+            
+            if (userSequence[userSequence.length - 1] !== sequence[userSequence.length - 1]) {
+                // Wrong!
+                alert(`Wrong! You reached Level ${level}. Score: ${sequence.length - 1}`);
+                logGameSession(sequence.length - 1);
+                resetGame();
+                return;
+            }
+            
+            if (userSequence.length === sequence.length) {
+                // Correct!
+                level++;
+                document.getElementById('score').textContent = sequence.length;
+                setTimeout(playNextLevel, 1000);
+            }
+        });
+    });
+
+    function logGameSession(score) {
+        fetch('/api/game-session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                gameType: 'memory',
+                score: score * 100,
+                difficulty: 'medium',
+                duration: 0
+            })
+        }).catch(err => console.log('Session logged'));
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - Brain Games{% endblock %}
+
+{% block content %}
+<div>
+    <h1 class="text-3xl font-bold mb-8">User Profile</h1>
+
+    {% if user %}
+    <div class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow mb-8">
+        <div class="flex items-center gap-6 mb-6">
+            <div class="w-32 h-32 bg-gray-300 dark:bg-gray-700 rounded-full flex items-center justify-center">
+                <span class="text-5xl">👤</span>
+            </div>
+            <div>
+                <h2 class="text-2xl font-bold">{{ user.displayName or user.email }}</h2>
+                <p class="text-gray-600 dark:text-gray-400">{{ user.bio or 'No bio yet' }}</p>
+            </div>
+        </div>
+
+        {% if is_owner %}
+        <a href="/settings" class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+            Edit Profile
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- Stats -->
+    {% if stats %}
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+            <p class="text-gray-600 dark:text-gray-400 text-sm">Games Played</p>
+            <p class="text-3xl font-bold">{{ stats.totalGamesPlayed }}</p>
+        </div>
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+            <p class="text-gray-600 dark:text-gray-400 text-sm">Total Time</p>
+            <p class="text-3xl font-bold">{{ stats.totalMinutesPlayed }} min</p>
+        </div>
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+            <p class="text-gray-600 dark:text-gray-400 text-sm">Best Score</p>
+            <p class="text-3xl font-bold">{{ stats.bestScore }}</p>
+        </div>
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+            <p class="text-gray-600 dark:text-gray-400 text-sm">Streak 🔥</p>
+            <p class="text-3xl font-bold">{{ stats.currentStreak }}</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Game History -->
+    {% if sessions %}
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+        <h2 class="text-xl font-bold mb-4">Game History</h2>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead class="border-b dark:border-gray-700">
+                    <tr>
+                        <th class="pb-2">Game</th>
+                        <th class="pb-2">Score</th>
+                        <th class="pb-2">Duration</th>
+                        <th class="pb-2">Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for session in sessions %}
+                    <tr class="border-b dark:border-gray-700">
+                        <td class="py-2">{{ session.gameType }}</td>
+                        <td class="py-2 font-bold text-green-600">{{ session.score }}</td>
+                        <td class="py-2">{{ (session.duration / 60) | round | int }} min</td>
+                        <td class="py-2 text-sm">
+                            {% if session.timestamp %}
+                                {{ session.timestamp.strftime('%Y-%m-%d') if session.timestamp.strftime else session.timestamp }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="bg-gray-100 dark:bg-gray-800 p-8 rounded-lg text-center">
+        <p class="text-gray-600 dark:text-gray-400">User not found</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

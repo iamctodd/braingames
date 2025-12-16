@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Brain Games{% endblock %}
+
+{% block content %}
+<div class="text-center py-12">
+    <h1 class="text-4xl font-bold mb-4">Welcome to Brain Games</h1>
+    <p class="text-xl text-gray-600 dark:text-gray-400 mb-8">
+        Train your mind with our cognitive games designed for brain recovery and enhancement
+    </p>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+        <!-- Memory Training -->
+        <a href="/games/memory" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow hover:shadow-lg transition">
+            <div class="text-4xl mb-4">🧩</div>
+            <h2 class="text-2xl font-bold mb-2">Memory Training</h2>
+            <p class="text-gray-600 dark:text-gray-400">Test and improve your memory with challenging sequences</p>
+        </a>
+
+        <!-- Problem Solving -->
+        <a href="/games/problem-solving" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow hover:shadow-lg transition">
+            <div class="text-4xl mb-4">💡</div>
+            <h2 class="text-2xl font-bold mb-2">Problem Solving</h2>
+            <p class="text-gray-600 dark:text-gray-400">Practice real-world problem-solving with case studies</p>
+        </a>
+
+        <!-- TBI Memory -->
+        <a href="/games/tbi-memory" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow hover:shadow-lg transition">
+            <div class="text-4xl mb-4">🎯</div>
+            <h2 class="text-2xl font-bold mb-2">TBI Memory</h2>
+            <p class="text-gray-600 dark:text-gray-400">Specialized exercises for cognitive recovery</p>
+        </a>
+    </div>
+
+    <div class="mt-12">
+        <a href="/dashboard" class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold">
+            Start Training →
+        </a>
+    </div>
+</div>
+{% endblock %}
