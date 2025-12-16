@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 import hashlib
 import secrets
 from sendgrid import SendGridAPIClient
@@ -20,21 +20,12 @@ SCORES_FILE = 'scores.json'
 USERS_FILE = 'users.json'
 RESET_TOKENS_FILE = 'reset_tokens.json'
 
+# In-memory token storage (will work on Fly.io)
+RESET_TOKENS = {}
+
 # ============================================================================
 # EMAIL FUNCTIONS
 # ============================================================================
-
-def load_reset_tokens():
-    """Load password reset tokens"""
-    if os.path.exists(RESET_TOKENS_FILE):
-        with open(RESET_TOKENS_FILE, 'r') as f:
-            return json.load(f)
-    return {}
-
-def save_reset_tokens(tokens):
-    """Save password reset tokens"""
-    with open(RESET_TOKENS_FILE, 'w') as f:
-        json.dump(tokens, f, indent=2)
 
 def send_password_reset_email(email, reset_token):
     """Send password reset email"""
@@ -69,48 +60,37 @@ def send_password_reset_email(email, reset_token):
         print(f"Error sending email: {e}")
         return False
 
-def generate_reset_token():
+def generate_reset_token(email):
     """Generate a secure reset token"""
-    return secrets.token_urlsafe(32)
-
-def create_reset_token(email):
-    """Create password reset token for email"""
-    token = generate_reset_token()
-    tokens = load_reset_tokens()
-    
-    tokens[token] = {
+    token = secrets.token_urlsafe(32)
+    RESET_TOKENS[token] = {
         'email': email,
-        'created_at': datetime.now().timestamp(),
+        'created_at': datetime.now(),
         'used': False
     }
-    save_reset_tokens(tokens)
     return token
 
 def verify_reset_token(token):
     """Verify reset token and return email if valid"""
-    tokens = load_reset_tokens()
-    
-    if token not in tokens:
+    if token not in RESET_TOKENS:
         return None, "Invalid token"
     
-    token_data = tokens[token]
+    token_data = RESET_TOKENS[token]
     
     if token_data['used']:
         return None, "Token already used"
     
     # Check if token expired (1 hour)
-    age = datetime.now().timestamp() - token_data['created_at']
-    if age > 3600:
+    age = datetime.now() - token_data['created_at']
+    if age > timedelta(hours=1):
         return None, "Token expired"
     
     return token_data['email'], None
 
 def use_reset_token(token):
     """Mark token as used"""
-    tokens = load_reset_tokens()
-    if token in tokens:
-        tokens[token]['used'] = True
-        save_reset_tokens(tokens)
+    if token in RESET_TOKENS:
+        RESET_TOKENS[token]['used'] = True
 
 # ============================================================================
 # USER MANAGEMENT
@@ -302,7 +282,7 @@ def forgot_password():
             return jsonify({'success': False, 'message': 'Email not found'}), 404
         
         # Create reset token
-        token = create_reset_token(email)
+        token = generate_reset_token(email)
         
         # Send email
         send_password_reset_email(email, token)
@@ -484,6 +464,6 @@ def current_user():
     return jsonify({'user_id': None, 'user': None})
 
 if __name__ == '__main__':
-    print("🧠 Brain Games - With Email Password Reset")
+    print("�� Brain Games - With Email Password Reset")
     print("✓ http://127.0.0.1:5000/")
     app.run(debug=True)
