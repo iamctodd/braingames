@@ -36,8 +36,11 @@ def load_reset_tokens():
 
 def save_reset_tokens(tokens):
     """Save reset tokens to file"""
-    with open(RESET_TOKENS_FILE, 'w') as f:
-        json.dump(tokens, f, indent=2)
+    try:
+        with open(RESET_TOKENS_FILE, 'w') as f:
+            json.dump(tokens, f, indent=2)
+    except Exception as e:
+        print(f"Error saving tokens: {e}")
 
 def generate_reset_token(email):
     """Generate and store a secure reset token"""
@@ -121,16 +124,54 @@ def send_password_reset_email(email, reset_token):
 # ============================================================================
 
 def load_users():
-    """Load users from JSON file"""
+    """Load users from JSON file with error handling"""
     if os.path.exists(USERS_FILE):
-        with open(USERS_FILE, 'r') as f:
-            return json.load(f)
-    return {}
+        try:
+            with open(USERS_FILE, 'r') as f:
+                content = f.read()
+                # Check if file is corrupted
+                if not content or not content.strip():
+                    print("Empty users file, creating default")
+                    return create_default_users()
+                return json.loads(content)
+        except json.JSONDecodeError as e:
+            print(f"JSON decode error: {e}")
+            print("Recreating users file")
+            return create_default_users()
+        except Exception as e:
+            print(f"Error loading users: {e}")
+            return create_default_users()
+    return create_default_users()
+
+def create_default_users():
+    """Create default users file"""
+    default_users = {
+        "demo@braingames.com": {
+            "password": "d3ad9315b7be5dd53b31a273b3b3aba5defe700808305aa16a3062b76658a791",
+            "display_name": "Demo User",
+            "created_at": "2025-12-16 12:00:00",
+            "avatar": None
+        }
+    }
+    save_users(default_users)
+    return default_users
 
 def save_users(users):
-    """Save users to JSON file"""
-    with open(USERS_FILE, 'w') as f:
-        json.dump(users, f, indent=2)
+    """Save users to JSON file with error handling"""
+    try:
+        # Write to temp file first
+        temp_file = USERS_FILE + '.tmp'
+        with open(temp_file, 'w') as f:
+            json.dump(users, f, indent=2)
+        # Verify it's valid JSON
+        with open(temp_file, 'r') as f:
+            json.load(f)
+        # Move temp to actual file
+        os.replace(temp_file, USERS_FILE)
+    except Exception as e:
+        print(f"Error saving users: {e}")
+        if os.path.exists(temp_file):
+            os.remove(temp_file)
 
 def hash_password(password):
     """Hash password for storage"""
@@ -177,14 +218,20 @@ def get_current_user():
 def load_scores():
     """Load scores from JSON file"""
     if os.path.exists(SCORES_FILE):
-        with open(SCORES_FILE, 'r') as f:
-            return json.load(f)
+        try:
+            with open(SCORES_FILE, 'r') as f:
+                return json.load(f)
+        except:
+            return {}
     return {}
 
 def save_scores(scores):
     """Save scores to JSON file"""
-    with open(SCORES_FILE, 'w') as f:
-        json.dump(scores, f, indent=2)
+    try:
+        with open(SCORES_FILE, 'w') as f:
+            json.dump(scores, f, indent=2)
+    except Exception as e:
+        print(f"Error saving scores: {e}")
 
 def add_score(user_id, game_type, score, difficulty='medium'):
     """Add a new score"""
@@ -488,6 +535,6 @@ def current_user():
     return jsonify({'user_id': None, 'user': None})
 
 if __name__ == '__main__':
-    print("🧠 Brain Games - With Email Password Reset")
+    print("🧠 Brain Games - With Resilient File Handling")
     print("✓ http://127.0.0.1:5000/")
     app.run(debug=True)
