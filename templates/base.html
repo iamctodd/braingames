@@ -17,6 +17,14 @@
                     <a href="/leaderboards">Leaderboards</a>
                     <a href="/profile">Profile</a>
                     <div class="flex items-center gap-3 ml-4">
+                        {% if user.avatar %}
+                        <img src="{{ user.avatar }}" alt="{{ user.display_name }}" 
+                             class="w-8 h-8 rounded-full object-cover border-2 border-primary">
+                        {% else %}
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-sm font-bold text-white">
+                            {{ user.display_name[0].upper() }}
+                        </div>
+                        {% endif %}
                         <span class="text-sm font-medium">{{ user.display_name }}</span>
                         <a href="/logout" class="btn btn-secondary text-sm px-4 py-2">Logout</a>
                     </div>

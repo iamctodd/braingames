@@ -538,3 +538,23 @@ if __name__ == '__main__':
     print("🧠 Brain Games - With Resilient File Handling")
     print("✓ http://127.0.0.1:5000/")
     app.run(debug=True)
+
+@app.route('/api/upload-avatar', methods=['POST'])
+def upload_avatar():
+    """Upload user avatar"""
+    user_id, user_data = get_current_user()
+    if not user_id:
+        return jsonify({'success': False, 'message': 'Not logged in'}), 401
+    
+    data = request.json
+    avatar_base64 = data.get('avatar')
+    
+    if not avatar_base64:
+        return jsonify({'success': False, 'message': 'No image provided'}), 400
+    
+    # Update user avatar
+    users = load_users()
+    users[user_id]['avatar'] = avatar_base64
+    save_users(users)
+    
+    return jsonify({'success': True, 'message': 'Avatar updated!'})
