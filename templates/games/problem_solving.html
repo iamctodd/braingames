@@ -21,16 +21,9 @@
 
     <!-- Case Study -->
     <div class="bg-blue-50 p-6 rounded mb-6">
-        <h2 class="text-xl font-bold mb-4">Case Study: Coffee Shop Inventory Problem</h2>
-        <p class="text-gray-700 mb-4">
-            Sarah runs a small coffee shop. Every morning she makes 50 cups of coffee, but:
-        </p>
-        <ul class="list-disc list-inside text-gray-700 mb-4">
-            <li>By noon, she often runs out and disappointed customers leave</li>
-            <li>At closing time, she throws away 10-15 unsold cups</li>
-            <li>She wastes money on wasted coffee</li>
-            <li>She loses customers who come back and find none available</li>
-        </ul>
+        <h2 class="text-xl font-bold mb-4" id="caseTitle">Loading case study...</h2>
+        <p class="text-gray-700 mb-4" id="caseDescription"></p>
+        <ul class="list-disc list-inside text-gray-700 mb-4" id="casePoints"></ul>
         <p class="font-bold text-gray-900">What would you suggest to solve this problem?</p>
     </div>
 
@@ -45,6 +38,9 @@
     <div class="flex gap-4">
         <button onclick="submitSolution()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-bold">
             Submit Solution
+        </button>
+        <button onclick="nextProblem()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-bold">
+            Next Problem
         </button>
         <button onclick="document.getElementById('solution').value = ''" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg font-bold">
             Clear
@@ -61,6 +57,79 @@
 </div>
 
 <script>
+    const casestudies = [
+        {
+            title: "Case Study 1: Coffee Shop Inventory Problem",
+            description: "Sarah runs a small coffee shop. Every morning she makes 50 cups of coffee, but:",
+            points: [
+                "By noon, she often runs out and disappointed customers leave",
+                "At closing time, she throws away 10-15 unsold cups",
+                "She wastes money on wasted coffee",
+                "She loses customers who come back and find none available"
+            ]
+        },
+        {
+            title: "Case Study 2: Team Communication Breakdown",
+            description: "A software development team is struggling with project delays. The issues include:",
+            points: [
+                "Team members are not communicating progress effectively",
+                "Tasks are duplicated because people don't know who's working on what",
+                "Meetings are frequent but lack clear agendas",
+                "Important decisions are being made without full team input"
+            ]
+        },
+        {
+            title: "Case Study 3: Customer Service Quality",
+            description: "An online retailer is receiving poor customer satisfaction reviews. The problems are:",
+            points: [
+                "Response time to customer inquiries is slow (24-48 hours)",
+                "Return process is complicated and frustrating",
+                "No tracking information is provided during shipping",
+                "Customer service representatives are not empowered to solve problems"
+            ]
+        },
+        {
+            title: "Case Study 4: Employee Turnover",
+            description: "A tech startup is experiencing high employee turnover. Contributing factors include:",
+            points: [
+                "Lack of clear career growth paths for employees",
+                "Compensation is below industry standards",
+                "Work-life balance is poor with frequent overtime",
+                "Company culture feels impersonal and not inclusive"
+            ]
+        },
+        {
+            title: "Case Study 5: Product Quality Issues",
+            description: "A manufacturing company is facing increased defect rates. The situation is:",
+            points: [
+                "Quality control procedures have been rushed due to production deadlines",
+                "Workers are not properly trained on new equipment",
+                "There's no feedback loop to address emerging issues",
+                "Management prioritizes speed over quality"
+            ]
+        }
+    ];
+
+    let currentCaseIndex = 0;
+    let sessionScore = 0;
+
+    function loadCaseStudy(index) {
+        const caseStudy = casestudies[index % casestudies.length];
+        document.getElementById('caseTitle').textContent = caseStudy.title;
+        document.getElementById('caseDescription').textContent = caseStudy.description;
+        
+        const pointsList = document.getElementById('casePoints');
+        pointsList.innerHTML = caseStudy.points.map(p => `<li>${p}</li>`).join('');
+        
+        document.getElementById('solution').value = '';
+        document.getElementById('feedback').classList.add('hidden');
+    }
+
+    function nextProblem() {
+        currentCaseIndex++;
+        loadCaseStudy(currentCaseIndex);
+    }
+
     function submitSolution() {
         const solution = document.getElementById('solution').value;
         
@@ -72,7 +141,7 @@
         let score = 0;
         score += Math.min(solution.length / 10, 100);
         
-        const keywords = ['problem', 'solution', 'suggest', 'make', 'try', 'track', 'customer', 'waste'];
+        const keywords = ['problem', 'solution', 'suggest', 'make', 'try', 'track', 'customer', 'waste', 'improve', 'process', 'team', 'communicate'];
         const solutionLower = solution.toLowerCase();
         keywords.forEach(keyword => {
             if (solutionLower.includes(keyword)) {
@@ -81,12 +150,13 @@
         });
         
         score = Math.min(Math.round(score), 100);
+        sessionScore += score;
 
         const feedback = document.getElementById('feedback');
         feedback.innerHTML = `<p class="font-bold text-green-700">✅ Solution submitted!</p><p class="text-sm mt-2">Score: ${score}/100</p>`;
         feedback.className = 'mt-6 p-4 rounded-lg bg-green-100 text-green-900';
         
-        document.getElementById('score').textContent = score;
+        document.getElementById('score').textContent = sessionScore;
 
         fetch('/api/save-score', {
             method: 'POST',
@@ -100,8 +170,10 @@
         .then(r => r.json())
         .then(data => {
             console.log('Score saved:', data);
-            setTimeout(() => location.reload(), 2000);
         });
     }
+
+    // Load first case study on page load
+    loadCaseStudy(0);
 </script>
 {% endblock %}
