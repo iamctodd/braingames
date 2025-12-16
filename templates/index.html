@@ -8,6 +8,9 @@
         <p class="text-xl text-gray-600">Train your mind with fun, challenging games</p>
     </div>
 
+    {% if logged_in %}
+    <!-- Logged In View -->
+    
     <!-- Quick Stats Row -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-12">
         <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-lg shadow">
@@ -27,35 +30,6 @@
             <p class="text-4xl font-bold">{{ tbi_best }}</p>
         </div>
     </div>
-
-    <!-- Recent Scores Section -->
-    {% if recent_scores %}
-    <div class="mb-12">
-        <h2 class="text-3xl font-bold mb-6">📈 Recent Scores</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {% for score in recent_scores[:3] %}
-            <div class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
-                <div class="flex justify-between items-start mb-3">
-                    <div>
-                        {% if score.game_type == 'memory' %}
-                            <h3 class="text-xl font-bold">🧩 Memory Training</h3>
-                        {% elif score.game_type == 'problem_solving' %}
-                            <h3 class="text-xl font-bold">💡 Problem Solving</h3>
-                        {% else %}
-                            <h3 class="text-xl font-bold">🎯 TBI Memory</h3>
-                        {% endif %}
-                    </div>
-                    <span class="text-3xl font-bold text-blue-600">{{ score.score }}</span>
-                </div>
-                <p class="text-sm text-gray-600">{{ score.date }}</p>
-                <span class="inline-block mt-3 bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs capitalize">
-                    {{ score.difficulty }}
-                </span>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-    {% endif %}
 
     <!-- Play Games Section -->
     <div class="mb-12">
@@ -108,10 +82,72 @@
     <!-- Call to Action -->
     <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-12 rounded-lg shadow text-center mb-12">
         <h2 class="text-3xl font-bold mb-4">Ready to Challenge Yourself?</h2>
-        <p class="text-lg mb-6 opacity-90">Start playing now and track your progress!</p>
-        <a href="/dashboard" class="inline-block bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 rounded-lg font-bold transition">
-            View Your Dashboard
+        <p class="text-lg mb-6 opacity-90">Check your progress and compete on the leaderboards!</p>
+        <a href="/leaderboards" class="inline-block bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 rounded-lg font-bold transition">
+            View Leaderboards
         </a>
     </div>
+
+    {% else %}
+    <!-- Not Logged In View -->
+    
+    <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-12 rounded-lg shadow text-center mb-12">
+        <h2 class="text-3xl font-bold mb-4">Ready to Train Your Brain?</h2>
+        <p class="text-lg mb-6 opacity-90">Create an account to track your scores and compete on leaderboards</p>
+        <div class="flex gap-4 justify-center">
+            <a href="/signup" class="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 rounded-lg font-bold transition">
+                Sign Up Free
+            </a>
+            <a href="/login" class="bg-blue-700 hover:bg-blue-800 text-white px-8 py-3 rounded-lg font-bold transition">
+                Sign In
+            </a>
+        </div>
+    </div>
+
+    <!-- Game Preview -->
+    <div class="mb-12">
+        <h2 class="text-3xl font-bold mb-6 text-center">🎮 Available Games</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-blue-50 p-8 rounded-lg shadow">
+                <div class="text-5xl mb-4">🧩</div>
+                <h3 class="text-2xl font-bold mb-2">Memory Training</h3>
+                <p class="text-gray-700">Watch the pattern and repeat it. How many levels can you reach?</p>
+            </div>
+            <div class="bg-green-50 p-8 rounded-lg shadow">
+                <div class="text-5xl mb-4">💡</div>
+                <h3 class="text-2xl font-bold mb-2">Problem Solving</h3>
+                <p class="text-gray-700">Solve real-world case studies and test your critical thinking.</p>
+            </div>
+            <div class="bg-purple-50 p-8 rounded-lg shadow">
+                <div class="text-5xl mb-4">🎯</div>
+                <h3 class="text-2xl font-bold mb-2">TBI Memory</h3>
+                <p class="text-gray-700">Remember words as they appear. Train your memory skills.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features -->
+    <div class="bg-white p-12 rounded-lg shadow mb-12">
+        <h2 class="text-3xl font-bold mb-8 text-center">Why Brain Games?</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="text-center">
+                <p class="text-4xl mb-4">📊</p>
+                <h3 class="font-bold text-xl mb-2">Track Your Progress</h3>
+                <p class="text-gray-600">See your improvement over time with detailed stats</p>
+            </div>
+            <div class="text-center">
+                <p class="text-4xl mb-4">🏆</p>
+                <h3 class="font-bold text-xl mb-2">Compete Globally</h3>
+                <p class="text-gray-600">Check leaderboards and challenge other players</p>
+            </div>
+            <div class="text-center">
+                <p class="text-4xl mb-4">🧠</p>
+                <h3 class="font-bold text-xl mb-2">Train Your Mind</h3>
+                <p class="text-gray-600">Improve memory, problem-solving, and cognitive skills</p>
+            </div>
+        </div>
+    </div>
+
+    {% endif %}
 </div>
 {% endblock %}

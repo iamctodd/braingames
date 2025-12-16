@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Leaderboards - Brain Games{% endblock %}
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <h1 class="text-4xl font-bold mb-8">🏆 Global Leaderboards</h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Memory Leaderboard -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-2xl font-bold mb-4">🧩 Memory Training</h2>
+            <div class="space-y-2">
+                {% for entry in memory_leaderboard %}
+                <div class="flex justify-between items-center p-3 bg-gray-50 rounded hover:bg-gray-100">
+                    <div>
+                        <p class="font-bold">{{ loop.index }}. {{ entry.display_name }}</p>
+                        <p class="text-sm text-gray-600">{{ entry.games_played }} games</p>
+                    </div>
+                    <p class="text-2xl font-bold text-blue-600">{{ entry.score }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Problem Solving Leaderboard -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-2xl font-bold mb-4">💡 Problem Solving</h2>
+            <div class="space-y-2">
+                {% for entry in problem_leaderboard %}
+                <div class="flex justify-between items-center p-3 bg-gray-50 rounded hover:bg-gray-100">
+                    <div>
+                        <p class="font-bold">{{ loop.index }}. {{ entry.display_name }}</p>
+                        <p class="text-sm text-gray-600">{{ entry.games_played }} games</p>
+                    </div>
+                    <p class="text-2xl font-bold text-green-600">{{ entry.score }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- TBI Memory Leaderboard -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-2xl font-bold mb-4">🎯 TBI Memory</h2>
+            <div class="space-y-2">
+                {% for entry in tbi_leaderboard %}
+                <div class="flex justify-between items-center p-3 bg-gray-50 rounded hover:bg-gray-100">
+                    <div>
+                        <p class="font-bold">{{ loop.index }}. {{ entry.display_name }}</p>
+                        <p class="text-sm text-gray-600">{{ entry.games_played }} games</p>
+                    </div>
+                    <p class="text-2xl font-bold text-purple-600">{{ entry.score }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Back to Games -->
+    <div class="mt-12 text-center">
+        <a href="/" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold">
+            ← Back to Games
+        </a>
+    </div>
+</div>
+{% endblock %}
