@@ -8,3 +8,6 @@ venv/
 .venv
 .env
 .DS_Store
+users.json
+scores.json
+reset_tokens.json
