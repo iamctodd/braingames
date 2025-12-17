@@ -7,55 +7,57 @@
 
     <!-- Game Container -->
     <div class="glass-card animate-in">
-        <div class="flex justify-between items-start mb-8">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem;">
             <div>
-                <h1 class="text-4xl font-bold mb-2">💡 Problem Solving</h1>
-                <p class="text-text-secondary">Read and solve real-world case studies</p>
+                <h1 style="font-size: 2.25rem; font-weight: bold; margin-bottom: 0.5rem;">💡 Problem Solving</h1>
+                <p style="color: var(--text-secondary);">Read and solve real-world case studies</p>
             </div>
-            <div class="text-right">
-                <p class="text-sm text-text-muted mb-1">Best Score</p>
-                <p class="text-3xl font-bold text-success">{{ best_score }}</p>
+            <div style="text-align: right;">
+                <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.25rem;">Best Score</p>
+                <p style="font-size: 1.875rem; font-weight: bold; color: var(--success);">{{ best_score }}</p>
                 {% if total_games > 0 %}
-                <p class="text-xs text-text-muted mt-1">Solved: {{ total_games }}</p>
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">Solved: {{ total_games }}</p>
                 {% endif %}
             </div>
         </div>
 
         <!-- Case Study -->
-        <div class="bg-glass-bg border border-glass-border rounded-lg p-6 mb-8">
-            <h2 class="text-xl font-bold mb-4" id="caseTitle">Loading case study...</h2>
-            <p class="text-text-secondary mb-4" id="caseDescription"></p>
-            <ul class="list-disc list-inside text-text-secondary space-y-2 mb-4" id="casePoints"></ul>
-            <p class="font-semibold text-text-primary">What would you suggest to solve this problem?</p>
+        <div style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; padding: 1.5rem; margin-bottom: 2rem;">
+            <h2 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem;" id="caseTitle">Loading case study...</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 1rem;" id="caseDescription"></p>
+            <ul id="casePoints" style="list-style: disc; margin-left: 1.5rem; color: var(--text-secondary); space-y: 0.5rem;"></ul>
+            <p style="font-weight: 600; color: var(--text-primary); margin-top: 1rem;">What would you suggest to solve this problem?</p>
         </div>
 
         <!-- Solution Input -->
-        <div class="mb-6">
-            <label class="block text-sm font-semibold mb-3">Your Solution</label>
+        <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.75rem;">Your Solution</label>
             <textarea id="solution" rows="6" placeholder="Share your thoughts on how to solve this problem..." 
-                      class="w-full px-4 py-3 bg-glass-bg border border-glass-border rounded-lg text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary transition-all resize-none"></textarea>
+                      style="width: 100%; padding: 0.75rem; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; color: var(--text-primary); font-family: inherit; resize: none; transition: all 250ms;" 
+                      onfocus="this.style.borderColor = 'var(--primary)'; this.style.boxShadow = '0 0 0 3px rgba(99, 102, 241, 0.1)'"
+                      onblur="this.style.borderColor = 'var(--glass-border)'; this.style.boxShadow = 'none'"></textarea>
         </div>
 
         <!-- Controls -->
-        <div class="flex gap-3 mb-8">
-            <button onclick="submitSolution()" class="btn btn-primary flex-1">
+        <div style="display: flex; gap: 0.75rem; margin-bottom: 2rem;">
+            <button onclick="submitSolution()" style="flex: 1; padding: 0.875rem 2rem; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; border: none; border-radius: 0.75rem; font-weight: 600; cursor: pointer; transition: all 250ms;">
                 Submit Solution
             </button>
-            <button onclick="nextProblem()" class="btn btn-secondary">
+            <button onclick="nextProblem()" style="padding: 0.875rem 2rem; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-primary); border-radius: 0.75rem; font-weight: 600; cursor: pointer; transition: all 250ms;">
                 Next Problem
             </button>
-            <button onclick="document.getElementById('solution').value = ''" class="btn btn-secondary">
+            <button onclick="document.getElementById('solution').value = ''" style="padding: 0.875rem 2rem; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-primary); border-radius: 0.75rem; font-weight: 600; cursor: pointer; transition: all 250ms;">
                 Clear
             </button>
         </div>
 
         <!-- Feedback -->
-        <div id="feedback" class="hidden"></div>
+        <div id="feedback" style="display: none;"></div>
 
         <!-- Score -->
-        <div class="text-center pt-6 border-t border-glass-border">
-            <p class="text-sm text-text-muted mb-1">Session Score</p>
-            <p class="text-3xl font-bold text-success" id="score">0</p>
+        <div style="text-align: center; padding-top: 1.5rem; border-top: 1px solid var(--glass-border);">
+            <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">Session Score</p>
+            <p style="font-size: 1.875rem; font-weight: bold; color: var(--success);" id="score">0</p>
         </div>
     </div>
 </div>
@@ -123,10 +125,10 @@
         document.getElementById('caseDescription').textContent = caseStudy.description;
         
         const pointsList = document.getElementById('casePoints');
-        pointsList.innerHTML = caseStudy.points.map(p => `<li>${p}</li>`).join('');
+        pointsList.innerHTML = caseStudy.points.map(p => `<li style="margin-bottom: 0.5rem;">${p}</li>`).join('');
         
         document.getElementById('solution').value = '';
-        document.getElementById('feedback').classList.add('hidden');
+        document.getElementById('feedback').style.display = 'none';
     }
 
     function nextProblem() {
@@ -157,8 +159,8 @@
         sessionScore += score;
 
         const feedback = document.getElementById('feedback');
-        feedback.innerHTML = `<div class="bg-glass-bg border border-success rounded-lg p-4"><p class="font-semibold text-success mb-2">✅ Solution submitted!</p><p class="text-sm text-text-secondary">Score: ${score}/100</p></div>`;
-        feedback.classList.remove('hidden');
+        feedback.innerHTML = `<div style="background: var(--glass-bg); border: 1px solid var(--success); border-radius: 0.5rem; padding: 1rem;"><p style="font-weight: 600; color: var(--success); margin-bottom: 0.5rem;">✅ Solution submitted!</p><p style="font-size: 0.875rem; color: var(--text-secondary);">Score: ${score}/100</p></div>`;
+        feedback.style.display = 'block';
         
         document.getElementById('score').textContent = sessionScore;
 
