@@ -14,10 +14,6 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 USERS_FILE = 'users.json'
 SCORES_FILE = 'scores.json'
 
-# ============================================================================
-# USER FUNCTIONS
-# ============================================================================
-
 def load_users():
     if os.path.exists(USERS_FILE):
         try:
@@ -28,24 +24,41 @@ def load_users():
     return {}
 
 def save_users(users):
-    with open(USERS_FILE, 'w') as f:
-        json.dump(users, f, indent=2)
+    try:
+        with open(USERS_FILE, 'w') as f:
+            json.dump(users, f, indent=2)
+        print(f"[DEBUG] Users saved. Total users: {len(users)}")
+        return True
+    except Exception as e:
+        print(f"[ERROR] Failed to save users: {e}")
+        return False
 
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
 def create_user(email, password, display_name):
+    print(f"[DEBUG] Creating user: {email}")
     users = load_users()
+    print(f"[DEBUG] Current users: {list(users.keys())}")
+    
     if email in users:
+        print(f"[DEBUG] User already exists: {email}")
         return False, "Email already exists"
+    
     users[email] = {
         'password': hash_password(password),
         'display_name': display_name,
         'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
         'avatar': None
     }
-    save_users(users)
-    return True, "Account created"
+    print(f"[DEBUG] New user object created for {email}")
+    
+    if save_users(users):
+        print(f"[DEBUG] User {email} saved successfully")
+        return True, "Account created"
+    else:
+        print(f"[DEBUG] Failed to save user {email}")
+        return False, "Failed to create account"
 
 def verify_user(email, password):
     users = load_users()
@@ -61,10 +74,6 @@ def get_current_user():
         if session['user_id'] in users:
             return session['user_id'], users[session['user_id']]
     return None, None
-
-# ============================================================================
-# SCORE FUNCTIONS
-# ============================================================================
 
 def load_scores():
     if os.path.exists(SCORES_FILE):
@@ -134,15 +143,19 @@ def get_leaderboard(game_type, limit=10):
     leaderboard.sort(key=lambda x: x['score'], reverse=True)
     return leaderboard[:limit]
 
-# ============================================================================
-# ROUTES
-# ============================================================================
-
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
         data = request.json
-        success, msg = create_user(data.get('email'), data.get('password'), data.get('display_name'))
+        print(f"[DEBUG] Signup request received: {data}")
+        email = data.get('email', '').strip()
+        password = data.get('password', '').strip()
+        display_name = data.get('display_name', '').strip()
+        
+        print(f"[DEBUG] Email: {email}, DisplayName: {display_name}")
+        
+        success, msg = create_user(email, password, display_name)
+        print(f"[DEBUG] Create user result: success={success}, msg={msg}")
         return jsonify({'success': success, 'message': msg})
     return render_template('auth/signup.html')
 
