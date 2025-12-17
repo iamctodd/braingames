@@ -22,37 +22,37 @@
         </div>
 
         <!-- Stats Row -->
-        <div class="grid grid-cols-3 gap-4 mb-8 pb-8 border-b border-glass-border">
-            <div class="text-center">
-                <p class="text-sm text-text-muted mb-2">Level</p>
-                <p class="text-3xl font-bold text-primary" id="level">1</p>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--glass-border);">
+            <div style="text-align: center;">
+                <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">Level</p>
+                <p style="font-size: 1.875rem; font-weight: bold; color: var(--primary);" id="level">1</p>
             </div>
-            <div class="text-center">
-                <p class="text-sm text-text-muted mb-2">Sequence</p>
-                <p class="text-3xl font-bold text-primary-light" id="sequence">1</p>
+            <div style="text-align: center;">
+                <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">Sequence</p>
+                <p style="font-size: 1.875rem; font-weight: bold; color: var(--primary-light);" id="sequence">1</p>
             </div>
-            <div class="text-center">
-                <p class="text-sm text-text-muted mb-2">Score</p>
-                <p class="text-3xl font-bold text-success" id="score">0</p>
+            <div style="text-align: center;">
+                <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">Score</p>
+                <p style="font-size: 1.875rem; font-weight: bold; color: var(--success);" id="score">0</p>
             </div>
         </div>
 
         <!-- Game Board -->
-        <div class="grid grid-cols-4 gap-3 mb-8 max-w-xs mx-auto" id="gameBoard">
+        <div id="gameBoard" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin-bottom: 2rem; max-width: 300px; margin-left: auto; margin-right: auto;">
         </div>
 
         <!-- Controls -->
-        <div class="flex gap-3 justify-center mb-8">
-            <button onclick="startGame()" class="btn btn-primary">
+        <div style="display: flex; gap: 0.75rem; justify-content: center; margin-bottom: 2rem;">
+            <button onclick="startGame()" style="padding: 0.875rem 2rem; border-radius: 0.75rem; font-weight: 600; font-size: 1rem; border: none; cursor: pointer; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3); transition: all 250ms;">
                 Start Game
             </button>
-            <button onclick="resetGame()" class="btn btn-secondary">
+            <button onclick="resetGame()" style="padding: 0.875rem 2rem; border-radius: 0.75rem; font-weight: 600; font-size: 1rem; border: 1px solid var(--glass-border); cursor: pointer; background: var(--glass-bg); color: var(--text-primary); transition: all 250ms;">
                 Reset
             </button>
         </div>
 
         <!-- Message -->
-        <div id="message" class="text-center text-lg font-semibold min-h-6"></div>
+        <div id="message" style="text-align: center; font-size: 1.125rem; font-weight: 600; min-height: 1.5rem;"></div>
     </div>
 </div>
 
@@ -69,9 +69,23 @@
         board.innerHTML = '';
         for (let i = 0; i < 16; i++) {
             const button = document.createElement('button');
-            button.className = 'memory-button w-16 h-16 bg-gradient-to-br from-primary to-primary-dark rounded-lg hover:shadow-lg transition transform hover:scale-105 active:scale-95';
+            button.style.width = '64px';
+            button.style.height = '64px';
+            button.style.background = 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)';
+            button.style.borderRadius = '0.5rem';
+            button.style.border = 'none';
+            button.style.cursor = 'pointer';
+            button.style.transition = 'all 150ms';
             button.dataset.index = i;
             button.addEventListener('click', handleButtonClick);
+            button.addEventListener('mouseover', function() {
+                this.style.transform = 'scale(1.05)';
+                this.style.boxShadow = '0 4px 12px rgba(99, 102, 241, 0.4)';
+            });
+            button.addEventListener('mouseout', function() {
+                this.style.transform = 'scale(1)';
+                this.style.boxShadow = 'none';
+            });
             board.appendChild(button);
         }
     }
@@ -86,7 +100,7 @@
         if (userSequence[userSequence.length - 1] !== sequence[userSequence.length - 1]) {
             const finalScore = sequence.length - 1;
             document.getElementById('message').textContent = `❌ Wrong! You reached Level ${level}. Score: ${finalScore}`;
-            document.getElementById('message').className = 'text-center text-lg font-semibold min-h-6 text-danger';
+            document.getElementById('message').style.color = 'var(--danger)';
             gameActive = false;
             saveScore();
             return;
@@ -95,12 +109,13 @@
         if (userSequence.length === sequence.length) {
             level++;
             document.getElementById('message').textContent = '✅ Correct! Next level...';
-            document.getElementById('message').className = 'text-center text-lg font-semibold min-h-6 text-success';
+            document.getElementById('message').style.color = 'var(--success)';
             setTimeout(playNextLevel, 1500);
         }
     }
 
     function startGame() {
+        console.log('Start game clicked');
         sequence = [];
         userSequence = [];
         level = 1;
@@ -151,7 +166,7 @@
     }
 
     function flashButton(index) {
-        const buttons = document.querySelectorAll('.memory-button');
+        const buttons = document.querySelectorAll('#gameBoard button');
         const btn = buttons[index];
         btn.style.opacity = '0.3';
         btn.style.transform = 'scale(0.95)';
