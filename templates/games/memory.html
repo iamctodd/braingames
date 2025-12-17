@@ -1,60 +1,64 @@
 {% extends "base.html" %}
 {% block title %}Memory Training{% endblock %}
 {% block content %}
-<!-- Back Button - Top Left, Outside Box -->
-<a href="/" class="inline-block mb-6 text-blue-600 hover:text-blue-800 font-bold text-lg">← Back to Home</a>
+<div class="max-w-2xl mx-auto">
+    <!-- Back Button -->
+    <a href="/" class="inline-block mb-6 text-primary hover:text-primary-light font-semibold transition-colors">← Back to Home</a>
 
-<div class="bg-white p-8 rounded shadow max-w-2xl mx-auto">
-    <div class="flex justify-between items-center mb-6">
-        <div>
-            <h1 class="text-3xl font-bold">🧩 Memory Training</h1>
-            <p class="text-gray-600">Watch the pattern and click the squares in the same order!</p>
+    <!-- Game Container -->
+    <div class="glass-card animate-in">
+        <div class="flex justify-between items-start mb-8">
+            <div>
+                <h1 class="text-4xl font-bold mb-2">🧩 Memory Training</h1>
+                <p class="text-text-secondary">Watch the pattern and click the squares in order</p>
+            </div>
+            <div class="text-right">
+                <p class="text-sm text-text-muted mb-1">Best Score</p>
+                <p class="text-3xl font-bold text-primary">{{ best_score }}</p>
+                {% if total_games > 0 %}
+                <p class="text-xs text-text-muted mt-1">Games: {{ total_games }}</p>
+                {% endif %}
+            </div>
         </div>
-        <div class="text-right">
-            <p class="text-sm text-gray-600">Best Score</p>
-            <p class="text-2xl font-bold text-blue-600">{{ best_score }}</p>
-            {% if total_games > 0 %}
-            <p class="text-xs text-gray-500">Games played: {{ total_games }}</p>
-            {% endif %}
+
+        <!-- Stats Row -->
+        <div class="grid grid-cols-3 gap-4 mb-8 pb-8 border-b border-glass-border">
+            <div class="text-center">
+                <p class="text-sm text-text-muted mb-2">Level</p>
+                <p class="text-3xl font-bold text-primary" id="level">1</p>
+            </div>
+            <div class="text-center">
+                <p class="text-sm text-text-muted mb-2">Sequence</p>
+                <p class="text-3xl font-bold text-primary-light" id="sequence">1</p>
+            </div>
+            <div class="text-center">
+                <p class="text-sm text-text-muted mb-2">Score</p>
+                <p class="text-3xl font-bold text-success" id="score">0</p>
+            </div>
         </div>
+
+        <!-- Game Board -->
+        <div class="grid grid-cols-4 gap-3 mb-8 max-w-xs mx-auto">
+            {% for i in range(16) %}
+            <button class="memory-button w-16 h-16 bg-gradient-to-br from-primary to-primary-dark rounded-lg hover:shadow-lg transition transform hover:scale-105 active:scale-95" 
+                    data-index="{{ i }}">
+            </button>
+            {% endfor %}
+        </div>
+
+        <!-- Controls -->
+        <div class="flex gap-3 justify-center mb-8">
+            <button onclick="startGame()" class="btn btn-primary">
+                Start Game
+            </button>
+            <button onclick="resetGame()" class="btn btn-secondary">
+                Reset
+            </button>
+        </div>
+
+        <!-- Message -->
+        <div id="message" class="text-center text-lg font-semibold min-h-6"></div>
     </div>
-
-    <!-- Stats -->
-    <div class="grid grid-cols-3 gap-4 mb-6">
-        <div class="bg-blue-50 p-4 rounded">
-            <p class="text-gray-600 text-sm">Level</p>
-            <p class="text-2xl font-bold" id="level">1</p>
-        </div>
-        <div class="bg-green-50 p-4 rounded">
-            <p class="text-gray-600 text-sm">Sequence</p>
-            <p class="text-2xl font-bold" id="sequence">1</p>
-        </div>
-        <div class="bg-purple-50 p-4 rounded">
-            <p class="text-gray-600 text-sm">Score</p>
-            <p class="text-2xl font-bold" id="score">0</p>
-        </div>
-    </div>
-
-    <!-- Game Board -->
-    <div class="grid grid-cols-4 gap-3 mb-6 max-w-xs mx-auto">
-        {% for i in range(16) %}
-        <button class="memory-button w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg hover:shadow-lg transition transform hover:scale-105" 
-                data-index="{{ i }}">
-        </button>
-        {% endfor %}
-    </div>
-
-    <!-- Controls -->
-    <div class="flex gap-4 justify-center">
-        <button onclick="startGame()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-bold">
-            Start Game
-        </button>
-        <button onclick="resetGame()" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg font-bold">
-            Reset
-        </button>
-    </div>
-
-    <div id="message" class="mt-6 text-center text-lg font-bold"></div>
 </div>
 
 <script>
@@ -154,7 +158,7 @@
             if (userSequence[userSequence.length - 1] !== sequence[userSequence.length - 1]) {
                 const finalScore = sequence.length - 1;
                 document.getElementById('message').textContent = `❌ Wrong! You reached Level ${level}. Score: ${finalScore}`;
-                document.getElementById('message').className = 'mt-6 text-center text-lg font-bold text-red-600';
+                document.getElementById('message').className = 'text-center text-lg font-semibold min-h-6 text-danger';
                 gameActive = false;
                 saveScore();
                 return;
@@ -163,7 +167,7 @@
             if (userSequence.length === sequence.length) {
                 level++;
                 document.getElementById('message').textContent = '✅ Correct! Next level...';
-                document.getElementById('message').className = 'mt-6 text-center text-lg font-bold text-green-600';
+                document.getElementById('message').className = 'text-center text-lg font-semibold min-h-6 text-success';
                 setTimeout(playNextLevel, 1500);
             }
         });

@@ -1,58 +1,62 @@
 {% extends "base.html" %}
 {% block title %}Problem Solving{% endblock %}
 {% block content %}
-<!-- Back Button - Top Left, Outside Box -->
-<a href="/" class="inline-block mb-6 text-blue-600 hover:text-blue-800 font-bold text-lg">← Back to Home</a>
+<div class="max-w-2xl mx-auto">
+    <!-- Back Button -->
+    <a href="/" class="inline-block mb-6 text-primary hover:text-primary-light font-semibold transition-colors">← Back to Home</a>
 
-<div class="bg-white p-8 rounded shadow max-w-2xl mx-auto">
-    <div class="flex justify-between items-center mb-6">
-        <div>
-            <h1 class="text-3xl font-bold">💡 Problem Solving</h1>
-            <p class="text-gray-600">Read the case study and provide your solution</p>
+    <!-- Game Container -->
+    <div class="glass-card animate-in">
+        <div class="flex justify-between items-start mb-8">
+            <div>
+                <h1 class="text-4xl font-bold mb-2">💡 Problem Solving</h1>
+                <p class="text-text-secondary">Read and solve real-world case studies</p>
+            </div>
+            <div class="text-right">
+                <p class="text-sm text-text-muted mb-1">Best Score</p>
+                <p class="text-3xl font-bold text-success">{{ best_score }}</p>
+                {% if total_games > 0 %}
+                <p class="text-xs text-text-muted mt-1">Solved: {{ total_games }}</p>
+                {% endif %}
+            </div>
         </div>
-        <div class="text-right">
-            <p class="text-sm text-gray-600">Best Score</p>
-            <p class="text-2xl font-bold text-blue-600">{{ best_score }}</p>
-            {% if total_games > 0 %}
-            <p class="text-xs text-gray-500">Problems solved: {{ total_games }}</p>
-            {% endif %}
+
+        <!-- Case Study -->
+        <div class="bg-glass-bg border border-glass-border rounded-lg p-6 mb-8">
+            <h2 class="text-xl font-bold mb-4" id="caseTitle">Loading case study...</h2>
+            <p class="text-text-secondary mb-4" id="caseDescription"></p>
+            <ul class="list-disc list-inside text-text-secondary space-y-2 mb-4" id="casePoints"></ul>
+            <p class="font-semibold text-text-primary">What would you suggest to solve this problem?</p>
         </div>
-    </div>
 
-    <!-- Case Study -->
-    <div class="bg-blue-50 p-6 rounded mb-6">
-        <h2 class="text-xl font-bold mb-4" id="caseTitle">Loading case study...</h2>
-        <p class="text-gray-700 mb-4" id="caseDescription"></p>
-        <ul class="list-disc list-inside text-gray-700 mb-4" id="casePoints"></ul>
-        <p class="font-bold text-gray-900">What would you suggest to solve this problem?</p>
-    </div>
+        <!-- Solution Input -->
+        <div class="mb-6">
+            <label class="block text-sm font-semibold mb-3">Your Solution</label>
+            <textarea id="solution" rows="6" placeholder="Share your thoughts on how to solve this problem..." 
+                      class="w-full px-4 py-3 bg-glass-bg border border-glass-border rounded-lg text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary transition-all resize-none"></textarea>
+        </div>
 
-    <!-- Solution Input -->
-    <div class="mb-6">
-        <label class="block text-sm font-bold mb-2">Your Solution:</label>
-        <textarea id="solution" rows="6" placeholder="Type your solution here..." 
-                  class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
-    </div>
+        <!-- Controls -->
+        <div class="flex gap-3 mb-8">
+            <button onclick="submitSolution()" class="btn btn-primary flex-1">
+                Submit Solution
+            </button>
+            <button onclick="nextProblem()" class="btn btn-secondary">
+                Next Problem
+            </button>
+            <button onclick="document.getElementById('solution').value = ''" class="btn btn-secondary">
+                Clear
+            </button>
+        </div>
 
-    <!-- Buttons -->
-    <div class="flex gap-4">
-        <button onclick="submitSolution()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-bold">
-            Submit Solution
-        </button>
-        <button onclick="nextProblem()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-bold">
-            Next Problem
-        </button>
-        <button onclick="document.getElementById('solution').value = ''" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg font-bold">
-            Clear
-        </button>
-    </div>
+        <!-- Feedback -->
+        <div id="feedback" class="hidden"></div>
 
-    <!-- Feedback -->
-    <div id="feedback" class="mt-6 p-4 rounded-lg hidden"></div>
-
-    <!-- Score -->
-    <div class="mt-8 text-center">
-        <p class="text-2xl font-bold">Session Score: <span id="score">0</span></p>
+        <!-- Score -->
+        <div class="text-center pt-6 border-t border-glass-border">
+            <p class="text-sm text-text-muted mb-1">Session Score</p>
+            <p class="text-3xl font-bold text-success" id="score">0</p>
+        </div>
     </div>
 </div>
 
@@ -153,8 +157,8 @@
         sessionScore += score;
 
         const feedback = document.getElementById('feedback');
-        feedback.innerHTML = `<p class="font-bold text-green-700">✅ Solution submitted!</p><p class="text-sm mt-2">Score: ${score}/100</p>`;
-        feedback.className = 'mt-6 p-4 rounded-lg bg-green-100 text-green-900';
+        feedback.innerHTML = `<div class="bg-glass-bg border border-success rounded-lg p-4"><p class="font-semibold text-success mb-2">✅ Solution submitted!</p><p class="text-sm text-text-secondary">Score: ${score}/100</p></div>`;
+        feedback.classList.remove('hidden');
         
         document.getElementById('score').textContent = sessionScore;
 
@@ -173,7 +177,6 @@
         });
     }
 
-    // Load first case study on page load
     loadCaseStudy(0);
 </script>
 {% endblock %}
