@@ -2,8 +2,8 @@
 <html>
 <head>
     <title>{% block title %}Brain Games{% endblock %}</title>
-    <link rel="stylesheet" href="/static/css/modern.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/css/modern.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
@@ -44,7 +44,7 @@
         // Initialize theme
         function initTheme() {
             const savedTheme = localStorage.getItem('theme') || 'night';
-            document.body.classList.toggle('day-mode', savedTheme === 'day');
+            document.body.classList.toggle('day-mode', savedTheme === 'night' ? false : true);
             updateThemeButton(savedTheme);
         }
 
