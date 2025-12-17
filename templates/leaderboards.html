@@ -2,63 +2,81 @@
 {% block title %}Leaderboards - Brain Games{% endblock %}
 {% block content %}
 <div class="max-w-6xl mx-auto">
-    <h1 class="text-4xl font-bold mb-8">🏆 Global Leaderboards</h1>
+    <!-- Header -->
+    <div class="mb-12 animate-in">
+        <h1 class="text-4xl font-bold mb-2">🏆 Leaderboards</h1>
+        <p class="text-text-secondary">See how you rank against other players</p>
+    </div>
 
+    <!-- Leaderboard Cards -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- Memory Leaderboard -->
-        <div class="bg-white rounded-lg shadow p-6">
-            <h2 class="text-2xl font-bold mb-4">🧩 Memory Training</h2>
-            <div class="space-y-2">
+        <div class="glass-card animate-in animate-in-delay-1">
+            <h2 class="text-2xl font-bold mb-6">🧩 Memory Training</h2>
+            <div class="space-y-3">
                 {% for entry in memory_leaderboard %}
-                <div class="flex justify-between items-center p-3 bg-gray-50 rounded hover:bg-gray-100">
-                    <div>
-                        <p class="font-bold">{{ loop.index }}. {{ entry.display_name }}</p>
-                        <p class="text-sm text-gray-600">{{ entry.games_played }} games</p>
+                <div class="flex items-center justify-between p-3 rounded-lg hover:bg-glass-bg transition-all">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-sm font-bold text-white">
+                            {{ loop.index }}
+                        </div>
+                        <div>
+                            <p class="font-semibold text-text-primary">{{ entry.display_name }}</p>
+                            <p class="text-xs text-text-muted">{{ entry.games_played }} games</p>
+                        </div>
                     </div>
-                    <p class="text-2xl font-bold text-blue-600">{{ entry.score }}</p>
+                    <p class="text-xl font-bold text-primary">{{ entry.score }}</p>
                 </div>
                 {% endfor %}
             </div>
         </div>
 
         <!-- Problem Solving Leaderboard -->
-        <div class="bg-white rounded-lg shadow p-6">
-            <h2 class="text-2xl font-bold mb-4">💡 Problem Solving</h2>
-            <div class="space-y-2">
+        <div class="glass-card animate-in animate-in-delay-2">
+            <h2 class="text-2xl font-bold mb-6">💡 Problem Solving</h2>
+            <div class="space-y-3">
                 {% for entry in problem_leaderboard %}
-                <div class="flex justify-between items-center p-3 bg-gray-50 rounded hover:bg-gray-100">
-                    <div>
-                        <p class="font-bold">{{ loop.index }}. {{ entry.display_name }}</p>
-                        <p class="text-sm text-gray-600">{{ entry.games_played }} games</p>
+                <div class="flex items-center justify-between p-3 rounded-lg hover:bg-glass-bg transition-all">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-success to-emerald-500 flex items-center justify-center text-sm font-bold text-white">
+                            {{ loop.index }}
+                        </div>
+                        <div>
+                            <p class="font-semibold text-text-primary">{{ entry.display_name }}</p>
+                            <p class="text-xs text-text-muted">{{ entry.games_played }} games</p>
+                        </div>
                     </div>
-                    <p class="text-2xl font-bold text-green-600">{{ entry.score }}</p>
+                    <p class="text-xl font-bold text-success">{{ entry.score }}</p>
                 </div>
                 {% endfor %}
             </div>
         </div>
 
         <!-- TBI Memory Leaderboard -->
-        <div class="bg-white rounded-lg shadow p-6">
-            <h2 class="text-2xl font-bold mb-4">🎯 TBI Memory</h2>
-            <div class="space-y-2">
+        <div class="glass-card animate-in animate-in-delay-3">
+            <h2 class="text-2xl font-bold mb-6">🎯 TBI Memory</h2>
+            <div class="space-y-3">
                 {% for entry in tbi_leaderboard %}
-                <div class="flex justify-between items-center p-3 bg-gray-50 rounded hover:bg-gray-100">
-                    <div>
-                        <p class="font-bold">{{ loop.index }}. {{ entry.display_name }}</p>
-                        <p class="text-sm text-gray-600">{{ entry.games_played }} games</p>
+                <div class="flex items-center justify-between p-3 rounded-lg hover:bg-glass-bg transition-all">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-sm font-bold text-white">
+                            {{ loop.index }}
+                        </div>
+                        <div>
+                            <p class="font-semibold text-text-primary">{{ entry.display_name }}</p>
+                            <p class="text-xs text-text-muted">{{ entry.games_played }} games</p>
+                        </div>
                     </div>
-                    <p class="text-2xl font-bold text-purple-600">{{ entry.score }}</p>
+                    <p class="text-xl font-bold" style="background: linear-gradient(135deg, #a78bfa 0%, #c084fc 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">{{ entry.score }}</p>
                 </div>
                 {% endfor %}
             </div>
         </div>
     </div>
 
-    <!-- Back to Games -->
-    <div class="mt-12 text-center">
-        <a href="/" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold">
-            ← Back to Games
-        </a>
+    <!-- Back Button -->
+    <div class="mt-12 animate-in animate-in-delay-1">
+        <a href="/" class="btn btn-secondary">← Back to Games</a>
     </div>
 </div>
 {% endblock %}

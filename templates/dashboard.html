@@ -1,109 +1,109 @@
 {% extends "base.html" %}
 {% block title %}Dashboard - Brain Games{% endblock %}
 {% block content %}
-<div class="max-w-4xl mx-auto">
-    <h1 class="text-4xl font-bold mb-8">📊 Dashboard</h1>
+<div class="max-w-6xl mx-auto">
+    <!-- Header -->
+    <div class="mb-12 animate-in">
+        <h1 class="text-4xl font-bold mb-2">📊 Dashboard</h1>
+        <p class="text-text-secondary">Your performance overview</p>
+    </div>
 
-    <!-- Overview Stats -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
         <!-- Memory Stats -->
-        <div class="bg-blue-50 p-6 rounded-lg shadow">
-            <h2 class="text-2xl font-bold mb-4">🧩 Memory Training</h2>
-            <div class="space-y-3">
-                <div>
-                    <p class="text-gray-600 text-sm">Best Score</p>
-                    <p class="text-3xl font-bold text-blue-600">{{ stats.memory.best }}</p>
+        <div class="glass-card animate-in animate-in-delay-1">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-2xl font-bold">🧩 Memory</h2>
+            </div>
+            <div class="space-y-4">
+                <div class="border-b border-glass-border pb-4">
+                    <p class="text-sm text-text-muted mb-1">Best Score</p>
+                    <p class="text-3xl font-bold text-primary">{{ stats.memory.best }}</p>
                 </div>
-                <div>
-                    <p class="text-gray-600 text-sm">Average Score</p>
-                    <p class="text-2xl font-bold text-blue-500">{{ stats.memory.average }}</p>
+                <div class="border-b border-glass-border pb-4">
+                    <p class="text-sm text-text-muted mb-1">Average</p>
+                    <p class="text-2xl font-bold text-primary-light">{{ stats.memory.average }}</p>
                 </div>
-                <div>
-                    <p class="text-gray-600 text-sm">Games Played</p>
-                    <p class="text-2xl font-bold text-blue-500">{{ stats.memory.total }}</p>
+                <div class="pb-4">
+                    <p class="text-sm text-text-muted mb-1">Played</p>
+                    <p class="text-2xl font-bold text-text-primary">{{ stats.memory.total }}</p>
                 </div>
             </div>
-            <a href="/games/memory" class="mt-4 block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-center font-bold">
-                Play Game
-            </a>
+            <a href="/games/memory" class="btn btn-secondary w-full mt-4">Play Game</a>
         </div>
 
         <!-- Problem Solving Stats -->
-        <div class="bg-green-50 p-6 rounded-lg shadow">
-            <h2 class="text-2xl font-bold mb-4">💡 Problem Solving</h2>
-            <div class="space-y-3">
-                <div>
-                    <p class="text-gray-600 text-sm">Best Score</p>
-                    <p class="text-3xl font-bold text-green-600">{{ stats.problem_solving.best }}</p>
+        <div class="glass-card animate-in animate-in-delay-2">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-2xl font-bold">💡 Problem Solving</h2>
+            </div>
+            <div class="space-y-4">
+                <div class="border-b border-glass-border pb-4">
+                    <p class="text-sm text-text-muted mb-1">Best Score</p>
+                    <p class="text-3xl font-bold text-success">{{ stats.problem_solving.best }}</p>
                 </div>
-                <div>
-                    <p class="text-gray-600 text-sm">Average Score</p>
-                    <p class="text-2xl font-bold text-green-500">{{ stats.problem_solving.average }}</p>
+                <div class="border-b border-glass-border pb-4">
+                    <p class="text-sm text-text-muted mb-1">Average</p>
+                    <p class="text-2xl font-bold text-success">{{ stats.problem_solving.average }}</p>
                 </div>
-                <div>
-                    <p class="text-gray-600 text-sm">Problems Solved</p>
-                    <p class="text-2xl font-bold text-green-500">{{ stats.problem_solving.total }}</p>
+                <div class="pb-4">
+                    <p class="text-sm text-text-muted mb-1">Played</p>
+                    <p class="text-2xl font-bold text-text-primary">{{ stats.problem_solving.total }}</p>
                 </div>
             </div>
-            <a href="/games/problem-solving" class="mt-4 block bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-center font-bold">
-                Play Game
-            </a>
+            <a href="/games/problem-solving" class="btn btn-secondary w-full mt-4">Play Game</a>
         </div>
 
         <!-- TBI Memory Stats -->
-        <div class="bg-purple-50 p-6 rounded-lg shadow">
-            <h2 class="text-2xl font-bold mb-4">🎯 TBI Memory</h2>
-            <div class="space-y-3">
-                <div>
-                    <p class="text-gray-600 text-sm">Best Score</p>
-                    <p class="text-3xl font-bold text-purple-600">{{ stats.tbi_memory.best }}</p>
+        <div class="glass-card animate-in animate-in-delay-3">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-2xl font-bold">🎯 TBI Memory</h2>
+            </div>
+            <div class="space-y-4">
+                <div class="border-b border-glass-border pb-4">
+                    <p class="text-sm text-text-muted mb-1">Best Score</p>
+                    <p class="text-3xl font-bold" style="background: linear-gradient(135deg, #a78bfa 0%, #c084fc 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">{{ stats.tbi_memory.best }}</p>
                 </div>
-                <div>
-                    <p class="text-gray-600 text-sm">Average Score</p>
-                    <p class="text-2xl font-bold text-purple-500">{{ stats.tbi_memory.average }}</p>
+                <div class="border-b border-glass-border pb-4">
+                    <p class="text-sm text-text-muted mb-1">Average</p>
+                    <p class="text-2xl font-bold" style="background: linear-gradient(135deg, #a78bfa 0%, #c084fc 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">{{ stats.tbi_memory.average }}</p>
                 </div>
-                <div>
-                    <p class="text-gray-600 text-sm">Rounds Played</p>
-                    <p class="text-2xl font-bold text-purple-500">{{ stats.tbi_memory.total }}</p>
+                <div class="pb-4">
+                    <p class="text-sm text-text-muted mb-1">Played</p>
+                    <p class="text-2xl font-bold text-text-primary">{{ stats.tbi_memory.total }}</p>
                 </div>
             </div>
-            <a href="/games/tbi-memory" class="mt-4 block bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded text-center font-bold">
-                Play Game
-            </a>
+            <a href="/games/tbi-memory" class="btn btn-secondary w-full mt-4">Play Game</a>
         </div>
     </div>
 
-    <!-- Overall Stats -->
-    <div class="bg-white p-6 rounded-lg shadow mb-8">
-        <h2 class="text-2xl font-bold mb-4">📈 Overall Statistics</h2>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div class="bg-gray-50 p-4 rounded">
-                <p class="text-gray-600 text-sm">Total Games</p>
-                <p class="text-3xl font-bold">{{ stats.memory.total + stats.problem_solving.total + stats.tbi_memory.total }}</p>
+    <!-- Overall Stats Card -->
+    <div class="glass-card mb-12 animate-in animate-in-delay-1">
+        <h2 class="text-2xl font-bold mb-6">📈 Overall Stats</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div>
+                <p class="text-sm text-text-muted mb-2">Total Games</p>
+                <p class="text-4xl font-bold text-primary">{{ stats.memory.total + stats.problem_solving.total + stats.tbi_memory.total }}</p>
             </div>
-            <div class="bg-gray-50 p-4 rounded">
-                <p class="text-gray-600 text-sm">Best Memory Score</p>
-                <p class="text-3xl font-bold text-blue-600">{{ stats.memory.best }}</p>
+            <div>
+                <p class="text-sm text-text-muted mb-2">Memory Best</p>
+                <p class="text-4xl font-bold text-primary">{{ stats.memory.best }}</p>
             </div>
-            <div class="bg-gray-50 p-4 rounded">
-                <p class="text-gray-600 text-sm">Best Problem Score</p>
-                <p class="text-3xl font-bold text-green-600">{{ stats.problem_solving.best }}</p>
+            <div>
+                <p class="text-sm text-text-muted mb-2">Problem Best</p>
+                <p class="text-4xl font-bold text-success">{{ stats.problem_solving.best }}</p>
             </div>
-            <div class="bg-gray-50 p-4 rounded">
-                <p class="text-gray-600 text-sm">Best TBI Score</p>
-                <p class="text-3xl font-bold text-purple-600">{{ stats.tbi_memory.best }}</p>
+            <div>
+                <p class="text-sm text-text-muted mb-2">TBI Best</p>
+                <p class="text-4xl font-bold" style="background: linear-gradient(135deg, #a78bfa 0%, #c084fc 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">{{ stats.tbi_memory.best }}</p>
             </div>
         </div>
     </div>
 
-    <!-- Links -->
-    <div class="flex gap-4">
-        <a href="/history" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold">
-            View Score History
-        </a>
-        <a href="/" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-bold">
-            Back to Games
-        </a>
+    <!-- Navigation Links -->
+    <div class="flex gap-4 animate-in animate-in-delay-2">
+        <a href="/history" class="btn btn-primary">View Score History</a>
+        <a href="/" class="btn btn-secondary">Back to Games</a>
     </div>
 </div>
 {% endblock %}
