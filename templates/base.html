@@ -32,11 +32,38 @@
                     <a href="/leaderboards">Leaderboards</a>
                     <a href="/login" class="btn btn-primary text-sm px-4 py-2 ml-2">Login</a>
                 {% endif %}
+                <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()"></button>
             </div>
         </div>
     </nav>
     <main class="max-w-7xl mx-auto px-4 py-8">
         {% block content %}{% endblock %}
     </main>
+
+    <script>
+        // Initialize theme
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'night';
+            document.body.classList.toggle('day-mode', savedTheme === 'day');
+            updateThemeButton(savedTheme);
+        }
+
+        function toggleTheme() {
+            const currentTheme = localStorage.getItem('theme') || 'night';
+            const newTheme = currentTheme === 'night' ? 'day' : 'night';
+            
+            localStorage.setItem('theme', newTheme);
+            document.body.classList.toggle('day-mode', newTheme === 'day');
+            updateThemeButton(newTheme);
+        }
+
+        function updateThemeButton(theme) {
+            const button = document.getElementById('themeToggle');
+            button.textContent = theme === 'night' ? '☀️' : '🌙';
+        }
+
+        // Initialize on page load
+        initTheme();
+    </script>
 </body>
 </html>
