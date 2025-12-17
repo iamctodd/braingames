@@ -1,11 +1,15 @@
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 import hashlib
 
 app = Flask(__name__)
-app.secret_key = 'brain-games-secret-key-2025'  # Fixed key
+app.secret_key = 'brain-games-secret-key-2025'
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=30)
+app.config['SESSION_COOKIE_SECURE'] = False
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
 USERS_FILE = 'users.json'
 SCORES_FILE = 'scores.json'
@@ -15,7 +19,6 @@ SCORES_FILE = 'scores.json'
 # ============================================================================
 
 def load_users():
-    """Load users"""
     if os.path.exists(USERS_FILE):
         try:
             with open(USERS_FILE, 'r') as f:
@@ -25,7 +28,6 @@ def load_users():
     return {}
 
 def save_users(users):
-    """Save users"""
     with open(USERS_FILE, 'w') as f:
         json.dump(users, f, indent=2)
 
@@ -33,11 +35,9 @@ def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
 def create_user(email, password, display_name):
-    """Create user"""
     users = load_users()
     if email in users:
         return False, "Email already exists"
-    
     users[email] = {
         'password': hash_password(password),
         'display_name': display_name,
@@ -48,18 +48,14 @@ def create_user(email, password, display_name):
     return True, "Account created"
 
 def verify_user(email, password):
-    """Verify user"""
     users = load_users()
     if email not in users:
         return False, "User not found"
-    
     if users[email]['password'] != hash_password(password):
         return False, "Wrong password"
-    
     return True, users[email]
 
 def get_current_user():
-    """Get logged in user"""
     if 'user_id' in session:
         users = load_users()
         if session['user_id'] in users:
@@ -87,7 +83,6 @@ def add_score(user_id, game_type, score, difficulty='medium'):
     scores = load_scores()
     if user_id not in scores:
         scores[user_id] = {'memory': [], 'problem_solving': [], 'tbi_memory': []}
-    
     scores[user_id][game_type].append({
         'score': score,
         'difficulty': difficulty,
@@ -157,8 +152,8 @@ def login():
         data = request.json
         success, result = verify_user(data.get('email'), data.get('password'))
         if success:
-            session['user_id'] = data.get('email')
             session.permanent = True
+            session['user_id'] = data.get('email')
             return jsonify({'success': True})
         return jsonify({'success': False, 'message': result})
     return render_template('auth/login.html')
