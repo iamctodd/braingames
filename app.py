@@ -17,25 +17,39 @@ SCORES_FILE = 'scores.json'
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
-# Initialize default users if file doesn't exist
+# Initialize default users
 def init_default_users():
-    if not os.path.exists(USERS_FILE):
-        users = {
-            "demo@braingames.com": {
-                "password": hash_password("demo123"),
-                "display_name": "Demo User",
-                "created_at": "2025-12-16 12:00:00",
-                "avatar": None
-            },
-            "email@ctoddlombardo.com": {
-                "password": hash_password("123456"),
-                "display_name": "C TODD LOMBARDO",
-                "created_at": "2025-12-17 18:25:23",
-                "avatar": None
-            }
+    default_users = {
+        "demo@braingames.com": {
+            "password": hash_password("demo123"),
+            "display_name": "Demo User",
+            "created_at": "2025-12-16 12:00:00",
+            "avatar": None
+        },
+        "email@ctoddlombardo.com": {
+            "password": hash_password("123456"),
+            "display_name": "C TODD LOMBARDO",
+            "created_at": "2025-12-17 18:25:23",
+            "avatar": None
         }
+    }
+    
+    if os.path.exists(USERS_FILE):
+        try:
+            with open(USERS_FILE, 'r') as f:
+                users = json.load(f)
+            # Merge default users into existing file
+            for email, data in default_users.items():
+                if email not in users:
+                    users[email] = data
+            with open(USERS_FILE, 'w') as f:
+                json.dump(users, f, indent=2)
+        except:
+            with open(USERS_FILE, 'w') as f:
+                json.dump(default_users, f, indent=2)
+    else:
         with open(USERS_FILE, 'w') as f:
-            json.dump(users, f, indent=2)
+            json.dump(default_users, f, indent=2)
 
 init_default_users()
 
@@ -282,4 +296,4 @@ def upload_avatar():
     return jsonify({'success': True})
 
 if __name__ == '__main__':
-    app.run(debug=True) # Just updated
+    app.run(debug=True)
