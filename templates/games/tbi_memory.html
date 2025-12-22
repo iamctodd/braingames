@@ -75,7 +75,8 @@
             <textarea id="response" rows="4" placeholder="Example: apple, bicycle, cloud, dragon" 
                       style="width: 100%; padding: 0.75rem; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; color: var(--text-primary); font-family: inherit; resize: none; transition: all 250ms;"
                       onfocus="this.style.borderColor = 'var(--primary)'; this.style.boxShadow = '0 0 0 3px rgba(99, 102, 241, 0.1)'"
-                      onblur="this.style.borderColor = 'var(--glass-border)'; this.style.boxShadow = 'none'"></textarea>
+                      onblur="this.style.borderColor = 'var(--glass-border)'; this.style.boxShadow = 'none'"
+                      oninput="validateSubmitButton()"></textarea>
         </div>
 
         <!-- Controls -->
@@ -83,7 +84,7 @@
             <button id="startBtn" onclick="startRound()" style="flex: 1; padding: 0.875rem 2rem; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; border: none; border-radius: 0.75rem; font-weight: 600; cursor: pointer; transition: all 250ms;">
                 Start Round
             </button>
-            <button onclick="submitResponse()" style="padding: 0.875rem 2rem; background: linear-gradient(135deg, var(--success) 0%, #059669 100%); color: white; border: none; border-radius: 0.75rem; font-weight: 600; cursor: pointer; transition: all 250ms;">
+            <button id="submitBtn" onclick="submitResponse()" disabled style="padding: 0.875rem 2rem; background: linear-gradient(135deg, var(--success) 0%, #059669 100%); color: white; border: none; border-radius: 0.75rem; font-weight: 600; cursor: not-allowed; transition: all 250ms; opacity: 0.5;">
                 Submit
             </button>
             <button onclick="resetGame()" style="padding: 0.875rem 2rem; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-primary); border-radius: 0.75rem; font-weight: 600; cursor: pointer; transition: all 250ms;">
@@ -126,6 +127,22 @@
         });
     });
 
+    function validateSubmitButton() {
+        const submitBtn = document.getElementById('submitBtn');
+        const responseText = document.getElementById('response').value.trim();
+        
+        // Enable submit only if user has typed something (at least 3 characters)
+        if (responseText.length >= 3) {
+            submitBtn.disabled = false;
+            submitBtn.style.opacity = '1';
+            submitBtn.style.cursor = 'pointer';
+        } else {
+            submitBtn.disabled = true;
+            submitBtn.style.opacity = '0.5';
+            submitBtn.style.cursor = 'not-allowed';
+        }
+    }
+
     function getWords(difficulty) {
         const allWords = [
             'apple', 'bicycle', 'cloud', 'dragon', 'elephant', 'flower', 
@@ -150,6 +167,9 @@
         startBtn.disabled = true;
         startBtn.style.opacity = '0.5';
         startBtn.style.cursor = 'not-allowed';
+        
+        // Disable Submit button (until user types)
+        validateSubmitButton();
         
         let index = 0;
         const speed = currentDifficulty === 'easy' ? 3000 : currentDifficulty === 'medium' ? 2000 : 1500;
@@ -238,6 +258,12 @@
         startBtn.disabled = false;
         startBtn.style.opacity = '1';
         startBtn.style.cursor = 'pointer';
+        
+        // Disable Submit button
+        validateSubmitButton();
     }
+
+    // Initialize Submit button state
+    validateSubmitButton();
 </script>
 {% endblock %}
