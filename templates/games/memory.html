@@ -41,12 +41,6 @@
         <div id="gameBoard" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin-bottom: 2rem; max-width: 300px; margin-left: auto; margin-right: auto; position: relative;">
         </div>
 
-        <!-- Learning Tip -->
-        <div id="learningTip" style="display: none; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; padding: 1rem; margin-bottom: 2rem; text-align: center;">
-            <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 0.5rem;">💡 Tip: Watch the numbers show the correct sequence order!</p>
-            <p style="color: var(--text-muted); font-size: 0.75rem;">The numbers disappear when you start playing</p>
-        </div>
-
         <!-- Controls -->
         <div style="display: flex; gap: 0.75rem; justify-content: center; margin-bottom: 2rem;">
             <button id="startBtn" onclick="startGame()" style="padding: 0.875rem 2rem; border-radius: 0.75rem; font-weight: 600; font-size: 1rem; border: none; cursor: pointer; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3); transition: all 250ms;">
@@ -58,7 +52,14 @@
         </div>
 
         <!-- Message -->
-        <div id="message" style="text-align: center; font-size: 1.125rem; font-weight: 600; min-height: 1.5rem;"></div>
+        <div id="message" style="text-align: center; font-size: 1.125rem; font-weight: 600; min-height: 1.5rem; margin-bottom: 1rem;"></div>
+
+        <!-- Learning Section (shown after game over) -->
+        <div id="learningSection" style="display: none; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; padding: 1.5rem; text-align: center;">
+            <p style="font-weight: 600; color: var(--text-secondary); margin-bottom: 1rem;">📚 Here's the sequence you should have followed:</p>
+            <div id="solutionBoard" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; max-width: 300px; margin-left: auto; margin-right: auto;">
+            </div>
+        </div>
     </div>
 </div>
 
@@ -68,7 +69,6 @@
     let level = 1;
     let isPlaying = false;
     let gameActive = false;
-    let showingSequence = false;
 
     // Initialize game board
     function initBoard() {
@@ -83,11 +83,10 @@
             button.style.border = 'none';
             button.style.cursor = 'pointer';
             button.style.transition = 'all 150ms';
-            button.style.position = 'relative';
             button.dataset.index = i;
             button.addEventListener('click', handleButtonClick);
             button.addEventListener('mouseover', function() {
-                if (gameActive && !showingSequence) {
+                if (gameActive) {
                     this.style.transform = 'scale(1.05)';
                     this.style.boxShadow = '0 4px 12px rgba(99, 102, 241, 0.4)';
                 }
@@ -101,7 +100,7 @@
     }
 
     function handleButtonClick(e) {
-        if (isPlaying || !gameActive || showingSequence) return;
+        if (isPlaying || !gameActive) return;
         
         const index = parseInt(e.target.dataset.index);
         userSequence.push(index);
@@ -113,7 +112,7 @@
             document.getElementById('message').style.color = 'var(--danger)';
             gameActive = false;
             disableStartButton(false);
-            showCorrectSequence(); // Show the correct sequence after mistake
+            showSolutionSequence(); // Show what they should have done
             saveScore();
             return;
         }
@@ -134,7 +133,7 @@
         gameActive = true;
         disableStartButton(true);
         document.getElementById('message').textContent = '';
-        document.getElementById('learningTip').style.display = 'block';
+        document.getElementById('learningSection').style.display = 'none';
         updateDisplay();
         playNextLevel();
     }
@@ -145,12 +144,10 @@
         level = 1;
         isPlaying = false;
         gameActive = false;
-        showingSequence = false;
         disableStartButton(false);
         updateDisplay();
         document.getElementById('message').textContent = '';
-        document.getElementById('learningTip').style.display = 'none';
-        clearSequenceNumbers();
+        document.getElementById('learningSection').style.display = 'none';
     }
 
     function disableStartButton(disabled) {
@@ -179,7 +176,6 @@
 
     function playSequence() {
         isPlaying = true;
-        showingSequence = true;
         let delay = 600;
         
         sequence.forEach((index, i) => {
@@ -188,11 +184,7 @@
             }, delay + i * 600);
         });
         
-        setTimeout(() => {
-            isPlaying = false;
-            showingSequence = false;
-            showSequenceNumbers();
-        }, delay + (sequence.length - 1) * 600 + 400);
+        isPlaying = false;
     }
 
     function flashButton(index) {
@@ -207,57 +199,46 @@
         }, 300);
     }
 
-    function showSequenceNumbers() {
-        const buttons = document.querySelectorAll('#gameBoard button');
-        sequence.forEach((index, order) => {
-            const btn = buttons[index];
-            const numberBadge = document.createElement('div');
-            numberBadge.textContent = order + 1;
-            numberBadge.style.position = 'absolute';
-            numberBadge.style.top = '50%';
-            numberBadge.style.left = '50%';
-            numberBadge.style.transform = 'translate(-50%, -50%)';
-            numberBadge.style.width = '28px';
-            numberBadge.style.height = '28px';
-            numberBadge.style.background = 'linear-gradient(135deg, var(--secondary) 0%, #ec4899 100%)';
-            numberBadge.style.color = 'white';
-            numberBadge.style.borderRadius = '50%';
-            numberBadge.style.display = 'flex';
-            numberBadge.style.alignItems = 'center';
-            numberBadge.style.justifyContent = 'center';
-            numberBadge.style.fontWeight = 'bold';
-            numberBadge.style.fontSize = '0.875rem';
-            numberBadge.style.zIndex = '10';
-            numberBadge.className = 'sequence-number';
-            btn.appendChild(numberBadge);
-        });
-    }
-
-    function showCorrectSequence() {
-        // Show the correct sequence one more time when user makes a mistake
-        setTimeout(() => {
-            const buttons = document.querySelectorAll('#gameBoard button');
-            let delay = 300;
+    function showSolutionSequence() {
+        // Create a visual showing which squares in which order they should have clicked
+        const solutionBoard = document.getElementById('solutionBoard');
+        solutionBoard.innerHTML = '';
+        
+        for (let i = 0; i < 16; i++) {
+            const square = document.createElement('div');
+            square.style.width = '64px';
+            square.style.height = '64px';
+            square.style.background = 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)';
+            square.style.borderRadius = '0.5rem';
+            square.style.position = 'relative';
+            square.style.display = 'flex';
+            square.style.alignItems = 'center';
+            square.style.justifyContent = 'center';
             
-            sequence.forEach((index, i) => {
-                setTimeout(() => {
-                    const btn = buttons[index];
-                    btn.style.opacity = '0.3';
-                    btn.style.transform = 'scale(0.95)';
-                    
-                    setTimeout(() => {
-                        btn.style.opacity = '1';
-                        btn.style.transform = 'scale(1)';
-                    }, 300);
-                }, delay + i * 600);
-            });
-        }, 500);
-    }
-
-    function clearSequenceNumbers() {
-        document.querySelectorAll('.sequence-number').forEach(badge => {
-            badge.remove();
-        });
+            // Check if this square is in the sequence
+            const sequenceOrder = sequence.indexOf(i);
+            if (sequenceOrder !== -1) {
+                const badge = document.createElement('div');
+                badge.textContent = sequenceOrder + 1;
+                badge.style.width = '28px';
+                badge.style.height = '28px';
+                badge.style.background = 'linear-gradient(135deg, var(--secondary) 0%, #ec4899 100%)';
+                badge.style.color = 'white';
+                badge.style.borderRadius = '50%';
+                badge.style.display = 'flex';
+                badge.style.alignItems = 'center';
+                badge.style.justifyContent = 'center';
+                badge.style.fontWeight = 'bold';
+                badge.style.fontSize = '1rem';
+                square.appendChild(badge);
+            } else {
+                square.style.opacity = '0.3';
+            }
+            
+            solutionBoard.appendChild(square);
+        }
+        
+        document.getElementById('learningSection').style.display = 'block';
     }
 
     function saveScore() {
@@ -274,7 +255,7 @@
         .then(r => r.json())
         .then(data => {
             console.log('Score saved:', data);
-            setTimeout(() => location.reload(), 1000);
+            setTimeout(() => location.reload(), 2000);
         });
     }
 
