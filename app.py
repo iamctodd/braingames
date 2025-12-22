@@ -442,5 +442,77 @@ def upload_avatar():
     save_users(users)
     return jsonify({'success': True})
 
+@app.route('/api/update-profile', methods=['POST'])
+def update_profile():
+    user_id, user_data = get_current_user()
+    if not user_id:
+        return jsonify({'success': False, 'message': 'Not authenticated'}), 401
+    
+    data = request.json
+    display_name = data.get('display_name', '').strip()
+    
+    if not display_name or len(display_name) < 2:
+        return jsonify({'success': False, 'message': 'Display name must be at least 2 characters'})
+    
+    users = load_users()
+    users[user_id]['display_name'] = display_name
+    save_users(users)
+    
+    return jsonify({'success': True, 'message': 'Profile updated'})
+
+@app.route('/api/change-password', methods=['POST'])
+def change_password():
+    user_id, user_data = get_current_user()
+    if not user_id:
+        return jsonify({'success': False, 'message': 'Not authenticated'}), 401
+    
+    data = request.json
+    current_password = data.get('current_password', '')
+    new_password = data.get('new_password', '')
+    
+    # Verify current password
+    users = load_users()
+    if users[user_id]['password'] != hash_password(current_password):
+        return jsonify({'success': False, 'message': 'Current password is incorrect'})
+    
+    if len(new_password) < 5:
+        return jsonify({'success': False, 'message': 'New password must be at least 5 characters'})
+    
+    # Update password
+    users[user_id]['password'] = hash_password(new_password)
+    save_users(users)
+    
+    return jsonify({'success': True, 'message': 'Password changed successfully'})
+
+@app.route('/api/delete-account', methods=['POST'])
+def delete_account():
+    user_id, user_data = get_current_user()
+    if not user_id:
+        return jsonify({'success': False, 'message': 'Not authenticated'}), 401
+    
+    data = request.json
+    email = data.get('email', '').strip()
+    
+    # Verify email matches
+    if email != user_id:
+        return jsonify({'success': False, 'message': 'Email does not match'})
+    
+    # Delete user
+    users = load_users()
+    if user_id in users:
+        del users[user_id]
+        save_users(users)
+    
+    # Delete scores
+    scores = load_scores()
+    if user_id in scores:
+        del scores[user_id]
+        save_scores(scores)
+    
+    # Clear session
+    session.clear()
+    
+    return jsonify({'success': True, 'message': 'Account deleted'})
+
 if __name__ == '__main__':
     app.run(debug=True)

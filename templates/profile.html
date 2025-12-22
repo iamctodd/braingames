@@ -1,152 +1,392 @@
 {% extends "base.html" %}
 {% block title %}Profile - Brain Games{% endblock %}
 {% block content %}
-<div class="max-w-4xl mx-auto">
+<div class="max-w-2xl mx-auto">
+    <!-- Back Button -->
+    <a href="/" class="inline-block mb-6 text-primary hover:text-primary-light font-semibold transition-colors">← Back to Home</a>
+
     <!-- Profile Header -->
-    <div class="glass-card mb-8 animate-in">
-        <div class="flex items-start gap-6">
+    <div class="glass-card animate-in mb-6">
+        <div style="display: flex; gap: 2rem; align-items: flex-start; margin-bottom: 2rem;">
             <!-- Avatar Section -->
-            <div class="flex-shrink-0">
-                <div class="relative">
-                    {% if user.avatar %}
-                    <img src="{{ user.avatar }}" alt="{{ user.display_name }}" 
-                         class="w-32 h-32 rounded-full object-cover border-4 border-primary shadow-lg">
-                    {% else %}
-                    <div class="w-32 h-32 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-5xl font-bold text-white shadow-lg">
-                        {{ user.display_name[0].upper() }}
-                    </div>
-                    {% endif %}
-                    <button onclick="document.getElementById('avatarInput').click()" 
-                            class="absolute bottom-0 right-0 w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white shadow-lg hover:bg-primary-dark transition-all">
-                        📷
-                    </button>
-                    <input type="file" id="avatarInput" accept="image/*" style="display: none;" onchange="uploadAvatar(event)">
+            <div style="flex-shrink: 0;">
+                {% if user.avatar %}
+                <img src="{{ user.avatar }}" alt="{{ user.display_name }}" 
+                     style="width: 128px; height: 128px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary);">
+                {% else %}
+                <div style="width: 128px; height: 128px; border-radius: 50%; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: bold; color: white; border: 3px solid var(--primary);">
+                    {{ user.display_name[0].upper() }}
                 </div>
-            </div>
-            
-            <!-- User Info -->
-            <div class="flex-grow">
-                <h1 class="text-4xl font-bold mb-2">{{ user.display_name }}</h1>
-                <p class="text-text-secondary mb-1">{{ user_id }}</p>
-                <p class="text-sm text-text-muted">Member since {{ user.created_at }}</p>
+                {% endif %}
                 
-                <div class="mt-6">
-                    <a href="/logout" class="btn btn-secondary">Logout</a>
+                <!-- Upload Avatar Button -->
+                <button onclick="document.getElementById('avatarInput').click()" 
+                        style="margin-top: 1rem; padding: 0.5rem 1rem; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-primary); border-radius: 0.5rem; font-size: 0.875rem; cursor: pointer; transition: all 250ms; width: 100%;">
+                    📷 Change Photo
+                </button>
+                <input type="file" id="avatarInput" accept="image/*" style="display: none;" onchange="handleAvatarUpload(event)">
+            </div>
+
+            <!-- User Info -->
+            <div style="flex: 1;">
+                <h1 style="font-size: 2rem; font-weight: bold; margin-bottom: 0.5rem;">{{ user.display_name }}</h1>
+                <p style="color: var(--text-secondary); margin-bottom: 0.5rem;">{{ user_id }}</p>
+                <p style="color: var(--text-muted); font-size: 0.875rem;">Member since {{ user.created_at }}</p>
+                
+                <!-- Stats -->
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1.5rem;">
+                    <div style="text-center; padding: 1rem; background: var(--glass-bg); border-radius: 0.5rem; border: 1px solid var(--glass-border);">
+                        <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Games Played</p>
+                        <p style="font-size: 1.5rem; font-weight: bold; color: var(--primary);">{{ stats.memory.total + stats.problem_solving.total + stats.tbi_memory.total }}</p>
+                    </div>
+                    <div style="text-center; padding: 1rem; background: var(--glass-bg); border-radius: 0.5rem; border: 1px solid var(--glass-border);">
+                        <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Best Score</p>
+                        <p style="font-size: 1.5rem; font-weight: bold; color: var(--success);">{{ [stats.memory.best, stats.problem_solving.best, stats.tbi_memory.best]|max }}</p>
+                    </div>
+                    <div style="text-center; padding: 1rem; background: var(--glass-bg); border-radius: 0.5rem; border: 1px solid var(--glass-border);">
+                        <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Avg Score</p>
+                        <p style="font-size: 1.5rem; font-weight: bold; color: var(--secondary);">{{ ((stats.memory.average + stats.problem_solving.average + stats.tbi_memory.average) / 3)|int }}</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Stats Grid -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
-        <!-- Memory Stats -->
-        <div class="gradient-card animate-in animate-in-delay-1" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);">
-            <h3 class="text-2xl font-bold mb-4">🧩 Memory Training</h3>
-            <div style="margin-bottom: 1rem;">
-                <div style="margin-bottom: 1rem;">
-                    <p style="font-size: 0.875rem; opacity: 0.75;">Best Score</p>
-                    <p style="font-size: 2.25rem; font-weight: bold;">{{ stats.memory.best }}</p>
-                </div>
-                <div style="margin-bottom: 1rem;">
-                    <p style="font-size: 0.875rem; opacity: 0.75;">Average Score</p>
-                    <p style="font-size: 1.5rem; font-weight: bold;">{{ stats.memory.average }}</p>
-                </div>
-                <div style="margin-bottom: 1rem;">
-                    <p style="font-size: 0.875rem; opacity: 0.75;">Games Played</p>
-                    <p style="font-size: 1.5rem; font-weight: bold;">{{ stats.memory.total }}</p>
-                </div>
-            </div>
-            <button onclick="location.href='/games/memory'" style="width: 100%; margin-top: 1rem; padding: 0.875rem 2rem; background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 0.75rem; font-weight: 600; cursor: pointer; font-size: 1rem; transition: background 250ms;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
-                Play Game
-            </button>
-        </div>
+    <!-- Tabs Navigation -->
+    <div style="display: flex; gap: 0; margin-bottom: 2rem; border-bottom: 1px solid var(--glass-border);">
+        <button onclick="showTab('account')" id="accountTab"
+                style="padding: 1rem 1.5rem; background: transparent; border: none; color: var(--text-primary); font-weight: 600; cursor: pointer; border-bottom: 3px solid var(--primary); transition: all 250ms;">
+            Account Settings
+        </button>
+        <button onclick="showTab('security')" id="securityTab"
+                style="padding: 1rem 1.5rem; background: transparent; border: none; color: var(--text-muted); font-weight: 600; cursor: pointer; border-bottom: 3px solid transparent; transition: all 250ms;">
+            Security
+        </button>
+        <button onclick="showTab('stats')" id="statsTab"
+                style="padding: 1rem 1.5rem; background: transparent; border: none; color: var(--text-muted); font-weight: 600; cursor: pointer; border-bottom: 3px solid transparent; transition: all 250ms;">
+            Game Stats
+        </button>
+    </div>
 
-        <!-- Problem Solving Stats -->
-        <div class="gradient-card animate-in animate-in-delay-2" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
-            <h3 class="text-2xl font-bold mb-4">💡 Problem Solving</h3>
-            <div style="margin-bottom: 1rem;">
-                <div style="margin-bottom: 1rem;">
-                    <p style="font-size: 0.875rem; opacity: 0.75;">Best Score</p>
-                    <p style="font-size: 2.25rem; font-weight: bold;">{{ stats.problem_solving.best }}</p>
+    <!-- Account Settings Tab -->
+    <div id="accountTab-content" class="tab-content">
+        <div class="glass-card animate-in mb-6">
+            <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem;">Edit Profile</h2>
+            
+            <form id="editProfileForm" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                <!-- Display Name -->
+                <div>
+                    <label style="display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">Display Name</label>
+                    <input type="text" id="displayName" value="{{ user.display_name }}" 
+                           style="width: 100%; padding: 0.75rem; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; color: var(--text-primary); font-family: inherit; font-size: 1rem; transition: all 250ms;"
+                           onfocus="this.style.borderColor = 'var(--primary)'; this.style.boxShadow = '0 0 0 3px rgba(99, 102, 241, 0.1)'"
+                           onblur="this.style.borderColor = 'var(--glass-border)'; this.style.boxShadow = 'none'">
                 </div>
-                <div style="margin-bottom: 1rem;">
-                    <p style="font-size: 0.875rem; opacity: 0.75;">Average Score</p>
-                    <p style="font-size: 1.5rem; font-weight: bold;">{{ stats.problem_solving.average }}</p>
-                </div>
-                <div style="margin-bottom: 1rem;">
-                    <p style="font-size: 0.875rem; opacity: 0.75;">Problems Solved</p>
-                    <p style="font-size: 1.5rem; font-weight: bold;">{{ stats.problem_solving.total }}</p>
-                </div>
-            </div>
-            <button onclick="location.href='/games/problem-solving'" style="width: 100%; margin-top: 1rem; padding: 0.875rem 2rem; background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 0.75rem; font-weight: 600; cursor: pointer; font-size: 1rem; transition: background 250ms;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
-                Play Game
-            </button>
-        </div>
 
-        <!-- TBI Memory Stats -->
-        <div class="gradient-card animate-in animate-in-delay-3" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);">
-            <h3 class="text-2xl font-bold mb-4">🎯 TBI Memory</h3>
-            <div style="margin-bottom: 1rem;">
-                <div style="margin-bottom: 1rem;">
-                    <p style="font-size: 0.875rem; opacity: 0.75;">Best Score</p>
-                    <p style="font-size: 2.25rem; font-weight: bold;">{{ stats.tbi_memory.best }}</p>
+                <!-- Email (Read-only) -->
+                <div>
+                    <label style="display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">Email Address</label>
+                    <input type="email" value="{{ user_id }}" disabled
+                           style="width: 100%; padding: 0.75rem; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; color: var(--text-muted); font-family: inherit; font-size: 1rem; cursor: not-allowed; opacity: 0.6;">
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">Email cannot be changed</p>
                 </div>
-                <div style="margin-bottom: 1rem;">
-                    <p style="font-size: 0.875rem; opacity: 0.75;">Average Score</p>
-                    <p style="font-size: 1.5rem; font-weight: bold;">{{ stats.tbi_memory.average }}</p>
-                </div>
-                <div style="margin-bottom: 1rem;">
-                    <p style="font-size: 0.875rem; opacity: 0.75;">Rounds Played</p>
-                    <p style="font-size: 1.5rem; font-weight: bold;">{{ stats.tbi_memory.total }}</p>
-                </div>
-            </div>
-            <button onclick="location.href='/games/tbi-memory'" style="width: 100%; margin-top: 1rem; padding: 0.875rem 2rem; background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 0.75rem; font-weight: 600; cursor: pointer; font-size: 1rem; transition: background 250ms;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
-                Play Game
-            </button>
+
+                <!-- Save Button -->
+                <button type="button" onclick="saveProfile()"
+                        style="padding: 0.875rem; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; border: none; border-radius: 0.5rem; font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 250ms;">
+                    Save Changes
+                </button>
+            </form>
         </div>
     </div>
 
-    <!-- Links -->
-    <div style="display: flex; gap: 1rem;">
-        <a href="/dashboard" style="padding: 0.875rem 2rem; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; border: none; border-radius: 0.75rem; font-weight: 600; cursor: pointer; text-align: center; text-decoration: none;">Dashboard</a>
-        <a href="/history" style="padding: 0.875rem 2rem; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-primary); border-radius: 0.75rem; font-weight: 600; cursor: pointer; text-align: center; text-decoration: none;">Score History</a>
-        <a href="/" style="padding: 0.875rem 2rem; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-primary); border-radius: 0.75rem; font-weight: 600; cursor: pointer; text-align: center; text-decoration: none;">Back to Games</a>
+    <!-- Security Tab -->
+    <div id="securityTab-content" class="tab-content" style="display: none;">
+        <div class="glass-card animate-in mb-6">
+            <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem;">Change Password</h2>
+            
+            <form id="changePasswordForm" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                <!-- Current Password -->
+                <div>
+                    <label style="display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">Current Password</label>
+                    <input type="password" id="currentPassword" placeholder="••••••••"
+                           style="width: 100%; padding: 0.75rem; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; color: var(--text-primary); font-family: inherit; font-size: 1rem; transition: all 250ms;"
+                           onfocus="this.style.borderColor = 'var(--primary)'; this.style.boxShadow = '0 0 0 3px rgba(99, 102, 241, 0.1)'"
+                           onblur="this.style.borderColor = 'var(--glass-border)'; this.style.boxShadow = 'none'">
+                </div>
+
+                <!-- New Password -->
+                <div>
+                    <label style="display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">New Password</label>
+                    <input type="password" id="newPassword" placeholder="••••••••" 
+                           style="width: 100%; padding: 0.75rem; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; color: var(--text-primary); font-family: inherit; font-size: 1rem; transition: all 250ms;"
+                           onfocus="this.style.borderColor = 'var(--primary)'; this.style.boxShadow = '0 0 0 3px rgba(99, 102, 241, 0.1)'"
+                           onblur="this.style.borderColor = 'var(--glass-border)'; this.style.boxShadow = 'none'">
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">Minimum 5 characters</p>
+                </div>
+
+                <!-- Confirm Password -->
+                <div>
+                    <label style="display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">Confirm New Password</label>
+                    <input type="password" id="confirmPassword" placeholder="••••••••"
+                           style="width: 100%; padding: 0.75rem; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; color: var(--text-primary); font-family: inherit; font-size: 1rem; transition: all 250ms;"
+                           onfocus="this.style.borderColor = 'var(--primary)'; this.style.boxShadow = '0 0 0 3px rgba(99, 102, 241, 0.1)'"
+                           onblur="this.style.borderColor = 'var(--glass-border)'; this.style.boxShadow = 'none'">
+                </div>
+
+                <!-- Error Message -->
+                <div id="passwordError" style="display: none; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 0.5rem; padding: 0.75rem; color: #ef4444; font-size: 0.875rem;"></div>
+
+                <!-- Change Button -->
+                <button type="button" onclick="changePassword()"
+                        style="padding: 0.875rem; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; border: none; border-radius: 0.5rem; font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 250ms;">
+                    Update Password
+                </button>
+            </form>
+
+            <hr style="border: none; border-top: 1px solid var(--glass-border); margin: 2rem 0;">
+
+            <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem;">Danger Zone</h2>
+            
+            <div style="background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 0.5rem; padding: 1.5rem;">
+                <h3 style="font-size: 1.125rem; font-weight: bold; margin-bottom: 0.5rem; color: #ef4444;">Delete Account</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.875rem;">
+                    This action is permanent and cannot be undone. All your games, scores, and profile data will be deleted.
+                </p>
+                <button onclick="deleteAccount()"
+                        style="padding: 0.875rem 2rem; background: #ef4444; color: white; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; transition: all 250ms;">
+                    Delete My Account
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Stats Tab -->
+    <div id="statsTab-content" class="tab-content" style="display: none;">
+        <div class="glass-card animate-in">
+            <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem;">Your Game Statistics</h2>
+            
+            <div style="display: grid; grid-template-columns: repeat(1, 1fr); gap: 1.5rem;">
+                <!-- Memory Stats -->
+                <div style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; padding: 1.5rem;">
+                    <h3 style="font-size: 1.125rem; font-weight: bold; margin-bottom: 1rem;">🧩 Memory Training</h3>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+                        <div>
+                            <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Best Score</p>
+                            <p style="font-size: 1.5rem; font-weight: bold; color: var(--primary);">{{ stats.memory.best }}</p>
+                        </div>
+                        <div>
+                            <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Average</p>
+                            <p style="font-size: 1.5rem; font-weight: bold; color: var(--secondary);">{{ stats.memory.average }}</p>
+                        </div>
+                        <div>
+                            <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Games Played</p>
+                            <p style="font-size: 1.5rem; font-weight: bold; color: var(--success);">{{ stats.memory.total }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Problem Solving Stats -->
+                <div style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; padding: 1.5rem;">
+                    <h3 style="font-size: 1.125rem; font-weight: bold; margin-bottom: 1rem;">💡 Problem Solving</h3>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+                        <div>
+                            <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Best Score</p>
+                            <p style="font-size: 1.5rem; font-weight: bold; color: var(--success);">{{ stats.problem_solving.best }}</p>
+                        </div>
+                        <div>
+                            <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Average</p>
+                            <p style="font-size: 1.5rem; font-weight: bold; color: var(--secondary);">{{ stats.problem_solving.average }}</p>
+                        </div>
+                        <div>
+                            <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Games Played</p>
+                            <p style="font-size: 1.5rem; font-weight: bold; color: var(--success);">{{ stats.problem_solving.total }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TBI Memory Stats -->
+                <div style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; padding: 1.5rem;">
+                    <h3 style="font-size: 1.125rem; font-weight: bold; margin-bottom: 1rem;">🎯 TBI Memory</h3>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+                        <div>
+                            <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Best Score</p>
+                            <p style="font-size: 1.5rem; font-weight: bold; color: var(--primary-light);">{{ stats.tbi_memory.best }}</p>
+                        </div>
+                        <div>
+                            <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Average</p>
+                            <p style="font-size: 1.5rem; font-weight: bold; color: var(--secondary);">{{ stats.tbi_memory.average }}</p>
+                        </div>
+                        <div>
+                            <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Games Played</p>
+                            <p style="font-size: 1.5rem; font-weight: bold; color: var(--success);">{{ stats.tbi_memory.total }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--glass-border);">
+                <a href="/history" style="color: var(--primary); text-decoration: none; font-weight: 600; transition: color 250ms;">
+                    View Detailed Score History →
+                </a>
+            </div>
+        </div>
     </div>
 </div>
 
 <script>
-async function uploadAvatar(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    
-    if (file.size > 5 * 1024 * 1024) {
-        alert('Image must be less than 5MB');
-        return;
-    }
-    
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-        const base64 = e.target.result;
+    function showTab(tabName) {
+        // Hide all tabs
+        document.querySelectorAll('.tab-content').forEach(tab => {
+            tab.style.display = 'none';
+        });
         
-        try {
-            const response = await fetch('/api/upload-avatar', {
+        // Remove active styling from all tab buttons
+        document.querySelectorAll('[id$="Tab"]').forEach(btn => {
+            btn.style.color = 'var(--text-muted)';
+            btn.style.borderBottom = '3px solid transparent';
+        });
+        
+        // Show selected tab
+        const tabElement = document.getElementById(tabName + 'Tab-content');
+        if (tabElement) {
+            tabElement.style.display = 'block';
+        }
+        
+        // Add active styling to selected tab button
+        const tabBtn = document.getElementById(tabName + 'Tab');
+        if (tabBtn) {
+            tabBtn.style.color = 'var(--text-primary)';
+            tabBtn.style.borderBottom = '3px solid var(--primary)';
+        }
+    }
+
+    function handleAvatarUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        if (file.size > 5 * 1024 * 1024) {
+            alert('Image must be smaller than 5MB');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            fetch('/api/upload-avatar', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ avatar: base64 })
+                body: JSON.stringify({
+                    avatar: e.target.result
+                })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Profile photo updated!');
+                    location.reload();
+                } else {
+                    alert('Failed to upload photo');
+                }
             });
-            
-            const data = await response.json();
-            
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function saveProfile() {
+        const displayName = document.getElementById('displayName').value.trim();
+        
+        if (!displayName || displayName.length < 2) {
+            alert('Display name must be at least 2 characters');
+            return;
+        }
+
+        fetch('/api/update-profile', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                display_name: displayName
+            })
+        })
+        .then(r => r.json())
+        .then(data => {
             if (data.success) {
+                alert('Profile updated successfully!');
                 location.reload();
             } else {
-                alert(data.message || 'Upload failed');
+                alert('Failed to update profile: ' + data.message);
             }
-        } catch (error) {
-            alert('Upload failed');
+        });
+    }
+
+    function changePassword() {
+        const currentPassword = document.getElementById('currentPassword').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        const errorDiv = document.getElementById('passwordError');
+
+        errorDiv.style.display = 'none';
+
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            errorDiv.textContent = 'All fields are required';
+            errorDiv.style.display = 'block';
+            return;
         }
-    };
-    reader.readAsDataURL(file);
-}
+
+        if (newPassword.length < 5) {
+            errorDiv.textContent = 'New password must be at least 5 characters';
+            errorDiv.style.display = 'block';
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            errorDiv.textContent = 'New passwords do not match';
+            errorDiv.style.display = 'block';
+            return;
+        }
+
+        fetch('/api/change-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                current_password: currentPassword,
+                new_password: newPassword
+            })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                alert('Password changed successfully!');
+                document.getElementById('changePasswordForm').reset();
+            } else {
+                errorDiv.textContent = data.message || 'Failed to change password';
+                errorDiv.style.display = 'block';
+            }
+        });
+    }
+
+    function deleteAccount() {
+        const confirmed = confirm('Are you absolutely sure? This cannot be undone. Type your email to confirm.');
+        if (!confirmed) return;
+
+        const userEmail = prompt('Please type your email address to confirm deletion:');
+        if (!userEmail) return;
+
+        fetch('/api/delete-account', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                email: userEmail
+            })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                alert('Account deleted. Redirecting...');
+                window.location.href = '/';
+            } else {
+                alert('Failed to delete account: ' + data.message);
+            }
+        });
+    }
 </script>
 {% endblock %}
