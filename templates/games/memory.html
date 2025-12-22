@@ -38,7 +38,13 @@
         </div>
 
         <!-- Game Board -->
-        <div id="gameBoard" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin-bottom: 2rem; max-width: 300px; margin-left: auto; margin-right: auto;">
+        <div id="gameBoard" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin-bottom: 2rem; max-width: 300px; margin-left: auto; margin-right: auto; position: relative;">
+        </div>
+
+        <!-- Learning Tip -->
+        <div id="learningTip" style="display: none; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; padding: 1rem; margin-bottom: 2rem; text-align: center;">
+            <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 0.5rem;">💡 Tip: Watch the numbers show the correct sequence order!</p>
+            <p style="color: var(--text-muted); font-size: 0.75rem;">The numbers disappear when you start playing</p>
         </div>
 
         <!-- Controls -->
@@ -62,6 +68,7 @@
     let level = 1;
     let isPlaying = false;
     let gameActive = false;
+    let showingSequence = false;
 
     // Initialize game board
     function initBoard() {
@@ -76,10 +83,11 @@
             button.style.border = 'none';
             button.style.cursor = 'pointer';
             button.style.transition = 'all 150ms';
+            button.style.position = 'relative';
             button.dataset.index = i;
             button.addEventListener('click', handleButtonClick);
             button.addEventListener('mouseover', function() {
-                if (gameActive) {
+                if (gameActive && !showingSequence) {
                     this.style.transform = 'scale(1.05)';
                     this.style.boxShadow = '0 4px 12px rgba(99, 102, 241, 0.4)';
                 }
@@ -93,7 +101,7 @@
     }
 
     function handleButtonClick(e) {
-        if (isPlaying || !gameActive) return;
+        if (isPlaying || !gameActive || showingSequence) return;
         
         const index = parseInt(e.target.dataset.index);
         userSequence.push(index);
@@ -105,6 +113,7 @@
             document.getElementById('message').style.color = 'var(--danger)';
             gameActive = false;
             disableStartButton(false);
+            showCorrectSequence(); // Show the correct sequence after mistake
             saveScore();
             return;
         }
@@ -125,6 +134,7 @@
         gameActive = true;
         disableStartButton(true);
         document.getElementById('message').textContent = '';
+        document.getElementById('learningTip').style.display = 'block';
         updateDisplay();
         playNextLevel();
     }
@@ -135,9 +145,12 @@
         level = 1;
         isPlaying = false;
         gameActive = false;
+        showingSequence = false;
         disableStartButton(false);
         updateDisplay();
         document.getElementById('message').textContent = '';
+        document.getElementById('learningTip').style.display = 'none';
+        clearSequenceNumbers();
     }
 
     function disableStartButton(disabled) {
@@ -166,6 +179,7 @@
 
     function playSequence() {
         isPlaying = true;
+        showingSequence = true;
         let delay = 600;
         
         sequence.forEach((index, i) => {
@@ -174,7 +188,11 @@
             }, delay + i * 600);
         });
         
-        isPlaying = false;
+        setTimeout(() => {
+            isPlaying = false;
+            showingSequence = false;
+            showSequenceNumbers();
+        }, delay + (sequence.length - 1) * 600 + 400);
     }
 
     function flashButton(index) {
@@ -187,6 +205,59 @@
             btn.style.opacity = '1';
             btn.style.transform = 'scale(1)';
         }, 300);
+    }
+
+    function showSequenceNumbers() {
+        const buttons = document.querySelectorAll('#gameBoard button');
+        sequence.forEach((index, order) => {
+            const btn = buttons[index];
+            const numberBadge = document.createElement('div');
+            numberBadge.textContent = order + 1;
+            numberBadge.style.position = 'absolute';
+            numberBadge.style.top = '50%';
+            numberBadge.style.left = '50%';
+            numberBadge.style.transform = 'translate(-50%, -50%)';
+            numberBadge.style.width = '28px';
+            numberBadge.style.height = '28px';
+            numberBadge.style.background = 'linear-gradient(135deg, var(--secondary) 0%, #ec4899 100%)';
+            numberBadge.style.color = 'white';
+            numberBadge.style.borderRadius = '50%';
+            numberBadge.style.display = 'flex';
+            numberBadge.style.alignItems = 'center';
+            numberBadge.style.justifyContent = 'center';
+            numberBadge.style.fontWeight = 'bold';
+            numberBadge.style.fontSize = '0.875rem';
+            numberBadge.style.zIndex = '10';
+            numberBadge.className = 'sequence-number';
+            btn.appendChild(numberBadge);
+        });
+    }
+
+    function showCorrectSequence() {
+        // Show the correct sequence one more time when user makes a mistake
+        setTimeout(() => {
+            const buttons = document.querySelectorAll('#gameBoard button');
+            let delay = 300;
+            
+            sequence.forEach((index, i) => {
+                setTimeout(() => {
+                    const btn = buttons[index];
+                    btn.style.opacity = '0.3';
+                    btn.style.transform = 'scale(0.95)';
+                    
+                    setTimeout(() => {
+                        btn.style.opacity = '1';
+                        btn.style.transform = 'scale(1)';
+                    }, 300);
+                }, delay + i * 600);
+            });
+        }, 500);
+    }
+
+    function clearSequenceNumbers() {
+        document.querySelectorAll('.sequence-number').forEach(badge => {
+            badge.remove();
+        });
     }
 
     function saveScore() {
