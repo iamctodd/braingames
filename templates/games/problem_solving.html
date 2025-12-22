@@ -29,48 +29,73 @@
             </div>
         </div>
 
-        <!-- Case Study -->
-        <div style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; padding: 1.5rem; margin-bottom: 2rem;">
-            <h2 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem;" id="caseTitle">Loading case study...</h2>
-            <p style="color: var(--text-secondary); margin-bottom: 1rem;" id="caseDescription"></p>
-            <ul id="casePoints" style="list-style: disc; margin-left: 1.5rem; color: var(--text-secondary); space-y: 0.5rem;"></ul>
-            <p style="font-weight: 600; color: var(--text-primary); margin-top: 1rem;">What would you suggest to solve this problem?</p>
+        <!-- Game Content Container -->
+        <div id="gameContent">
+            <!-- Case Study -->
+            <div style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; padding: 1.5rem; margin-bottom: 2rem;">
+                <h2 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem;" id="caseTitle">Loading case study...</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;" id="caseDescription"></p>
+                <ul id="casePoints" style="list-style: disc; margin-left: 1.5rem; color: var(--text-secondary); space-y: 0.5rem;"></ul>
+                <p style="font-weight: 600; color: var(--text-primary); margin-top: 1rem;">What would you suggest to solve this problem?</p>
+            </div>
+
+            <!-- Solution Input -->
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--text-primary);">Your Solution</label>
+                <textarea id="solution" rows="6" placeholder="Share your thoughts on how to solve this problem... (minimum 25 characters)" 
+                          style="width: 100%; padding: 0.75rem; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; color: var(--text-primary); font-family: inherit; resize: none; transition: all 250ms;" 
+                          onfocus="this.style.borderColor = 'var(--primary)'; this.style.boxShadow = '0 0 0 3px rgba(99, 102, 241, 0.1)'"
+                          onblur="this.style.borderColor = 'var(--glass-border)'; this.style.boxShadow = 'none'"
+                          oninput="updateCharCount(); validateSubmit()"></textarea>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
+                    <p style="font-size: 0.75rem; color: var(--text-muted);">Character count: <span id="charCount">0</span>/25 (minimum)</p>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div style="display: flex; gap: 0.75rem; margin-bottom: 2rem;">
+                <button id="submitBtn" onclick="submitSolution()" disabled
+                        style="flex: 1; padding: 0.875rem 2rem; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; border: none; border-radius: 0.75rem; font-weight: 600; cursor: not-allowed; transition: all 250ms; opacity: 0.5;">
+                    Submit Solution
+                </button>
+                <button id="nextBtn" onclick="nextProblem()" disabled
+                        style="padding: 0.875rem 2rem; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-primary); border-radius: 0.75rem; font-weight: 600; cursor: not-allowed; transition: all 250ms; opacity: 0.5;">
+                    Next Problem
+                </button>
+                <button onclick="document.getElementById('solution').value = ''; updateCharCount(); validateSubmit();" 
+                        style="padding: 0.875rem 2rem; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-primary); border-radius: 0.75rem; font-weight: 600; cursor: pointer; transition: all 250ms;">
+                    Clear
+                </button>
+            </div>
+
+            <!-- Feedback -->
+            <div id="feedback" style="display: none; margin-bottom: 1.5rem;"></div>
         </div>
 
-        <!-- Solution Input -->
-        <div style="margin-bottom: 1.5rem;">
-            <label style="display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--text-primary);">Your Solution</label>
-            <textarea id="solution" rows="6" placeholder="Share your thoughts on how to solve this problem... (minimum 25 characters)" 
-                      style="width: 100%; padding: 0.75rem; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; color: var(--text-primary); font-family: inherit; resize: none; transition: all 250ms;" 
-                      onfocus="this.style.borderColor = 'var(--primary)'; this.style.boxShadow = '0 0 0 3px rgba(99, 102, 241, 0.1)'"
-                      onblur="this.style.borderColor = 'var(--glass-border)'; this.style.boxShadow = 'none'"
-                      oninput="updateCharCount(); validateSubmit()"></textarea>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
-                <p style="font-size: 0.75rem; color: var(--text-muted);">Character count: <span id="charCount">0</span>/25 (minimum)</p>
+        <!-- Game Complete Screen -->
+        <div id="completeScreen" style="display: none; text-align: center; padding: 2rem;">
+            <p style="font-size: 3rem; margin-bottom: 1rem;">🎉</p>
+            <h2 style="font-size: 2rem; font-weight: bold; margin-bottom: 1rem; color: var(--success);">Great Job!</h2>
+            <p style="font-size: 1.125rem; color: var(--text-secondary); margin-bottom: 2rem;">You completed all 5 case studies</p>
+            
+            <div style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; padding: 1.5rem; margin-bottom: 2rem;">
+                <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">Final Score</p>
+                <p style="font-size: 2.25rem; font-weight: bold; color: var(--success);" id="finalScore">0</p>
+                <p style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 1rem;">Average: <span id="avgScore">0</span>/100</p>
+            </div>
+
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+                <a href="/" class="btn btn-primary" style="text-decoration: none; padding: 0.875rem 2rem; border-radius: 0.75rem;">
+                    Back to Home
+                </a>
+                <a href="/dashboard" class="btn btn-secondary" style="text-decoration: none; padding: 0.875rem 2rem; border-radius: 0.75rem; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-primary);">
+                    View Dashboard
+                </a>
             </div>
         </div>
 
-        <!-- Controls -->
-        <div style="display: flex; gap: 0.75rem; margin-bottom: 2rem;">
-            <button id="submitBtn" onclick="submitSolution()" disabled
-                    style="flex: 1; padding: 0.875rem 2rem; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; border: none; border-radius: 0.75rem; font-weight: 600; cursor: not-allowed; transition: all 250ms; opacity: 0.5;">
-                Submit Solution
-            </button>
-            <button id="nextBtn" onclick="nextProblem()" disabled
-                    style="padding: 0.875rem 2rem; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-primary); border-radius: 0.75rem; font-weight: 600; cursor: not-allowed; transition: all 250ms; opacity: 0.5;">
-                Next Problem
-            </button>
-            <button onclick="document.getElementById('solution').value = ''; updateCharCount(); validateSubmit();" 
-                    style="padding: 0.875rem 2rem; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-primary); border-radius: 0.75rem; font-weight: 600; cursor: pointer; transition: all 250ms;">
-                Clear
-            </button>
-        </div>
-
-        <!-- Feedback -->
-        <div id="feedback" style="display: none; margin-bottom: 1.5rem;"></div>
-
         <!-- Score -->
-        <div style="text-align: center; padding-top: 1.5rem; border-top: 1px solid var(--glass-border);">
+        <div id="scoreSection" style="text-align: center; padding-top: 1.5rem; border-top: 1px solid var(--glass-border);">
             <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">Session Score</p>
             <p style="font-size: 1.875rem; font-weight: bold; color: var(--success);" id="score">0</p>
         </div>
@@ -131,12 +156,13 @@
         }
     ];
 
+    const MAX_PROBLEMS = 5;
     let currentCaseIndex = 0;
     let sessionScore = 0;
     let problemsSolved = 0;
 
     function loadCaseStudy(index) {
-        const caseStudy = casestudies[index % casestudies.length];
+        const caseStudy = casestudies[index];
         document.getElementById('caseTitle').textContent = caseStudy.title;
         document.getElementById('caseDescription').textContent = caseStudy.description;
         
@@ -166,17 +192,24 @@
     }
 
     function updateProgressBar() {
-        const progress = (currentCaseIndex % casestudies.length) / casestudies.length * 100;
+        const progress = (currentCaseIndex + 1) / MAX_PROBLEMS * 100;
         document.getElementById('progressBar').style.width = progress + '%';
-        document.getElementById('progressText').textContent = `Problem ${(currentCaseIndex % casestudies.length) + 1} of ${casestudies.length}`;
+        document.getElementById('progressText').textContent = `Problem ${currentCaseIndex + 1} of ${MAX_PROBLEMS}`;
     }
 
     function nextProblem() {
         currentCaseIndex++;
+        
+        if (currentCaseIndex >= MAX_PROBLEMS) {
+            showGameComplete();
+            return;
+        }
+        
         loadCaseStudy(currentCaseIndex);
         document.getElementById('nextBtn').disabled = true;
         document.getElementById('nextBtn').style.opacity = '0.5';
         document.getElementById('nextBtn').style.cursor = 'not-allowed';
+        document.getElementById('nextBtn').style.background = 'var(--glass-bg)';
     }
 
     function submitSolution() {
@@ -232,6 +265,16 @@
         .then(data => {
             console.log('Score saved:', data);
         });
+    }
+
+    function showGameComplete() {
+        document.getElementById('gameContent').style.display = 'none';
+        document.getElementById('scoreSection').style.display = 'none';
+        document.getElementById('completeScreen').style.display = 'block';
+        
+        document.getElementById('finalScore').textContent = sessionScore;
+        const avgScore = Math.round(sessionScore / MAX_PROBLEMS);
+        document.getElementById('avgScore').textContent = avgScore;
     }
 
     loadCaseStudy(0);
