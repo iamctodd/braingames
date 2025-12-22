@@ -1,91 +1,83 @@
 {% extends "base.html" %}
 {% block title %}Login - Brain Games{% endblock %}
 {% block content %}
-<div class="max-w-md mx-auto mt-12">
-    <div class="bg-white p-8 rounded-lg shadow">
-        <h1 class="text-3xl font-bold mb-2 text-center">🧠 Brain Games</h1>
-        <p class="text-center text-gray-600 mb-8">Sign in to your account</p>
-
-        <!-- Error Message -->
-        <div id="error" class="mb-6 p-4 rounded-lg bg-red-100 text-red-700 hidden"></div>
-
-        <!-- Login Form -->
-        <form id="loginForm" class="space-y-4">
-            <div>
-                <label class="block text-sm font-bold mb-2">Email</label>
-                <input type="email" id="email" required 
-                       class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                       placeholder="you@example.com">
-            </div>
-
-            <div>
-                <label class="block text-sm font-bold mb-2">Password</label>
-                <input type="password" id="password" required
-                       class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                       placeholder="••••••••">
-            </div>
-
-            <div class="text-right">
-                <a href="/forgot-password" class="text-blue-600 hover:text-blue-800 text-sm font-bold">
-                    Forgot password?
-                </a>
-            </div>
-
-            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg">
-                Sign In
-            </button>
-        </form>
-
-        <!-- Divider -->
-        <div class="my-6 relative">
-            <div class="absolute inset-0 flex items-center">
-                <div class="w-full border-t border-gray-300"></div>
-            </div>
-            <div class="relative flex justify-center text-sm">
-                <span class="px-2 bg-white text-gray-500">or</span>
-            </div>
+<div style="display: flex; justify-content: center; align-items: center; min-height: 70vh;">
+    <div class="glass-card" style="width: 100%; max-width: 400px;">
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <h1 style="font-size: 2rem; font-weight: bold; margin-bottom: 0.5rem;">🧠 Brain Games</h1>
+            <p style="color: var(--text-secondary);">Sign in to your account</p>
         </div>
 
-        <!-- Sign Up Link -->
-        <a href="/signup" class="block w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded-lg text-center">
-            Create New Account
-        </a>
+        <form method="POST" style="display: flex; flex-direction: column; gap: 1rem;">
+            <!-- Email Input -->
+            <div>
+                <label style="display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">Email</label>
+                <input type="email" name="email" placeholder="you@example.com" required 
+                       style="width: 100%; padding: 0.75rem; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; color: var(--text-primary); font-family: inherit; font-size: 1rem; transition: all 250ms;"
+                       onfocus="this.style.borderColor = 'var(--primary)'; this.style.boxShadow = '0 0 0 3px rgba(99, 102, 241, 0.1)'"
+                       onblur="this.style.borderColor = 'var(--glass-border)'; this.style.boxShadow = 'none'; validateForm()">
+            </div>
 
-        <!-- Demo Credentials -->
-        <div class="mt-8 p-4 bg-blue-50 rounded-lg text-sm">
-            <p class="font-bold mb-2">Demo Credentials:</p>
-            <p class="text-gray-700">Email: <code class="bg-white px-2 py-1 rounded">demo@braingames.com</code></p>
-            <p class="text-gray-700">Password: <code class="bg-white px-2 py-1 rounded">demo123</code></p>
+            <!-- Password Input -->
+            <div>
+                <label style="display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">Password</label>
+                <input type="password" name="password" placeholder="••••••••" required 
+                       style="width: 100%; padding: 0.75rem; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; color: var(--text-primary); font-family: inherit; font-size: 1rem; transition: all 250ms;"
+                       onfocus="this.style.borderColor = 'var(--primary)'; this.style.boxShadow = '0 0 0 3px rgba(99, 102, 241, 0.1)'"
+                       onblur="this.style.borderColor = 'var(--glass-border)'; this.style.boxShadow = 'none'; validateForm()"
+                       id="passwordInput">
+            </div>
+
+            {% if error %}
+            <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 0.5rem; padding: 0.75rem; color: #ef4444; font-size: 0.875rem;">
+                {{ error }}
+            </div>
+            {% endif %}
+
+            <!-- Sign In Button -->
+            <button type="submit" id="submitBtn" disabled
+                    style="padding: 0.875rem; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; border: none; border-radius: 0.5rem; font-weight: 600; font-size: 1rem; cursor: not-allowed; transition: all 250ms; opacity: 0.5;">
+                Sign In
+            </button>
+
+            <!-- Forgot Password Link -->
+            <div style="text-align: center;">
+                <a href="/forgot-password" style="color: var(--primary); text-decoration: none; font-size: 0.875rem; transition: color 250ms;">
+                    Forgot your password?
+                </a>
+            </div>
+        </form>
+
+        <!-- Sign Up Link -->
+        <div style="text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--glass-border);">
+            <p style="color: var(--text-secondary); font-size: 0.875rem;">
+                Don't have an account? 
+                <a href="/signup" style="color: var(--primary); text-decoration: none; font-weight: 600; transition: color 250ms;">
+                    Sign up
+                </a>
+            </p>
         </div>
     </div>
 </div>
 
 <script>
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
+    function validateForm() {
+        const email = document.querySelector('input[name="email"]').value.trim();
+        const password = document.querySelector('input[name="password"]').value;
+        const submitBtn = document.getElementById('submitBtn');
         
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
+        const isValid = email.length >= 5 && password.length >= 5;
+        
+        submitBtn.disabled = !isValid;
+        submitBtn.style.opacity = isValid ? '1' : '0.5';
+        submitBtn.style.cursor = isValid ? 'pointer' : 'not-allowed';
+    }
 
-        try {
-            const response = await fetch('/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-                window.location.href = '/';
-            } else {
-                document.getElementById('error').textContent = data.message;
-                document.getElementById('error').classList.remove('hidden');
-            }
-        } catch (error) {
-            document.getElementById('error').textContent = 'An error occurred';
-            document.getElementById('error').classList.remove('hidden');
-        }
-    });
+    // Validate on page load
+    validateForm();
+    
+    // Add event listeners to inputs
+    document.querySelector('input[name="email"]').addEventListener('input', validateForm);
+    document.querySelector('input[name="password"]').addEventListener('input', validateForm);
 </script>
 {% endblock %}

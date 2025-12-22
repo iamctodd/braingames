@@ -3,6 +3,7 @@ import json
 import os
 from datetime import datetime, timedelta
 import hashlib
+import secrets
 
 app = Flask(__name__)
 app.secret_key = 'brain-games-secret-key-2025'
@@ -13,6 +14,7 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
 USERS_FILE = 'users.json'
 SCORES_FILE = 'scores.json'
+RESET_TOKENS_FILE = 'reset_tokens.json'
 
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
@@ -104,6 +106,74 @@ def get_current_user():
     return None, None
 
 # ============================================================================
+# PASSWORD RESET FUNCTIONS
+# ============================================================================
+
+def load_reset_tokens():
+    if os.path.exists(RESET_TOKENS_FILE):
+        try:
+            with open(RESET_TOKENS_FILE, 'r') as f:
+                return json.load(f)
+        except:
+            return {}
+    return {}
+
+def save_reset_tokens(tokens):
+    with open(RESET_TOKENS_FILE, 'w') as f:
+        json.dump(tokens, f, indent=2)
+
+def create_reset_token(email):
+    """Create a password reset token for a user"""
+    users = load_users()
+    if email not in users:
+        return None
+    
+    token = secrets.token_urlsafe(32)
+    tokens = load_reset_tokens()
+    
+    tokens[token] = {
+        'email': email,
+        'created_at': datetime.now().isoformat(),
+        'expires_at': (datetime.now() + timedelta(hours=24)).isoformat()
+    }
+    save_reset_tokens(tokens)
+    return token
+
+def verify_reset_token(token):
+    """Verify a password reset token and return email if valid"""
+    tokens = load_reset_tokens()
+    if token not in tokens:
+        return None
+    
+    token_data = tokens[token]
+    expires_at = datetime.fromisoformat(token_data['expires_at'])
+    
+    if datetime.now() > expires_at:
+        # Token expired, delete it
+        del tokens[token]
+        save_reset_tokens(tokens)
+        return None
+    
+    return token_data['email']
+
+def reset_password(token, new_password):
+    """Reset password using a valid token"""
+    email = verify_reset_token(token)
+    if not email:
+        return False, "Invalid or expired token"
+    
+    users = load_users()
+    users[email]['password'] = hash_password(new_password)
+    save_users(users)
+    
+    # Delete the token
+    tokens = load_reset_tokens()
+    del tokens[token]
+    save_reset_tokens(tokens)
+    
+    return True, "Password reset successful"
+
+# ============================================================================
 # SCORE FUNCTIONS
 # ============================================================================
 
@@ -182,27 +252,91 @@ def get_leaderboard(game_type, limit=10):
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
-        data = request.json
-        success, msg = create_user(data.get('email'), data.get('password'), data.get('display_name'))
-        return jsonify({'success': success, 'message': msg})
+        display_name = request.form.get('display_name', '').strip()
+        email = request.form.get('email', '').strip()
+        password = request.form.get('password', '')
+        
+        if not display_name or len(display_name) < 2:
+            return render_template('auth/signup.html', error='Display name must be at least 2 characters')
+        
+        if not email or len(email) < 5:
+            return render_template('auth/signup.html', error='Email must be at least 5 characters')
+        
+        if not password or len(password) < 5:
+            return render_template('auth/signup.html', error='Password must be at least 5 characters')
+        
+        success, msg = create_user(email, password, display_name)
+        if success:
+            session.permanent = True
+            session['user_id'] = email
+            return redirect(url_for('index'))
+        return render_template('auth/signup.html', error=msg)
+    
     return render_template('auth/signup.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        data = request.json
-        success, result = verify_user(data.get('email'), data.get('password'))
+        email = request.form.get('email', '').strip()
+        password = request.form.get('password', '')
+        
+        success, result = verify_user(email, password)
         if success:
             session.permanent = True
-            session['user_id'] = data.get('email')
-            return jsonify({'success': True})
-        return jsonify({'success': False, 'message': result})
+            session['user_id'] = email
+            return redirect(url_for('index'))
+        
+        return render_template('auth/login.html', error='Invalid email or password')
+    
     return render_template('auth/login.html')
 
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('index'))
+
+@app.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip()
+        
+        token = create_reset_token(email)
+        if token:
+            # TODO: Send email with reset link
+            # For now, just show the reset link
+            reset_link = url_for('reset_password', token=token, _external=True)
+            return render_template('auth/forgot_password.html', 
+                message=f'Password reset link sent to {email}. Click here to reset: {reset_link}')
+        
+        return render_template('auth/forgot_password.html',
+            message='If an account exists with that email, you will receive a password reset link.')
+    
+    return render_template('auth/forgot_password.html')
+
+@app.route('/reset-password/<token>', methods=['GET', 'POST'])
+def reset_password_route(token):
+    email = verify_reset_token(token)
+    if not email:
+        return render_template('auth/reset_password.html', error='Invalid or expired reset link'), 400
+    
+    if request.method == 'POST':
+        password = request.form.get('password', '')
+        confirm_password = request.form.get('confirm_password', '')
+        
+        if len(password) < 5:
+            return render_template('auth/reset_password.html', 
+                error='Password must be at least 5 characters', token=token)
+        
+        if password != confirm_password:
+            return render_template('auth/reset_password.html',
+                error='Passwords do not match', token=token)
+        
+        success, msg = reset_password(token, password)
+        if success:
+            return redirect(url_for('login'))
+        return render_template('auth/reset_password.html', error=msg, token=token)
+    
+    return render_template('auth/reset_password.html', token=token)
 
 @app.route('/')
 def index():
