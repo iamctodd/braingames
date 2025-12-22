@@ -77,8 +77,8 @@
         <!-- Response Area -->
         <div style="margin-bottom: 1.5rem;">
             <label style="display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--text-primary);">Type the words in order (comma-separated)</label>
-            <textarea id="response" rows="4" placeholder="Example: apple, bicycle, cloud, dragon" 
-                      style="width: 100%; padding: 0.75rem; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; color: var(--text-primary); font-family: inherit; resize: none; transition: all 250ms;"
+            <textarea id="response" rows="4" placeholder="Example: apple, bicycle, cloud, dragon" disabled
+                      style="width: 100%; padding: 0.75rem; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; color: var(--text-primary); font-family: inherit; resize: none; transition: all 250ms; cursor: not-allowed; opacity: 0.6;"
                       onfocus="this.style.borderColor = 'var(--primary)'; this.style.boxShadow = '0 0 0 3px rgba(99, 102, 241, 0.1)'"
                       onblur="this.style.borderColor = 'var(--glass-border)'; this.style.boxShadow = 'none'"
                       oninput="validateSubmitButton()"></textarea>
@@ -170,6 +170,12 @@
         startBtn.style.opacity = '0.5';
         startBtn.style.cursor = 'not-allowed';
         
+        // Disable textarea during word display
+        const responseArea = document.getElementById('response');
+        responseArea.disabled = true;
+        responseArea.style.opacity = '0.6';
+        responseArea.style.cursor = 'not-allowed';
+        
         // Disable Submit button (until user types)
         validateSubmitButton();
         
@@ -184,7 +190,12 @@
                 setTimeout(showWord, speed);
             } else {
                 document.getElementById('word-display').textContent = 'Now type the words...';
-                document.getElementById('response').focus();
+                
+                // Enable textarea after words finish
+                responseArea.disabled = false;
+                responseArea.style.opacity = '1';
+                responseArea.style.cursor = 'auto';
+                responseArea.focus();
                 
                 // Re-enable Start Round button
                 startBtn.disabled = false;
@@ -261,11 +272,17 @@
         startBtn.style.opacity = '1';
         startBtn.style.cursor = 'pointer';
         
+        // Disable textarea
+        const responseArea = document.getElementById('response');
+        responseArea.disabled = true;
+        responseArea.style.opacity = '0.6';
+        responseArea.style.cursor = 'not-allowed';
+        
         // Disable Submit button
         validateSubmitButton();
     }
 
-    // Initialize Submit button state
+    // Initialize - textarea disabled on page load
     validateSubmitButton();
 </script>
 {% endblock %}
