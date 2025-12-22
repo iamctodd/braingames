@@ -113,14 +113,23 @@ def load_reset_tokens():
     if os.path.exists(RESET_TOKENS_FILE):
         try:
             with open(RESET_TOKENS_FILE, 'r') as f:
-                return json.load(f)
-        except:
+                content = f.read().strip()
+                if content:
+                    return json.loads(content)
+                return {}
+        except Exception as e:
+            print(f"[ERROR] Failed to load reset tokens: {e}")
             return {}
     return {}
 
 def save_reset_tokens(tokens):
-    with open(RESET_TOKENS_FILE, 'w') as f:
-        json.dump(tokens, f, indent=2)
+    try:
+        with open(RESET_TOKENS_FILE, 'w') as f:
+            json.dump(tokens, f, indent=2)
+        return True
+    except Exception as e:
+        print(f"[ERROR] Failed to save reset tokens: {e}")
+        return False
 
 def create_reset_token(email):
     """Create a password reset token for a user"""
@@ -146,7 +155,10 @@ def verify_reset_token(token):
         return None
     
     token_data = tokens[token]
-    expires_at = datetime.fromisoformat(token_data['expires_at'])
+    try:
+        expires_at = datetime.fromisoformat(token_data['expires_at'])
+    except:
+        return None
     
     if datetime.now() > expires_at:
         # Token expired, delete it
@@ -168,8 +180,9 @@ def reset_password(token, new_password):
     
     # Delete the token
     tokens = load_reset_tokens()
-    del tokens[token]
-    save_reset_tokens(tokens)
+    if token in tokens:
+        del tokens[token]
+        save_reset_tokens(tokens)
     
     return True, "Password reset successful"
 
@@ -304,9 +317,9 @@ def forgot_password():
         if token:
             # TODO: Send email with reset link
             # For now, just show the reset link
-            reset_link = url_for('reset_password', token=token, _external=True)
+            reset_link = url_for('reset_password_route', token=token, _external=True)
             return render_template('auth/forgot_password.html', 
-                message=f'Password reset link sent to {email}. Click here to reset: {reset_link}')
+                message=f'Password reset link: {reset_link}')
         
         return render_template('auth/forgot_password.html',
             message='If an account exists with that email, you will receive a password reset link.')

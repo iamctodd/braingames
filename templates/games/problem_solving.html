@@ -13,11 +13,19 @@
                 <p style="color: var(--text-secondary);">Read and solve real-world case studies</p>
             </div>
             <div style="text-align: right;">
-                <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.25rem;">Best Score</p>
-                <p style="font-size: 1.875rem; font-weight: bold; color: var(--success);">{{ best_score }}</p>
-                {% if total_games > 0 %}
-                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">Solved: {{ total_games }}</p>
-                {% endif %}
+                <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.25rem;">Problems Solved</p>
+                <p style="font-size: 1.875rem; font-weight: bold; color: var(--success);" id="problemsCount">0</p>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; padding: 1rem; margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                <p style="font-size: 0.875rem; font-weight: 600; color: var(--text-primary);">Progress</p>
+                <p style="font-size: 0.875rem; color: var(--text-secondary);" id="progressText">Problem 1 of 5</p>
+            </div>
+            <div style="width: 100%; height: 8px; background: var(--glass-border); border-radius: 4px; overflow: hidden;">
+                <div id="progressBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%); transition: width 250ms;"></div>
             </div>
         </div>
 
@@ -31,28 +39,35 @@
 
         <!-- Solution Input -->
         <div style="margin-bottom: 1.5rem;">
-            <label style="display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.75rem;">Your Solution</label>
-            <textarea id="solution" rows="6" placeholder="Share your thoughts on how to solve this problem..." 
+            <label style="display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--text-primary);">Your Solution</label>
+            <textarea id="solution" rows="6" placeholder="Share your thoughts on how to solve this problem... (minimum 25 characters)" 
                       style="width: 100%; padding: 0.75rem; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; color: var(--text-primary); font-family: inherit; resize: none; transition: all 250ms;" 
                       onfocus="this.style.borderColor = 'var(--primary)'; this.style.boxShadow = '0 0 0 3px rgba(99, 102, 241, 0.1)'"
-                      onblur="this.style.borderColor = 'var(--glass-border)'; this.style.boxShadow = 'none'"></textarea>
+                      onblur="this.style.borderColor = 'var(--glass-border)'; this.style.boxShadow = 'none'"
+                      oninput="updateCharCount(); validateSubmit()"></textarea>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
+                <p style="font-size: 0.75rem; color: var(--text-muted);">Character count: <span id="charCount">0</span>/25 (minimum)</p>
+            </div>
         </div>
 
         <!-- Controls -->
         <div style="display: flex; gap: 0.75rem; margin-bottom: 2rem;">
-            <button onclick="submitSolution()" style="flex: 1; padding: 0.875rem 2rem; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; border: none; border-radius: 0.75rem; font-weight: 600; cursor: pointer; transition: all 250ms;">
+            <button id="submitBtn" onclick="submitSolution()" disabled
+                    style="flex: 1; padding: 0.875rem 2rem; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; border: none; border-radius: 0.75rem; font-weight: 600; cursor: not-allowed; transition: all 250ms; opacity: 0.5;">
                 Submit Solution
             </button>
-            <button onclick="nextProblem()" style="padding: 0.875rem 2rem; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-primary); border-radius: 0.75rem; font-weight: 600; cursor: pointer; transition: all 250ms;">
+            <button id="nextBtn" onclick="nextProblem()" disabled
+                    style="padding: 0.875rem 2rem; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-primary); border-radius: 0.75rem; font-weight: 600; cursor: not-allowed; transition: all 250ms; opacity: 0.5;">
                 Next Problem
             </button>
-            <button onclick="document.getElementById('solution').value = ''" style="padding: 0.875rem 2rem; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-primary); border-radius: 0.75rem; font-weight: 600; cursor: pointer; transition: all 250ms;">
+            <button onclick="document.getElementById('solution').value = ''; updateCharCount(); validateSubmit();" 
+                    style="padding: 0.875rem 2rem; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-primary); border-radius: 0.75rem; font-weight: 600; cursor: pointer; transition: all 250ms;">
                 Clear
             </button>
         </div>
 
         <!-- Feedback -->
-        <div id="feedback" style="display: none;"></div>
+        <div id="feedback" style="display: none; margin-bottom: 1.5rem;"></div>
 
         <!-- Score -->
         <div style="text-align: center; padding-top: 1.5rem; border-top: 1px solid var(--glass-border);">
@@ -118,6 +133,7 @@
 
     let currentCaseIndex = 0;
     let sessionScore = 0;
+    let problemsSolved = 0;
 
     function loadCaseStudy(index) {
         const caseStudy = casestudies[index % casestudies.length];
@@ -129,18 +145,45 @@
         
         document.getElementById('solution').value = '';
         document.getElementById('feedback').style.display = 'none';
+        updateCharCount();
+        validateSubmit();
+        updateProgressBar();
+    }
+
+    function updateCharCount() {
+        const count = document.getElementById('solution').value.length;
+        document.getElementById('charCount').textContent = count;
+    }
+
+    function validateSubmit() {
+        const solution = document.getElementById('solution').value;
+        const submitBtn = document.getElementById('submitBtn');
+        
+        const isValid = solution.length >= 25;
+        submitBtn.disabled = !isValid;
+        submitBtn.style.opacity = isValid ? '1' : '0.5';
+        submitBtn.style.cursor = isValid ? 'pointer' : 'not-allowed';
+    }
+
+    function updateProgressBar() {
+        const progress = (currentCaseIndex % casestudies.length) / casestudies.length * 100;
+        document.getElementById('progressBar').style.width = progress + '%';
+        document.getElementById('progressText').textContent = `Problem ${(currentCaseIndex % casestudies.length) + 1} of ${casestudies.length}`;
     }
 
     function nextProblem() {
         currentCaseIndex++;
         loadCaseStudy(currentCaseIndex);
+        document.getElementById('nextBtn').disabled = true;
+        document.getElementById('nextBtn').style.opacity = '0.5';
+        document.getElementById('nextBtn').style.cursor = 'not-allowed';
     }
 
     function submitSolution() {
         const solution = document.getElementById('solution').value;
         
-        if (!solution.trim()) {
-            alert('Please write a solution');
+        if (solution.length < 25) {
+            alert('Solution must be at least 25 characters');
             return;
         }
 
@@ -157,12 +200,24 @@
         
         score = Math.min(Math.round(score), 100);
         sessionScore += score;
+        problemsSolved++;
 
         const feedback = document.getElementById('feedback');
         feedback.innerHTML = `<div style="background: var(--glass-bg); border: 1px solid var(--success); border-radius: 0.5rem; padding: 1rem;"><p style="font-weight: 600; color: var(--success); margin-bottom: 0.5rem;">✅ Solution submitted!</p><p style="font-size: 0.875rem; color: var(--text-secondary);">Score: ${score}/100</p></div>`;
         feedback.style.display = 'block';
         
+        document.getElementById('problemsCount').textContent = problemsSolved;
         document.getElementById('score').textContent = sessionScore;
+
+        // Disable submit, enable next
+        document.getElementById('submitBtn').disabled = true;
+        document.getElementById('submitBtn').style.opacity = '0.5';
+        document.getElementById('submitBtn').style.cursor = 'not-allowed';
+        
+        document.getElementById('nextBtn').disabled = false;
+        document.getElementById('nextBtn').style.opacity = '1';
+        document.getElementById('nextBtn').style.cursor = 'pointer';
+        document.getElementById('nextBtn').style.background = 'linear-gradient(135deg, var(--success) 0%, #059669 100%)';
 
         fetch('/api/save-score', {
             method: 'POST',
