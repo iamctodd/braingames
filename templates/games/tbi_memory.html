@@ -27,34 +27,66 @@
             <p style="color: var(--text-secondary);">Words shown: <span style="font-weight: 600; color: var(--text-primary);" id="word-count">0</span></p>
         </div>
 
-        <!-- Difficulty Selection -->
-        <div style="margin-bottom: 1.5rem;">
-            <label style="display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.75rem;">Difficulty Level</label>
-            <select id="difficulty" style="width: 100%; padding: 0.75rem; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; color: var(--text-primary); font-family: inherit; transition: all 250ms;" disabled>
-                <option value="easy">Easy (4 words)</option>
-                <option value="medium" selected>Medium (6 words)</option>
-                <option value="hard">Hard (8 words)</option>
-            </select>
+        <!-- Difficulty Selection with Radio Buttons -->
+        <div style="margin-bottom: 2rem;">
+            <label style="display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-primary);">Difficulty Level</label>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+                <!-- Easy -->
+                <label style="display: flex; align-items: center; padding: 1rem; background: var(--glass-bg); border: 2px solid var(--glass-border); border-radius: 0.5rem; cursor: pointer; transition: all 250ms;"
+                       onmouseover="this.style.borderColor = 'var(--primary)'; this.style.background = 'rgba(99, 102, 241, 0.05)'"
+                       onmouseout="this.style.borderColor = 'var(--glass-border)'; this.style.background = 'var(--glass-bg)'" 
+                       id="easyLabel">
+                    <input type="radio" name="difficulty" value="easy" id="easyRadio" style="margin-right: 0.75rem; cursor: pointer; width: 18px; height: 18px;">
+                    <div>
+                        <div style="font-weight: 600; color: var(--text-primary);">Easy</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">4 words</div>
+                    </div>
+                </label>
+
+                <!-- Medium -->
+                <label style="display: flex; align-items: center; padding: 1rem; background: var(--glass-bg); border: 2px solid var(--primary); border-radius: 0.5rem; cursor: pointer; transition: all 250ms;"
+                       onmouseover="this.style.background = 'rgba(99, 102, 241, 0.05)'"
+                       onmouseout="this.style.background = 'var(--glass-bg)'"
+                       id="mediumLabel">
+                    <input type="radio" name="difficulty" value="medium" id="mediumRadio" checked style="margin-right: 0.75rem; cursor: pointer; width: 18px; height: 18px;">
+                    <div>
+                        <div style="font-weight: 600; color: var(--text-primary);">Medium</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">6 words</div>
+                    </div>
+                </label>
+
+                <!-- Hard -->
+                <label style="display: flex; align-items: center; padding: 1rem; background: var(--glass-bg); border: 2px solid var(--glass-border); border-radius: 0.5rem; cursor: pointer; transition: all 250ms;"
+                       onmouseover="this.style.borderColor = 'var(--primary)'; this.style.background = 'rgba(99, 102, 241, 0.05)'"
+                       onmouseout="this.style.borderColor = 'var(--glass-border)'; this.style.background = 'var(--glass-bg)'"
+                       id="hardLabel">
+                    <input type="radio" name="difficulty" value="hard" id="hardRadio" style="margin-right: 0.75rem; cursor: pointer; width: 18px; height: 18px;">
+                    <div>
+                        <div style="font-weight: 600; color: var(--text-primary);">Hard</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">8 words</div>
+                    </div>
+                </label>
+            </div>
         </div>
 
         <!-- Response Area -->
         <div style="margin-bottom: 1.5rem;">
-            <label style="display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.75rem;">Type the words in order (comma-separated)</label>
+            <label style="display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--text-primary);">Type the words in order (comma-separated)</label>
             <textarea id="response" rows="4" placeholder="Example: apple, bicycle, cloud, dragon" 
-                      style="width: 100%; padding: 0.75rem; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; color: var(--text-primary); font-family: inherit; resize: none; transition: all 250ms; opacity: 0.5;" disabled
+                      style="width: 100%; padding: 0.75rem; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; color: var(--text-primary); font-family: inherit; resize: none; transition: all 250ms;"
                       onfocus="this.style.borderColor = 'var(--primary)'; this.style.boxShadow = '0 0 0 3px rgba(99, 102, 241, 0.1)'"
                       onblur="this.style.borderColor = 'var(--glass-border)'; this.style.boxShadow = 'none'"></textarea>
         </div>
 
         <!-- Controls -->
         <div style="display: flex; gap: 0.75rem; margin-bottom: 2rem;">
-            <button id="startBtn" onclick="startRound()" style="flex: 1; padding: 0.875rem 2rem; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; border: none; border-radius: 0.75rem; font-weight: 600; cursor: pointer; transition: all 250ms;">
+            <button onclick="startRound()" style="flex: 1; padding: 0.875rem 2rem; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; border: none; border-radius: 0.75rem; font-weight: 600; cursor: pointer; transition: all 250ms;">
                 Start Round
             </button>
-            <button id="submitBtn" onclick="submitResponse()" style="padding: 0.875rem 2rem; background: linear-gradient(135deg, var(--success) 0%, #059669 100%); color: white; border: none; border-radius: 0.75rem; font-weight: 600; cursor: not-allowed; opacity: 0.5; transition: all 250ms;" disabled>
+            <button onclick="submitResponse()" style="padding: 0.875rem 2rem; background: linear-gradient(135deg, var(--success) 0%, #059669 100%); color: white; border: none; border-radius: 0.75rem; font-weight: 600; cursor: pointer; transition: all 250ms;">
                 Submit
             </button>
-            <button id="resetBtn" onclick="resetGame()" style="padding: 0.875rem 2rem; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-primary); border-radius: 0.75rem; font-weight: 600; cursor: pointer; transition: all 250ms;">
+            <button onclick="resetGame()" style="padding: 0.875rem 2rem; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-primary); border-radius: 0.75rem; font-weight: 600; cursor: pointer; transition: all 250ms;">
                 Reset
             </button>
         </div>
@@ -74,7 +106,25 @@
     let currentWords = [];
     let score = 0;
     let currentDifficulty = 'medium';
-    let roundInProgress = false;
+
+    // Update label styling when radio button changes
+    document.querySelectorAll('input[name="difficulty"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            // Remove borders from all labels
+            document.getElementById('easyLabel').style.borderColor = 'var(--glass-border)';
+            document.getElementById('mediumLabel').style.borderColor = 'var(--glass-border)';
+            document.getElementById('hardLabel').style.borderColor = 'var(--glass-border)';
+            
+            // Add border to selected label
+            if (this.id === 'easyRadio') {
+                document.getElementById('easyLabel').style.borderColor = 'var(--primary)';
+            } else if (this.id === 'mediumRadio') {
+                document.getElementById('mediumLabel').style.borderColor = 'var(--primary)';
+            } else if (this.id === 'hardRadio') {
+                document.getElementById('hardLabel').style.borderColor = 'var(--primary)';
+            }
+        });
+    });
 
     function getWords(difficulty) {
         const allWords = [
@@ -90,20 +140,10 @@
     }
 
     function startRound() {
-        if (roundInProgress) return;
-        
-        roundInProgress = true;
-        currentDifficulty = document.getElementById('difficulty').value;
+        currentDifficulty = document.querySelector('input[name="difficulty"]:checked').value;
         currentWords = getWords(currentDifficulty);
         document.getElementById('response').value = '';
         document.getElementById('feedback').style.display = 'none';
-        
-        // Disable controls
-        document.getElementById('difficulty').disabled = true;
-        document.getElementById('response').disabled = true;
-        document.getElementById('startBtn').disabled = true;
-        document.getElementById('startBtn').style.opacity = '0.5';
-        document.getElementById('startBtn').style.cursor = 'not-allowed';
         
         let index = 0;
         const speed = currentDifficulty === 'easy' ? 3000 : currentDifficulty === 'medium' ? 2000 : 1500;
@@ -116,11 +156,6 @@
                 setTimeout(showWord, speed);
             } else {
                 document.getElementById('word-display').textContent = 'Now type the words...';
-                document.getElementById('response').disabled = false;
-                document.getElementById('response').style.opacity = '1';
-                document.getElementById('submitBtn').disabled = false;
-                document.getElementById('submitBtn').style.opacity = '1';
-                document.getElementById('submitBtn').style.cursor = 'pointer';
                 document.getElementById('response').focus();
             }
         }
@@ -163,18 +198,6 @@
 
         document.getElementById('score').textContent = score;
 
-        // Reset for next round
-        roundInProgress = false;
-        document.getElementById('difficulty').disabled = false;
-        document.getElementById('response').disabled = true;
-        document.getElementById('response').style.opacity = '0.5';
-        document.getElementById('startBtn').disabled = false;
-        document.getElementById('startBtn').style.opacity = '1';
-        document.getElementById('startBtn').style.cursor = 'pointer';
-        document.getElementById('submitBtn').disabled = true;
-        document.getElementById('submitBtn').style.opacity = '0.5';
-        document.getElementById('submitBtn').style.cursor = 'not-allowed';
-
         fetch('/api/save-score', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -193,21 +216,11 @@
     function resetGame() {
         currentWords = [];
         score = 0;
-        roundInProgress = false;
         document.getElementById('response').value = '';
         document.getElementById('word-display').textContent = 'Ready to start?';
         document.getElementById('word-count').textContent = '0';
         document.getElementById('score').textContent = '0';
         document.getElementById('feedback').style.display = 'none';
-        document.getElementById('difficulty').disabled = false;
-        document.getElementById('response').disabled = true;
-        document.getElementById('response').style.opacity = '0.5';
-        document.getElementById('startBtn').disabled = false;
-        document.getElementById('startBtn').style.opacity = '1';
-        document.getElementById('startBtn').style.cursor = 'pointer';
-        document.getElementById('submitBtn').disabled = true;
-        document.getElementById('submitBtn').style.opacity = '0.5';
-        document.getElementById('submitBtn').style.cursor = 'not-allowed';
     }
 </script>
 {% endblock %}
