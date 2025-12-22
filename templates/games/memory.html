@@ -43,10 +43,10 @@
 
         <!-- Controls -->
         <div style="display: flex; gap: 0.75rem; justify-content: center; margin-bottom: 2rem;">
-            <button onclick="startGame()" style="padding: 0.875rem 2rem; border-radius: 0.75rem; font-weight: 600; font-size: 1rem; border: none; cursor: pointer; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3); transition: all 250ms;">
+            <button id="startBtn" onclick="startGame()" style="padding: 0.875rem 2rem; border-radius: 0.75rem; font-weight: 600; font-size: 1rem; border: none; cursor: pointer; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3); transition: all 250ms;">
                 Start Game
             </button>
-            <button onclick="resetGame()" style="padding: 0.875rem 2rem; border-radius: 0.75rem; font-weight: 600; font-size: 1rem; border: 1px solid var(--glass-border); cursor: pointer; background: var(--glass-bg); color: var(--text-primary); transition: all 250ms;">
+            <button id="resetBtn" onclick="resetGame()" style="padding: 0.875rem 2rem; border-radius: 0.75rem; font-weight: 600; font-size: 1rem; border: 1px solid var(--glass-border); cursor: pointer; background: var(--glass-bg); color: var(--text-primary); transition: all 250ms;">
                 Reset
             </button>
         </div>
@@ -61,7 +61,7 @@
     let userSequence = [];
     let level = 1;
     let isPlaying = false;
-    let gameActive = true;
+    let gameActive = false;
 
     // Initialize game board
     function initBoard() {
@@ -79,8 +79,10 @@
             button.dataset.index = i;
             button.addEventListener('click', handleButtonClick);
             button.addEventListener('mouseover', function() {
-                this.style.transform = 'scale(1.05)';
-                this.style.boxShadow = '0 4px 12px rgba(99, 102, 241, 0.4)';
+                if (gameActive) {
+                    this.style.transform = 'scale(1.05)';
+                    this.style.boxShadow = '0 4px 12px rgba(99, 102, 241, 0.4)';
+                }
             });
             button.addEventListener('mouseout', function() {
                 this.style.transform = 'scale(1)';
@@ -102,6 +104,7 @@
             document.getElementById('message').textContent = `❌ Wrong! You reached Level ${level}. Score: ${finalScore}`;
             document.getElementById('message').style.color = 'var(--danger)';
             gameActive = false;
+            disableStartButton(false);
             saveScore();
             return;
         }
@@ -120,6 +123,7 @@
         userSequence = [];
         level = 1;
         gameActive = true;
+        disableStartButton(true);
         document.getElementById('message').textContent = '';
         updateDisplay();
         playNextLevel();
@@ -130,9 +134,17 @@
         userSequence = [];
         level = 1;
         isPlaying = false;
-        gameActive = true;
+        gameActive = false;
+        disableStartButton(false);
         updateDisplay();
         document.getElementById('message').textContent = '';
+    }
+
+    function disableStartButton(disabled) {
+        const startBtn = document.getElementById('startBtn');
+        startBtn.disabled = disabled;
+        startBtn.style.opacity = disabled ? '0.5' : '1';
+        startBtn.style.cursor = disabled ? 'not-allowed' : 'pointer';
     }
 
     function updateDisplay() {
@@ -197,5 +209,6 @@
 
     // Initialize on load
     initBoard();
+    disableStartButton(false);
 </script>
 {% endblock %}
