@@ -80,7 +80,7 @@
 
         <!-- Controls -->
         <div style="display: flex; gap: 0.75rem; margin-bottom: 2rem;">
-            <button onclick="startRound()" style="flex: 1; padding: 0.875rem 2rem; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; border: none; border-radius: 0.75rem; font-weight: 600; cursor: pointer; transition: all 250ms;">
+            <button id="startBtn" onclick="startRound()" style="flex: 1; padding: 0.875rem 2rem; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; border: none; border-radius: 0.75rem; font-weight: 600; cursor: pointer; transition: all 250ms;">
                 Start Round
             </button>
             <button onclick="submitResponse()" style="padding: 0.875rem 2rem; background: linear-gradient(135deg, var(--success) 0%, #059669 100%); color: white; border: none; border-radius: 0.75rem; font-weight: 600; cursor: pointer; transition: all 250ms;">
@@ -145,6 +145,12 @@
         document.getElementById('response').value = '';
         document.getElementById('feedback').style.display = 'none';
         
+        // Disable Start Round button
+        const startBtn = document.getElementById('startBtn');
+        startBtn.disabled = true;
+        startBtn.style.opacity = '0.5';
+        startBtn.style.cursor = 'not-allowed';
+        
         let index = 0;
         const speed = currentDifficulty === 'easy' ? 3000 : currentDifficulty === 'medium' ? 2000 : 1500;
         
@@ -157,6 +163,11 @@
             } else {
                 document.getElementById('word-display').textContent = 'Now type the words...';
                 document.getElementById('response').focus();
+                
+                // Re-enable Start Round button
+                startBtn.disabled = false;
+                startBtn.style.opacity = '1';
+                startBtn.style.cursor = 'pointer';
             }
         }
         
@@ -221,6 +232,12 @@
         document.getElementById('word-count').textContent = '0';
         document.getElementById('score').textContent = '0';
         document.getElementById('feedback').style.display = 'none';
+        
+        // Re-enable Start Round button
+        const startBtn = document.getElementById('startBtn');
+        startBtn.disabled = false;
+        startBtn.style.opacity = '1';
+        startBtn.style.cursor = 'pointer';
     }
 </script>
 {% endblock %}
