@@ -12,9 +12,9 @@ app.config['SESSION_COOKIE_SECURE'] = False
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
-USERS_FILE = 'users.json'
-SCORES_FILE = 'scores.json'
-RESET_TOKENS_FILE = 'reset_tokens.json'
+USERS_FILE = '/data/users.json'
+SCORES_FILE = '/data/scores.json'
+RESET_TOKENS_FILE = '/data/reset_tokens.json'
 
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()

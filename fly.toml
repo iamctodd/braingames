@@ -23,3 +23,7 @@ primary_region = "sjc"
   [[services.ports]]
     handlers = ["tls", "http"]
     port = 443
+
+[mounts]
+source = "brain_games_data"
+destination = "/data"
