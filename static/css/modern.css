@@ -108,6 +108,12 @@ body.day-mode .modern-nav {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    transition: all 250ms;
+}
+
+.modern-nav .brand:hover {
+    filter: brightness(1.2);
+    transform: scale(1.05);
 }
 
 /* Theme Toggle Button */
