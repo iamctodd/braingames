@@ -12,9 +12,16 @@ app.config['SESSION_COOKIE_SECURE'] = False
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
+""" Commented out for now since we're running locally without Docker. If we switch to Docker, we can uncomment these and update the file paths.
 USERS_FILE = '/data/users.json'
 SCORES_FILE = '/data/scores.json'
-RESET_TOKENS_FILE = '/data/reset_tokens.json'
+RESET_TOKENS_FILE = '/data/reset_tokens.json' """
+
+DATA_DIR = os.getenv('DATA_DIR', '.')  # Default to current dir locally, /data on Fly.io
+
+USERS_FILE = os.path.join(DATA_DIR, 'users.json')
+SCORES_FILE = os.path.join(DATA_DIR, 'scores.json')
+RESET_TOKENS_FILE = os.path.join(DATA_DIR, 'reset_tokens.json')
 
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
@@ -206,7 +213,12 @@ def save_scores(scores):
 def add_score(user_id, game_type, score, difficulty='medium'):
     scores = load_scores()
     if user_id not in scores:
-        scores[user_id] = {'memory': [], 'problem_solving': [], 'tbi_memory': []}
+        scores[user_id] = {
+            'memory': [],
+            'problem_solving': [],
+            'tbi_memory': [],
+            'stroop_test': []
+        }
     scores[user_id][game_type].append({
         'score': score,
         'difficulty': difficulty,
@@ -217,7 +229,7 @@ def add_score(user_id, game_type, score, difficulty='medium'):
 
 def get_best_score(user_id, game_type):
     scores = load_scores()
-    if user_id not in scores or not scores[user_id][game_type]:
+    if user_id not in scores or not scores[user_id].get(game_type, []):
         return 0
     return max(s['score'] for s in scores[user_id][game_type])
 
@@ -225,7 +237,7 @@ def get_game_stats(user_id, game_type):
     scores = load_scores()
     if user_id not in scores:
         return {'best': 0, 'average': 0, 'total': 0}
-    game_scores = scores[user_id][game_type]
+    game_scores = scores[user_id].get(game_type, [])
     if not game_scores:
         return {'best': 0, 'average': 0, 'total': 0}
     return {
@@ -238,7 +250,8 @@ def get_all_games_stats(user_id):
     return {
         'memory': get_game_stats(user_id, 'memory'),
         'problem_solving': get_game_stats(user_id, 'problem_solving'),
-        'tbi_memory': get_game_stats(user_id, 'tbi_memory')
+        'tbi_memory': get_game_stats(user_id, 'tbi_memory'),
+        'stroop_test': get_game_stats(user_id, 'stroop_test')
     }
 
 def get_leaderboard(game_type, limit=10):
@@ -246,7 +259,7 @@ def get_leaderboard(game_type, limit=10):
     scores = load_scores()
     leaderboard = []
     for user_id, user_data in users.items():
-        if user_id in scores and scores[user_id][game_type]:
+        if user_id in scores and scores[user_id].get(game_type, []):
             best = max(s['score'] for s in scores[user_id][game_type])
             total = len(scores[user_id][game_type])
             leaderboard.append({
@@ -356,11 +369,12 @@ def index():
     user_id, user_data = get_current_user()
     if user_id:
         stats = get_all_games_stats(user_id)
-        total = stats['memory']['total'] + stats['problem_solving']['total'] + stats['tbi_memory']['total']
+        total = stats['memory']['total'] + stats['problem_solving']['total'] + stats['tbi_memory']['total'] + stats['stroop_test']['total']
         return render_template('index.html', logged_in=True, user=user_data, total_games=total,
             memory_best=stats['memory']['best'], memory_total=stats['memory']['total'],
             problem_best=stats['problem_solving']['best'], problem_total=stats['problem_solving']['total'],
-            tbi_best=stats['tbi_memory']['best'], tbi_total=stats['tbi_memory']['total'])
+            tbi_best=stats['tbi_memory']['best'], tbi_total=stats['tbi_memory']['total'],
+            stroop_best=stats['stroop_test']['best'], stroop_total=stats['stroop_test']['total'])
     return render_template('index.html', logged_in=False)
 
 @app.route('/dashboard')
@@ -399,7 +413,8 @@ def leaderboards():
     memory_lb = get_leaderboard('memory', 10)
     problem_lb = get_leaderboard('problem_solving', 10)
     tbi_lb = get_leaderboard('tbi_memory', 10)
-    return render_template('leaderboards.html', user=user_data, memory_leaderboard=memory_lb, problem_leaderboard=problem_lb, tbi_leaderboard=tbi_lb)
+    stroop_lb = get_leaderboard('stroop_test', 10)
+    return render_template('leaderboards.html', user=user_data, memory_leaderboard=memory_lb, problem_leaderboard=problem_lb, tbi_leaderboard=tbi_lb, stroop_leaderboard=stroop_lb)
 
 @app.route('/games/memory')
 def memory():
@@ -421,6 +436,13 @@ def tbi_memory():
     best_score = get_best_score(user_id, 'tbi_memory') if user_id else 0
     total_games = get_game_stats(user_id, 'tbi_memory')['total'] if user_id else 0
     return render_template('games/tbi_memory.html', user=user_data, best_score=best_score, total_games=total_games)
+
+@app.route('/games/stroop-test')
+def stroop_test():
+    user_id, user_data = get_current_user()
+    best_score = get_best_score(user_id, 'stroop_test') if user_id else 0
+    total_games = get_game_stats(user_id, 'stroop_test')['total'] if user_id else 0
+    return render_template('games/stroop_test.html', user=user_data, best_score=best_score, total_games=total_games)
 
 @app.route('/api/save-score', methods=['POST'])
 def save_score():

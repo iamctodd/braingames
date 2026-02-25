@@ -3,107 +3,101 @@
 {% block content %}
 <div class="max-w-6xl mx-auto">
     <!-- Header -->
-    <div class="mb-12 animate-in">
-        <h1 class="text-4xl font-bold mb-2">📊 Dashboard</h1>
-        <p class="text-text-secondary">Your performance overview</p>
+    <div class="mb-8">
+        <h1 style="font-size: 2.25rem; font-weight: bold; margin-bottom: 0.5rem;">📊 Your Dashboard</h1>
+        <p style="color: var(--text-secondary);">Track your progress across all games</p>
     </div>
 
-    <!-- Stats Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-        <!-- Memory Stats -->
-        <div class="glass-card animate-in animate-in-delay-1">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-2xl font-bold">🧩 Memory</h2>
-            </div>
-            <div class="space-y-4">
-                <div class="border-b border-glass-border pb-4">
-                    <p class="text-sm text-text-muted mb-1">Best Score</p>
-                    <p class="text-3xl font-bold text-primary">{{ stats.memory.best }}</p>
+    <!-- Game Stats Cards -->
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 2rem;">
+        <!-- Memory Training Stats -->
+        <div style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; padding: 1.5rem;">
+            <h2 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem;">🧩 Memory Training</h2>
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <div>
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Best Score</p>
+                    <p style="font-size: 1.5rem; font-weight: bold; color: var(--primary);">{{ stats.memory.best }}</p>
                 </div>
-                <div class="border-b border-glass-border pb-4">
-                    <p class="text-sm text-text-muted mb-1">Average</p>
-                    <p class="text-2xl font-bold text-primary-light">{{ stats.memory.average }}</p>
+                <div>
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Average</p>
+                    <p style="font-size: 1.5rem; font-weight: bold; color: var(--primary-light);">{{ stats.memory.average }}</p>
                 </div>
-                <div class="pb-4">
-                    <p class="text-sm text-text-muted mb-1">Played</p>
-                    <p class="text-2xl font-bold text-text-primary">{{ stats.memory.total }}</p>
+                <div>
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Games Played</p>
+                    <p style="font-size: 1.5rem; font-weight: bold; color: var(--success);">{{ stats.memory.total }}</p>
                 </div>
             </div>
-            <a href="/games/memory" class="btn btn-secondary w-full mt-4">Play Game</a>
         </div>
 
         <!-- Problem Solving Stats -->
-        <div class="glass-card animate-in animate-in-delay-2">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-2xl font-bold">💡 Problem Solving</h2>
-            </div>
-            <div class="space-y-4">
-                <div class="border-b border-glass-border pb-4">
-                    <p class="text-sm text-text-muted mb-1">Best Score</p>
-                    <p class="text-3xl font-bold text-success">{{ stats.problem_solving.best }}</p>
+        <div style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; padding: 1.5rem;">
+            <h2 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem;">💡 Problem Solving</h2>
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <div>
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Best Score</p>
+                    <p style="font-size: 1.5rem; font-weight: bold; color: var(--success);">{{ stats.problem_solving.best }}</p>
                 </div>
-                <div class="border-b border-glass-border pb-4">
-                    <p class="text-sm text-text-muted mb-1">Average</p>
-                    <p class="text-2xl font-bold text-success">{{ stats.problem_solving.average }}</p>
+                <div>
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Average</p>
+                    <p style="font-size: 1.5rem; font-weight: bold; color: var(--primary-light);">{{ stats.problem_solving.average }}</p>
                 </div>
-                <div class="pb-4">
-                    <p class="text-sm text-text-muted mb-1">Played</p>
-                    <p class="text-2xl font-bold text-text-primary">{{ stats.problem_solving.total }}</p>
+                <div>
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Games Played</p>
+                    <p style="font-size: 1.5rem; font-weight: bold; color: var(--success);">{{ stats.problem_solving.total }}</p>
                 </div>
             </div>
-            <a href="/games/problem-solving" class="btn btn-secondary w-full mt-4">Play Game</a>
         </div>
 
         <!-- TBI Memory Stats -->
-        <div class="glass-card animate-in animate-in-delay-3">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-2xl font-bold">🎯 TBI Memory</h2>
-            </div>
-            <div class="space-y-4">
-                <div class="border-b border-glass-border pb-4">
-                    <p class="text-sm text-text-muted mb-1">Best Score</p>
-                    <p class="text-3xl font-bold" style="background: linear-gradient(135deg, #a78bfa 0%, #c084fc 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">{{ stats.tbi_memory.best }}</p>
+        <div style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; padding: 1.5rem;">
+            <h2 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem;">🎯 TBI Memory</h2>
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <div>
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Best Score</p>
+                    <p style="font-size: 1.5rem; font-weight: bold; color: var(--primary-light);">{{ stats.tbi_memory.best }}</p>
                 </div>
-                <div class="border-b border-glass-border pb-4">
-                    <p class="text-sm text-text-muted mb-1">Average</p>
-                    <p class="text-2xl font-bold" style="background: linear-gradient(135deg, #a78bfa 0%, #c084fc 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">{{ stats.tbi_memory.average }}</p>
+                <div>
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Average</p>
+                    <p style="font-size: 1.5rem; font-weight: bold; color: var(--primary-light);">{{ stats.tbi_memory.average }}</p>
                 </div>
-                <div class="pb-4">
-                    <p class="text-sm text-text-muted mb-1">Played</p>
-                    <p class="text-2xl font-bold text-text-primary">{{ stats.tbi_memory.total }}</p>
+                <div>
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Games Played</p>
+                    <p style="font-size: 1.5rem; font-weight: bold; color: var(--success);">{{ stats.tbi_memory.total }}</p>
                 </div>
             </div>
-            <a href="/games/tbi-memory" class="btn btn-secondary w-full mt-4">Play Game</a>
         </div>
-    </div>
 
-    <!-- Overall Stats Card -->
-    <div class="glass-card mb-12 animate-in animate-in-delay-1">
-        <h2 class="text-2xl font-bold mb-6">📈 Overall Stats</h2>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div>
-                <p class="text-sm text-text-muted mb-2">Total Games</p>
-                <p class="text-4xl font-bold text-primary">{{ stats.memory.total + stats.problem_solving.total + stats.tbi_memory.total }}</p>
-            </div>
-            <div>
-                <p class="text-sm text-text-muted mb-2">Memory Best</p>
-                <p class="text-4xl font-bold text-primary">{{ stats.memory.best }}</p>
-            </div>
-            <div>
-                <p class="text-sm text-text-muted mb-2">Problem Best</p>
-                <p class="text-4xl font-bold text-success">{{ stats.problem_solving.best }}</p>
-            </div>
-            <div>
-                <p class="text-sm text-text-muted mb-2">TBI Best</p>
-                <p class="text-4xl font-bold" style="background: linear-gradient(135deg, #a78bfa 0%, #c084fc 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">{{ stats.tbi_memory.best }}</p>
+        <!-- Stroop Test Stats -->
+        <div style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; padding: 1.5rem;">
+            <h2 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem;">🎨 Stroop Test</h2>
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <div>
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Best Score</p>
+                    <p style="font-size: 1.5rem; font-weight: bold; color: var(--secondary);">{{ stats.stroop_test.best }}%</p>
+                </div>
+                <div>
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Average</p>
+                    <p style="font-size: 1.5rem; font-weight: bold; color: var(--secondary);">{{ stats.stroop_test.average }}%</p>
+                </div>
+                <div>
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Tests Played</p>
+                    <p style="font-size: 1.5rem; font-weight: bold; color: var(--success);">{{ stats.stroop_test.total }}</p>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Navigation Links -->
-    <div class="flex gap-4 animate-in animate-in-delay-2">
-        <a href="/history" class="btn btn-primary">View Score History</a>
-        <a href="/" class="btn btn-secondary">Back to Games</a>
+    <!-- Navigation -->
+    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+        <a href="/" style="padding: 0.875rem 2rem; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; text-decoration: none; border-radius: 0.5rem; font-weight: 600; transition: all 250ms;">
+            Back to Games
+        </a>
+        <a href="/history" style="padding: 0.875rem 2rem; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-primary); text-decoration: none; border-radius: 0.5rem; font-weight: 600; transition: all 250ms;">
+            View History
+        </a>
+        <a href="/leaderboards" style="padding: 0.875rem 2rem; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-primary); text-decoration: none; border-radius: 0.5rem; font-weight: 600; transition: all 250ms;">
+            Leaderboards
+        </a>
     </div>
 </div>
 {% endblock %}

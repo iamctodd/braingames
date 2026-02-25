@@ -1,164 +1,172 @@
 {% extends "base.html" %}
-{% block title %}Home - Brain Games{% endblock %}
+{% block title %}Inference - Train Your Mind with Games{% endblock %}
 {% block content %}
 
 {% if logged_in %}
-<!-- LOGGED IN VIEW -->
+<!-- Logged In View -->
+<div class="max-w-6xl mx-auto">
+    <!-- Hero Section -->
+    <div style="text-align: center; margin-bottom: 3rem;">
+        <h1 style="font-size: 3rem; font-weight: bold; margin-bottom: 0.5rem;">Welcome back, {{ user.display_name }}! 👋</h1>
+        <p style="color: var(--text-secondary); font-size: 1.125rem;">You've played {{ total_games }} games so far</p>
+    </div>
 
-<!-- Hero Section -->
-<div class="hero animate-in">
-    <h1>Welcome Back, {{ user.display_name }}! 🎉</h1>
-    <p>Ready to challenge your mind today?</p>
-</div>
-
-<!-- Quick Stats -->
-<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-12 animate-in animate-in-delay-1">
-    <div class="stat-card">
-        <div class="stat-value">{{ total_games }}</div>
-        <div class="stat-label">Total Games</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-value">{{ memory_best }}</div>
-        <div class="stat-label">Memory Best</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-value">{{ problem_best }}</div>
-        <div class="stat-label">Problem Best</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-value">{{ tbi_best }}</div>
-        <div class="stat-label">TBI Best</div>
-    </div>
-</div>
-
-<!-- Game Cards -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-    <!-- Memory Game -->
-    <div class="game-card animate-in animate-in-delay-2">
-        <div class="game-icon">🧩</div>
-        <h3 class="game-title">Memory Training</h3>
-        <p class="game-description">Watch the pattern light up and repeat it. How many levels can you conquer?</p>
-        
-        <div class="game-stats">
-            <div class="game-stat">
-                <div class="game-stat-label">Best Score</div>
-                <div class="game-stat-value">{{ memory_best }}</div>
-            </div>
-            <div class="game-stat">
-                <div class="game-stat-label">Played</div>
-                <div class="game-stat-value">{{ memory_total }}</div>
-            </div>
+    <!-- Quick Stats -->
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 3rem;">
+        <div style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; padding: 1.5rem; text-align: center;">
+            <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">Total Games</p>
+            <p style="font-size: 2rem; font-weight: bold; color: var(--primary);">{{ total_games }}</p>
         </div>
-        
-        <a href="/games/memory" class="btn btn-primary w-full">Play Now</a>
-    </div>
-
-    <!-- Problem Solving Game -->
-    <div class="game-card animate-in animate-in-delay-2" style="animation-delay: 0.25s;">
-        <div class="game-icon">💡</div>
-        <h3 class="game-title">Problem Solving</h3>
-        <p class="game-description">Tackle real-world case studies and showcase your critical thinking skills.</p>
-        
-        <div class="game-stats">
-            <div class="game-stat">
-                <div class="game-stat-label">Best Score</div>
-                <div class="game-stat-value">{{ problem_best }}</div>
-            </div>
-            <div class="game-stat">
-                <div class="game-stat-label">Played</div>
-                <div class="game-stat-value">{{ problem_total }}</div>
-            </div>
+        <div style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; padding: 1.5rem; text-align: center;">
+            <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">Memory Best</p>
+            <p style="font-size: 2rem; font-weight: bold; color: var(--primary);">{{ memory_best }}</p>
         </div>
-        
-        <a href="/games/problem-solving" class="btn btn-success w-full">Play Now</a>
-    </div>
-
-    <!-- TBI Memory Game -->
-    <div class="game-card animate-in animate-in-delay-2" style="animation-delay: 0.3s;">
-        <div class="game-icon">🎯</div>
-        <h3 class="game-title">TBI Memory</h3>
-        <p class="game-description">Remember words as they flash on screen. Train your recall abilities.</p>
-        
-        <div class="game-stats">
-            <div class="game-stat">
-                <div class="game-stat-label">Best Score</div>
-                <div class="game-stat-value">{{ tbi_best }}</div>
-            </div>
-            <div class="game-stat">
-                <div class="game-stat-label">Played</div>
-                <div class="game-stat-value">{{ tbi_total }}</div>
-            </div>
+        <div style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; padding: 1.5rem; text-align: center;">
+            <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">Problem Best</p>
+            <p style="font-size: 2rem; font-weight: bold; color: var(--success);">{{ problem_best }}</p>
         </div>
-        
-        <a href="/games/tbi-memory" class="btn btn-primary w-full">Play Now</a>
+        <div style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; padding: 1.5rem; text-align: center;">
+            <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">Stroop Best</p>
+            <p style="font-size: 2rem; font-weight: bold; color: var(--primary-light);">{{ stroop_best }}%</p>
+        </div>
     </div>
-</div>
 
-<!-- CTA Section with Button -->
-<div class="cta-section animate-in animate-in-delay-3" style="text-align: center;">
-    <h2>Climb the Leaderboards! 🏆</h2>
-    <p>See how you rank against other players worldwide</p>
-    <a href="/leaderboards" class="btn btn-secondary" style="margin-top: 1rem;">View Leaderboards</a>
+    <!-- Game Cards -->
+    <div style="margin-bottom: 3rem;">
+        <h2 style="font-size: 1.875rem; font-weight: bold; margin-bottom: 1.5rem;">Play Games</h2>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem;">
+            <!-- Memory Training -->
+            <a href="/games/memory" style="text-decoration: none;">
+                <div style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; padding: 1.5rem; transition: all 250ms; cursor: pointer;"
+                     onmouseover="this.style.borderColor = 'var(--primary)'; this.style.background = 'rgba(99, 102, 241, 0.1)'; this.style.transform = 'translateY(-4px)'"
+                     onmouseout="this.style.borderColor = 'var(--glass-border)'; this.style.background = 'var(--glass-bg)'; this.style.transform = 'translateY(0)'">
+                    <p style="font-size: 2rem; margin-bottom: 0.5rem;">🧩</p>
+                    <h3 style="font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">Memory Training</h3>
+                    <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1rem;">Best: {{ memory_best }} | Played: {{ memory_total }}</p>
+                    <button style="padding: 0.5rem 1rem; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; border: none; border-radius: 0.375rem; font-size: 0.875rem; cursor: pointer;">Play</button>
+                </div>
+            </a>
+
+            <!-- Problem Solving -->
+            <a href="/games/problem-solving" style="text-decoration: none;">
+                <div style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; padding: 1.5rem; transition: all 250ms; cursor: pointer;"
+                     onmouseover="this.style.borderColor = 'var(--success)'; this.style.background = 'rgba(16, 185, 129, 0.1)'; this.style.transform = 'translateY(-4px)'"
+                     onmouseout="this.style.borderColor = 'var(--glass-border)'; this.style.background = 'var(--glass-bg)'; this.style.transform = 'translateY(0)'">
+                    <p style="font-size: 2rem; margin-bottom: 0.5rem;">💡</p>
+                    <h3 style="font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">Problem Solving</h3>
+                    <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1rem;">Best: {{ problem_best }} | Played: {{ problem_total }}</p>
+                    <button style="padding: 0.5rem 1rem; background: linear-gradient(135deg, var(--success) 0%, #059669 100%); color: white; border: none; border-radius: 0.375rem; font-size: 0.875rem; cursor: pointer;">Play</button>
+                </div>
+            </a>
+
+            <!-- TBI Memory -->
+            <a href="/games/tbi-memory" style="text-decoration: none;">
+                <div style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; padding: 1.5rem; transition: all 250ms; cursor: pointer;"
+                     onmouseover="this.style.borderColor = 'var(--primary-light)'; this.style.background = 'rgba(167, 139, 250, 0.1)'; this.style.transform = 'translateY(-4px)'"
+                     onmouseout="this.style.borderColor = 'var(--glass-border)'; this.style.background = 'var(--glass-bg)'; this.style.transform = 'translateY(0)'">
+                    <p style="font-size: 2rem; margin-bottom: 0.5rem;">🎯</p>
+                    <h3 style="font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">TBI Memory</h3>
+                    <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1rem;">Best: {{ tbi_best }} | Played: {{ tbi_total }}</p>
+                    <button style="padding: 0.5rem 1rem; background: linear-gradient(135deg, var(--primary-light) 0%, #a78bfa 100%); color: white; border: none; border-radius: 0.375rem; font-size: 0.875rem; cursor: pointer;">Play</button>
+                </div>
+            </a>
+
+            <!-- Stroop Test -->
+            <a href="/games/stroop-test" style="text-decoration: none;">
+                <div style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; padding: 1.5rem; transition: all 250ms; cursor: pointer;"
+                     onmouseover="this.style.borderColor = 'var(--secondary)'; this.style.background = 'rgba(236, 72, 153, 0.1)'; this.style.transform = 'translateY(-4px)'"
+                     onmouseout="this.style.borderColor = 'var(--glass-border)'; this.style.background = 'var(--glass-bg)'; this.style.transform = 'translateY(0)'">
+                    <p style="font-size: 2rem; margin-bottom: 0.5rem;">🎨</p>
+                    <h3 style="font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">Stroop Test</h3>
+                    <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1rem;">Best: {{ stroop_best }}% | Played: {{ stroop_total }}</p>
+                    <button style="padding: 0.5rem 1rem; background: linear-gradient(135deg, var(--secondary) 0%, #ec4899 100%); color: white; border: none; border-radius: 0.375rem; font-size: 0.875rem; cursor: pointer;">Play</button>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    <div style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; padding: 2rem; text-align: center;">
+        <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem;">Ready for a Challenge?</h2>
+        <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Check out the leaderboards to see how you rank against other players</p>
+        <a href="/leaderboards" style="display: inline-block; padding: 0.875rem 2rem; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; text-decoration: none; border-radius: 0.5rem; font-weight: 600; transition: all 250ms;">
+            View Leaderboards →
+        </a>
+    </div>
 </div>
 
 {% else %}
-<!-- NOT LOGGED IN VIEW -->
-
-<!-- Hero Section -->
-<div class="hero animate-in">
-    <h1>Train Your Brain 🧠</h1>
-    <p>Challenge yourself with scientifically-designed cognitive games</p>
+<!-- Logged Out View -->
+<div style="text-align: center; margin-bottom: 3rem;">
+    <h1 style="font-size: 3rem; font-weight: bold; margin-bottom: 0.5rem;">Train Your Brain 🧠</h1>
+    <p style="color: var(--text-secondary); font-size: 1.125rem;">Improve your memory and cognitive skills with our brain training games</p>
 </div>
 
 <!-- CTA Section -->
-<div class="cta-section mb-12 animate-in animate-in-delay-1">
-    <h2>Start Your Journey Today</h2>
-    <p>Track your progress, compete globally, and improve your cognitive skills</p>
-    <div class="flex gap-4 justify-center flex-wrap">
-        <a href="/signup" class="btn btn-secondary">Sign Up Free</a>
-        <a href="/login" class="btn" style="background: rgba(255,255,255,0.2);">Sign In</a>
+<div style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; padding: 2rem; text-align: center; margin-bottom: 3rem;">
+    <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem;">Get Started Today</h2>
+    <div style="display: flex; gap: 1rem; justify-content: center;">
+        <a href="/signup" style="padding: 0.875rem 2rem; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; text-decoration: none; border-radius: 0.5rem; font-weight: 600;">
+            Sign Up
+        </a>
+        <a href="/login" style="padding: 0.875rem 2rem; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-primary); text-decoration: none; border-radius: 0.5rem; font-weight: 600;">
+            Sign In
+        </a>
     </div>
 </div>
 
 <!-- Game Preview Cards -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-    <div class="game-card animate-in animate-in-delay-2">
-        <div class="game-icon">🧩</div>
-        <h3 class="game-title">Memory Training</h3>
-        <p class="game-description">Watch patterns light up and test your recall abilities through increasingly difficult levels.</p>
-    </div>
+<div style="margin-bottom: 3rem;">
+    <h2 style="font-size: 1.875rem; font-weight: bold; margin-bottom: 1.5rem;">Our Games</h2>
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem;">
+        <!-- Memory Training -->
+        <div style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; padding: 1.5rem; text-align: center;">
+            <p style="font-size: 2rem; margin-bottom: 0.5rem;">🧩</p>
+            <h3 style="font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">Memory Training</h3>
+            <p style="font-size: 0.875rem; color: var(--text-muted);">Watch and repeat color patterns</p>
+        </div>
 
-    <div class="game-card animate-in animate-in-delay-2" style="animation-delay: 0.25s;">
-        <div class="game-icon">💡</div>
-        <h3 class="game-title">Problem Solving</h3>
-        <p class="game-description">Solve real-world business case studies and sharpen your analytical thinking.</p>
-    </div>
+        <!-- Problem Solving -->
+        <div style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; padding: 1.5rem; text-align: center;">
+            <p style="font-size: 2rem; margin-bottom: 0.5rem;">💡</p>
+            <h3 style="font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">Problem Solving</h3>
+            <p style="font-size: 0.875rem; color: var(--text-muted);">Solve real-world case studies</p>
+        </div>
 
-    <div class="game-card animate-in animate-in-delay-2" style="animation-delay: 0.3s;">
-        <div class="game-icon">🎯</div>
-        <h3 class="game-title">TBI Memory</h3>
-        <p class="game-description">Build recall strength by remembering sequences of words at increasing speeds.</p>
+        <!-- TBI Memory -->
+        <div style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; padding: 1.5rem; text-align: center;">
+            <p style="font-size: 2rem; margin-bottom: 0.5rem;">🎯</p>
+            <h3 style="font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">TBI Memory</h3>
+            <p style="font-size: 0.875rem; color: var(--text-muted);">Remember words as they flash</p>
+        </div>
+
+        <!-- Stroop Test -->
+        <div style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; padding: 1.5rem; text-align: center;">
+            <p style="font-size: 2rem; margin-bottom: 0.5rem;">🎨</p>
+            <h3 style="font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">Stroop Test</h3>
+            <p style="font-size: 0.875rem; color: var(--text-muted);">Match colors, not words</p>
+        </div>
     </div>
 </div>
 
 <!-- Features Section -->
-<div class="glass-card mb-12 animate-in animate-in-delay-3">
-    <h2 class="text-3xl font-bold mb-8 text-center">Why Brain Games?</h2>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div class="text-center">
-            <div class="text-5xl mb-4">📊</div>
-            <h3 class="text-xl font-bold mb-2">Track Progress</h3>
-            <p class="text-text-secondary">Monitor your improvement with detailed statistics and performance analytics</p>
+<div style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; padding: 2rem;">
+    <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem; text-align: center;">Why Brain Games?</h2>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem;">
+        <div style="text-align: center;">
+            <p style="font-size: 1.5rem; margin-bottom: 0.5rem;">📊</p>
+            <h3 style="font-weight: 600; margin-bottom: 0.5rem;">Track Progress</h3>
+            <p style="font-size: 0.875rem; color: var(--text-muted);">Monitor your improvements over time</p>
         </div>
-        <div class="text-center">
-            <div class="text-5xl mb-4">🏆</div>
-            <h3 class="text-xl font-bold mb-2">Global Competition</h3>
-            <p class="text-text-secondary">Compete on leaderboards and see how you stack up against players worldwide</p>
+        <div style="text-align: center;">
+            <p style="font-size: 1.5rem; margin-bottom: 0.5rem;">🏆</p>
+            <h3 style="font-weight: 600; margin-bottom: 0.5rem;">Global Competition</h3>
+            <p style="font-size: 0.875rem; color: var(--text-muted);">Compete with players worldwide</p>
         </div>
-        <div class="text-center">
-            <div class="text-5xl mb-4">🧠</div>
-            <h3 class="text-xl font-bold mb-2">Cognitive Training</h3>
-            <p class="text-text-secondary">Scientifically-designed exercises to boost memory, focus, and problem-solving</p>
+        <div style="text-align: center;">
+            <p style="font-size: 1.5rem; margin-bottom: 0.5rem;">🧠</p>
+            <h3 style="font-weight: 600; margin-bottom: 0.5rem;">Cognitive Training</h3>
+            <p style="font-size: 0.875rem; color: var(--text-muted);">Improve memory and focus</p>
         </div>
     </div>
 </div>

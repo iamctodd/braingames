@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+{% block title %}Stroop Test{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <!-- Back Button -->
+    <a href="/" class="inline-block mb-6 text-primary hover:text-primary-light font-semibold transition-colors">← Back to Home</a>
+
+    <!-- Game Container -->
+    <div class="glass-card animate-in">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem;">
+            <div>
+                <h1 style="font-size: 2.25rem; font-weight: bold; margin-bottom: 0.5rem;">🎨 Stroop Test</h1>
+                <p style="color: var(--text-secondary);">What color is the word? Not what the word says!</p>
+            </div>
+            <div style="text-align: right;">
+                <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.25rem;">Best Score</p>
+                <p style="font-size: 1.875rem; font-weight: bold; color: var(--primary);">{{ best_score }}%</p>
+                {% if total_games > 0 %}
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">Tests: {{ total_games }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Instructions -->
+        <div style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; padding: 1rem; margin-bottom: 2rem;">
+            <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.5rem;">
+                💡 <strong>How to play:</strong> A color name will appear in a different color. Click the button that matches the COLOR, not the word!
+            </p>
+            <p style="font-size: 0.75rem; color: var(--text-muted);">
+                Example: If you see the word "RED" printed in blue, click the BLUE button.
+            </p>
+        </div>
+
+        <!-- Stats Row -->
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--glass-border);">
+            <div style="text-align: center;">
+                <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">Correct</p>
+                <p style="font-size: 1.875rem; font-weight: bold; color: var(--success);" id="correct">0</p>
+            </div>
+            <div style="text-align: center;">
+                <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">Question</p>
+                <p style="font-size: 1.875rem; font-weight: bold; color: var(--primary);" id="question">1 of 10</p>
+            </div>
+            <div style="text-align: center;">
+                <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">Accuracy</p>
+                <p style="font-size: 1.875rem; font-weight: bold; color: var(--primary-light);" id="accuracy">0%</p>
+            </div>
+        </div>
+
+        <!-- Color Display -->
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <p id="colorWord" style="font-size: 4rem; font-weight: bold; margin-bottom: 1rem;">Ready?</p>
+            <p style="color: var(--text-secondary); font-size: 0.875rem;">What color is the word above?</p>
+        </div>
+
+        <!-- Color Options -->
+        <div id="colorOptions" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 2rem; max-width: 400px; margin-left: auto; margin-right: auto;">
+        </div>
+
+        <!-- Controls -->
+        <div style="display: flex; gap: 0.75rem; justify-content: center; margin-bottom: 2rem;">
+            <button id="startBtn" onclick="startTest()" style="flex: 1; padding: 0.875rem 2rem; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; border: none; border-radius: 0.75rem; font-weight: 600; cursor: pointer; transition: all 250ms;">
+                Start Test
+            </button>
+            <button onclick="resetGame()" style="padding: 0.875rem 2rem; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-primary); border-radius: 0.75rem; font-weight: 600; cursor: pointer; transition: all 250ms;">
+                Reset
+            </button>
+        </div>
+
+        <!-- Feedback -->
+        <div id="feedback" style="display: none; margin-bottom: 1.5rem; text-align: center; font-size: 1.125rem; font-weight: 600;"></div>
+
+        <!-- Final Score -->
+        <div id="finalScore" style="display: none; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; padding: 2rem; text-align: center; margin-bottom: 2rem;">
+            <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">Test Complete!</p>
+            <p style="font-size: 3rem; font-weight: bold; color: var(--success); margin-bottom: 1rem;" id="finalPercentage">0%</p>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                You got <span id="finalCorrect" style="font-weight: 600;">0</span> out of 10 correct
+            </p>
+            <button onclick="startTest()" style="padding: 0.875rem 2rem; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; border: none; border-radius: 0.75rem; font-weight: 600; cursor: pointer; transition: all 250ms;">
+                Try Again
+            </button>
+        </div>
+
+        <!-- Score -->
+        <div style="text-align: center; padding-top: 1.5rem; border-top: 1px solid var(--glass-border);">
+            <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">Session Score</p>
+            <p style="font-size: 1.875rem; font-weight: bold; color: var(--primary);" id="score">0</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    const colors = [
+        { name: 'RED', hex: '#ef4444' },
+        { name: 'BLUE', hex: '#3b82f6' },
+        { name: 'GREEN', hex: '#10b981' },
+        { name: 'YELLOW', hex: '#eab308' },
+        { name: 'PURPLE', hex: '#a855f7' },
+        { name: 'ORANGE', hex: '#f97316' }
+    ];
+
+    let currentQuestion = 0;
+    let correctAnswers = 0;
+    let sessionScore = 0;
+    let gameActive = false;
+    let currentColor = null;
+    let currentDisplayColor = null;
+
+    function initColorOptions() {
+        const options = document.getElementById('colorOptions');
+        options.innerHTML = '';
+        
+        colors.forEach(color => {
+            const button = document.createElement('button');
+            button.textContent = color.name;
+            button.style.padding = '1rem';
+            button.style.background = 'var(--glass-bg)';
+            button.style.border = '2px solid var(--glass-border)';
+            button.style.borderRadius = '0.5rem';
+            button.style.color = 'var(--text-primary)';
+            button.style.fontWeight = '600';
+            button.style.cursor = 'pointer';
+            button.style.transition = 'all 250ms';
+            button.style.fontSize = '1rem';
+            button.dataset.colorName = color.name;
+            button.dataset.colorHex = color.hex;
+            
+            button.addEventListener('mouseover', function() {
+                this.style.borderColor = 'var(--primary)';
+                this.style.background = 'rgba(99, 102, 241, 0.1)';
+            });
+            
+            button.addEventListener('mouseout', function() {
+                this.style.borderColor = 'var(--glass-border)';
+                this.style.background = 'var(--glass-bg)';
+            });
+            
+            button.addEventListener('click', () => handleAnswer(color.name));
+            
+            options.appendChild(button);
+        });
+    }
+
+    function startTest() {
+        currentQuestion = 0;
+        correctAnswers = 0;
+        gameActive = true;
+        document.getElementById('startBtn').disabled = true;
+        document.getElementById('startBtn').style.opacity = '0.5';
+        document.getElementById('startBtn').style.cursor = 'not-allowed';
+        document.getElementById('finalScore').style.display = 'none';
+        document.getElementById('feedback').style.display = 'none';
+        
+        nextQuestion();
+    }
+
+    function nextQuestion() {
+        if (currentQuestion >= 10) {
+            endTest();
+            return;
+        }
+
+        currentQuestion++;
+        const wordIndex = Math.floor(Math.random() * colors.length);
+        const displayIndex = Math.floor(Math.random() * colors.length);
+        
+        currentColor = colors[wordIndex];
+        currentDisplayColor = colors[displayIndex];
+        
+        document.getElementById('colorWord').textContent = currentColor.name;
+        document.getElementById('colorWord').style.color = currentDisplayColor.hex;
+        document.getElementById('question').textContent = `${currentQuestion} of 10`;
+        document.getElementById('feedback').style.display = 'none';
+        
+        updateStats();
+    }
+
+    function handleAnswer(selectedColor) {
+        if (!gameActive) return;
+        
+        const isCorrect = selectedColor === currentDisplayColor.name;
+        const feedback = document.getElementById('feedback');
+        
+        if (isCorrect) {
+            correctAnswers++;
+            feedback.textContent = '✅ Correct!';
+            feedback.style.color = 'var(--success)';
+        } else {
+            feedback.textContent = `❌ Wrong! It was ${currentDisplayColor.name}`;
+            feedback.style.color = 'var(--danger)';
+        }
+        
+        feedback.style.display = 'block';
+        updateStats();
+        
+        setTimeout(() => {
+            nextQuestion();
+        }, 1500);
+    }
+
+    function updateStats() {
+        document.getElementById('correct').textContent = correctAnswers;
+        const accuracy = currentQuestion > 0 ? Math.round((correctAnswers / currentQuestion) * 100) : 0;
+        document.getElementById('accuracy').textContent = accuracy + '%';
+    }
+
+    function endTest() {
+        gameActive = false;
+        const finalPercentage = Math.round((correctAnswers / 10) * 100);
+        sessionScore += finalPercentage;
+        
+        document.getElementById('finalPercentage').textContent = finalPercentage + '%';
+        document.getElementById('finalCorrect').textContent = correctAnswers;
+        document.getElementById('finalScore').style.display = 'block';
+        document.getElementById('score').textContent = sessionScore;
+        
+        document.getElementById('startBtn').disabled = false;
+        document.getElementById('startBtn').style.opacity = '1';
+        document.getElementById('startBtn').style.cursor = 'pointer';
+        
+        // Save score
+        fetch('/api/save-score', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                game_type: 'stroop_test',
+                score: finalPercentage,
+                difficulty: 'medium'
+            })
+        })
+        .then(r => r.json())
+        .then(data => {
+            console.log('Score saved:', data);
+        });
+    }
+
+    function resetGame() {
+        currentQuestion = 0;
+        correctAnswers = 0;
+        sessionScore = 0;
+        gameActive = false;
+        
+        document.getElementById('colorWord').textContent = 'Ready?';
+        document.getElementById('colorWord').style.color = 'var(--primary)';
+        document.getElementById('correct').textContent = '0';
+        document.getElementById('question').textContent = '1 of 10';
+        document.getElementById('accuracy').textContent = '0%';
+        document.getElementById('score').textContent = '0';
+        document.getElementById('feedback').style.display = 'none';
+        document.getElementById('finalScore').style.display = 'none';
+        
+        document.getElementById('startBtn').disabled = false;
+        document.getElementById('startBtn').style.opacity = '1';
+        document.getElementById('startBtn').style.cursor = 'pointer';
+    }
+
+    // Initialize
+    initColorOptions();
+</script>
+{% endblock %}
