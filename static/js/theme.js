@@ -6,7 +6,7 @@
 const ThemeManager = {
   LIGHT: 'light',
   DARK: 'dark',
-  STORAGE_KEY: 'braingames_theme',
+  STORAGE_KEY: 'inference_theme',
 
   /**
    * Initialize theme on page load

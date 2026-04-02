@@ -29,7 +29,7 @@ def hash_password(password):
 # Initialize default users
 def init_default_users():
     default_users = {
-        "demo@braingames.com": {
+        "demo@inference.app": {
             "password": hash_password("demo123"),
             "display_name": "Demo User",
             "created_at": "2025-12-16 12:00:00",
